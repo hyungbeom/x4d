@@ -6,9 +6,9 @@ import { easing } from 'maath'
 
 export function Robot(props:any) {
 
-    const head = useRef(null)
-    const stripe = useRef(null)
-    const light = useRef(null)
+    const head:any = useRef(null)
+    const stripe:any = useRef(null)
+    const light:any = useRef(null)
 
     const { nodes, materials }:any = useGLTF('/model/progist/robot.glb');
 

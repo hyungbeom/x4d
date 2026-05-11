@@ -4,7 +4,7 @@
 import { Canvas } from "@react-three/fiber";
 import { View } from "@react-three/drei";
 import {EffectComposer, Noise} from "@react-three/postprocessing";
-import { NodeToyTick } from '@nodetoy/react-nodetoy';
+
 export default function GlobalCanvas() {
 
     return (
@@ -29,7 +29,6 @@ export default function GlobalCanvas() {
 
             <View.Port />
 
-            <NodeToyTick />
         </Canvas>
     );
 }

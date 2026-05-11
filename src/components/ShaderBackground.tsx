@@ -112,7 +112,9 @@ function QuantumParticleField({ count = 500 }) {
         }
     });
 
+
     return (
+        // @ts-ignore
         <points ref={pointsRef} renderOrder={-0.5} depthTest={false}>
             <bufferGeometry {...geometry} />
             <pointsMaterial
@@ -143,7 +145,7 @@ export default function QuantumFieldBackground() {
         <>
             <Plane args={[2, 2]} renderOrder={-1}>
                 {/* 등록한 커스텀 쉐이더 재질 적용 */}
-                <dynamicGradientMaterial ref={materialRef} depthTest={false} depthWrite={false} />
+
             </Plane>
             <QuantumParticleField count={800} /> {/* 수백 개의 입자 추가 */}
         </>

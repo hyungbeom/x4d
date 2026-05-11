@@ -236,7 +236,7 @@ export default function NextSection() {
 
 
                                 </ModelAnimator>
-
+                                {/*@ts-ignored*/}
                                 <EffectComposer disableNormalPass>
                                     <Bloom luminanceThreshold={3} mipmapBlur intensity={1.2}/>
                                     <ToneMapping/>

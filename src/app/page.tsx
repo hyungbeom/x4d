@@ -1,6 +1,7 @@
 // app/page.tsx (또는 Home.tsx)
 "use client";
 
+import * as THREE from "three";
 import { Suspense } from 'react'; // Suspense 추가
 import { Canvas } from '@react-three/fiber'
 import { Environment, Grid, OrbitControls, Stage } from '@react-three/drei'
@@ -63,10 +64,11 @@ export default function Home() {
                 </Suspense>
 
                 <Grid renderOrder={-1} position={[0, -1.85, 0]} infiniteGrid cellSize={0.6} cellThickness={0.6}
-                      sectionSize={3.3} sectionThickness={1.5} sectionColor={[0.5, 0.5, 10]} fadeDistance={30}/>
+                      sectionSize={3.3} sectionThickness={1.5} sectionColor={new THREE.Color(0.5, 0.5, 10)} fadeDistance={30}/>
                 <OrbitControls autoRotate autoRotateSpeed={0.05} enableZoom={false} makeDefault
                                minPolarAngle={Math.PI / 2} maxPolarAngle={Math.PI / 2}/>
 
+                {/*@ts-ignored*/}
                 <EffectComposer disableNormalPass>
                     <Bloom luminanceThreshold={2} mipmapBlur/>
                     <ToneMapping/>

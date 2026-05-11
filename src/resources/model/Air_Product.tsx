@@ -4,8 +4,8 @@ import { useFrame } from '@react-three/fiber';
 
 // 🌟 1. 회로 라인 애니메이션을 담당하는 하위 컴포넌트 추가
 function CircuitPart({ name, geometry, position }: any) {
-        const stripe = useRef<any>(null);
-        const light = useRef<any>(null);
+        const stripe:any = useRef<any>(null);
+        const light:any = useRef<any>(null);
 
         useFrame((state) => {
                 // 빛의 깜빡임/색상 변화 계산
