@@ -80,7 +80,7 @@ export default function Home() {
                             cellThickness={1}
                             sectionSize={1}
                             sectionThickness={1.5}
-                            sectionColor={[0.5, 0.5, 10]}
+                            sectionColor={new THREE.Color(0.5, 0.5, 1)}
                             fadeDistance={35}
                         />
 
@@ -97,7 +97,7 @@ export default function Home() {
                             maxPolarAngle={Math.PI / 2}
                         />
 
-                        <EffectComposer disableNormalPass>
+                        <EffectComposer>
                             <Bloom luminanceThreshold={2} mipmapBlur/>
                             <ToneMapping/>
                         </EffectComposer>
