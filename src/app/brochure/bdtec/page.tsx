@@ -44,13 +44,36 @@ export default function Home() {
             {/* =======================================================
                 [섹션 A] 기존 3D 홀로그램 스크롤 영역 (z-index: 1)
             ======================================================= */}
-            <div className="scroll-container" style={{position: 'relative', width: '100vw', height: '700vh', backgroundColor: 'black'}}>
-                <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh'}}>
+            <div
+                className="scroll-container"
+                style={{
+                    position: 'relative',
+                    width: '100vw',
+                    height: '700vh',
+                    backgroundColor: 'black',
+                    touchAction: 'pan-y',
+                }}
+            >
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        pointerEvents: 'none',
+                    }}
+                >
                     <Overlay1/>
                     <Overlay2/>
                     <Overlay3/>
 
-                    <Canvas flat shadows camera={{position: [-15, 0, 10], fov: 55}}>
+                    <Canvas
+                        flat
+                        shadows
+                        style={{pointerEvents: 'none', touchAction: 'pan-y'}}
+                        camera={{position: [-15, 0, 10], fov: 55}}
+                    >
                         <ambientLight intensity={1.5}/>
                         <directionalLight position={[10, 10, 10]} intensity={2} color="#ffffff"/>
                         <directionalLight position={[-10, 5, -10]} intensity={0.5} color="#ffffff"/>
@@ -90,7 +113,7 @@ export default function Home() {
                             autoRotateSpeed={1.5}
                             enableZoom={false}
                             enablePan={false}
-                            enableRotate={isAutoRotate}
+                            enableRotate={false}
                             makeDefault
                             target={[0, 2, 0]}
                             minPolarAngle={Math.PI / 2 - 0.15}
