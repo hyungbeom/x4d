@@ -20,7 +20,8 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "three": "^0.164.0",
-    "three-stdlib": "^2.36.1"
+    "three-stdlib": "^2.36.1",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@types/node": "^20",

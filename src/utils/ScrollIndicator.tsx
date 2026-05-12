@@ -2,13 +2,13 @@ import React from 'react';
 
 export default function ScrollIndicator() {
     // 공통 스타일 정의
-    const containerStyle = {
+    const containerStyle: React.CSSProperties = {
         position: 'relative',
         width: '24px',
         height: '24px',
     };
 
-    const chevronStyle = {
+    const chevronStyle: React.CSSProperties = {
         position: 'absolute',
         width: '28px',
         height: '8px',
@@ -17,7 +17,7 @@ export default function ScrollIndicator() {
     };
 
     // :before, :after를 대체할 내부 div 스타일
-    const beforeStyle = {
+    const beforeStyle: React.CSSProperties = {
         position: 'absolute',
         top: 0,
         left: 0,
@@ -27,7 +27,7 @@ export default function ScrollIndicator() {
         transform: 'skew(0deg, 30deg)',
     };
 
-    const afterStyle = {
+    const afterStyle: React.CSSProperties = {
         position: 'absolute',
         top: 0,
         right: 0,
@@ -37,7 +37,7 @@ export default function ScrollIndicator() {
         transform: 'skew(0deg, -30deg)',
     };
 
-    const textStyle = {
+    const textStyle: React.CSSProperties = {
         display: 'block',
         marginTop: '75px',
         marginLeft: '-30px',

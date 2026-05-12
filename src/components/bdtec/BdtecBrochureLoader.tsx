@@ -2,8 +2,7 @@
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useProgress} from "@react-three/drei";
-import gsap from "gsap";
-import {ScrollTrigger} from "gsap/ScrollTrigger";
+import { gsap, ScrollTrigger } from "@/lib/brochureGsap";
 
 const AFTER_READY_MS = 3000;
 const FORCE_DONE_MS = 14_000;
@@ -65,8 +64,18 @@ export default function BdtecBrochureLoader() {
 
     useEffect(() => {
         const bar = barFillRef.current;
-        if (bar) gsap.to(bar, {width: `${pct}%`, duration: 0.22, ease: "power2.out"});
+        if (!bar) return;
+        gsap.to(bar, { width: `${pct}%`, duration: 0.22, ease: "power2.out" });
+        return () => {
+            gsap.killTweensOf(bar);
+        };
     }, [pct]);
+
+    useEffect(() => {
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, []);
 
     useEffect(() => {
         if (active) sawLoadingRef.current = true;
