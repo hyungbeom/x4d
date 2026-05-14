@@ -1,3 +1,4 @@
+'use client'
 
 import Overlay1 from "@/components/bdtec/overlay/OverLay1";
 import ScrollIndicator from "@/utils/ScrollIndicator";
