@@ -34,9 +34,7 @@ export default function Home() {
     const onLoad = (app: any) => {
         splineApp.current = app;
 
-        console.log("🧐 현재 로드된 변수 목록:", app.getVariables());
 
-        const obj = app.findObjectByName('main_paint');
         const camera = app.findObjectByName('Camera');
 
         // =========================================================
@@ -75,63 +73,6 @@ export default function Home() {
             // GSAP의 ticker(매 프레임 실행)에 추적 함수를 달아줌!
             gsap.ticker.add(trackPosition);
         }
-
-        if (obj) {
-            paintCaseRef.current = obj;
-            console.log("🎉 주인공 로드 성공!");
-
-            const glbMaterials: any[] = [];
-
-            if (threeScene) {
-                const junkGroup = threeScene.getObjectByName('junk_group');
-                if (junkGroup) {
-                    junkGroup.traverse((child: any) => {
-                        if (child.isMesh && child.material) {
-                            const mats = Array.isArray(child.material) ? child.material : [child.material];
-                            mats.forEach((mat: any) => {
-                                mat.transparent = true;
-                                mat.needsUpdate = true;
-                                mat.depthWrite = false;
-                                glbMaterials.push(mat);
-                            });
-                        }
-                    });
-                }
-            }
-
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: mainContainerRef.current,
-                    start: "top top",
-                    end: "bottom bottom",
-                    scrub: 1,
-                }
-            });
-
-            tl.to(obj.rotation, { x: (178.7 - 360) * (Math.PI / 180), ease: "none" }, 0);
-            tl.to(obj.position, { y: -38.3, z: 1866, ease: "none" }, 0);
-            if (camera) {
-                tl.to(camera.position, { z: camera.position.z - 3000, ease: "none" }, 0);
-            }
-
-            const fadeProxy = { val: 100 };
-            tl.to(fadeProxy, {
-                val: 0,
-                ease: "none",
-                onUpdate: () => {
-                    if (app.setVariable) {
-                        app.setVariable('junkOpacity', fadeProxy.val);
-                    }
-                    const targetOpacity = fadeProxy.val / 100;
-                    glbMaterials.forEach(mat => {
-                        mat.opacity = targetOpacity;
-                    });
-                }
-            }, 0);
-
-        } else {
-            console.warn("⚠️ main_paint를 찾을 수 없습니다! Spline 에디터에서 이름을 확인하세요.");
-        }
     };
 
 
@@ -144,16 +85,16 @@ export default function Home() {
 
         if (realCamera) {
             // 1. 캡처 이미지의 Position 수치
-            const targetX = -240;
-            const targetY = 327.3;
-            const targetZ = 301.4;
+            const targetX = -950;  // 👈 이 값을 수정했습니다.
+            const targetY = 327.3; // Y값 유지
+            const targetZ = 301.4; // Z값 유지
 
-            // 2. 캡처 이미지의 Rotation 수치
-            // (스플라인은 각도(Degree)를 쓰지만, Three.js는 라디안(Radian)을 쓰므로 변환해줍니다)
-            const rotX = -8.48 * (Math.PI / 180);
-            const rotY = -29 * (Math.PI / 180);
-            const rotZ = -5.29 * (Math.PI / 180);
+            // 2. Rotation 수치 (소수점 정리 및 라디안 변환)
+            const rotX = -8.5 * (Math.PI / 180); // 기존 -8.48 -> -8.5 정리
+            const rotY = -29 * (Math.PI / 180);  // 유지
+            const rotZ = -5.3 * (Math.PI / 180); // 기존 -5.29 -> -5.3 정리
 
+            // ... (아래 GSAP 애니메이션 코드는 그대로 유지)
             // 3. 캡처 이미지의 Zoom 수치
             const targetZoom = 2.80;
 
