@@ -1,7 +1,7 @@
 // components/ScrollIndicator.tsx
 import React from 'react';
 
-export default function ScrollIndicator() {
+export default function ScrollIndicator({color = 'black'}) {
     // --- 인라인 스타일 개체 (수정) ---
 
     const wrapperStyle: React.CSSProperties = {
@@ -21,7 +21,7 @@ export default function ScrollIndicator() {
         transform: 'translateX(-50%)', // 👈 텍스트를 컨테이너 정중앙에 배치 (오른쪽 치우침 해결!)
         fontFamily: '"Helvetica Neue", "Helvetica", Arial, sans-serif',
         fontSize: '12px',
-        color: 'black', // 👈 색상을 검은색으로 변경!
+        color: color, // 👈 색상을 검은색으로 변경!
         textTransform: 'uppercase',
         whiteSpace: 'nowrap',
         fontWeight: 800,
@@ -47,7 +47,7 @@ export default function ScrollIndicator() {
         left: 0,
         height: '100%',
         width: '51%',
-        background: 'black',
+        background: color,
         transform: 'skew(0deg, 30deg)',
     };
 
@@ -57,7 +57,7 @@ export default function ScrollIndicator() {
         right: 0,
         height: '100%',
         width: '50%',
-        background: 'black',
+        background: color,
         transform: 'skew(0deg, -30deg)',
     };
 

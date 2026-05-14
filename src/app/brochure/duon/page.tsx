@@ -6,7 +6,6 @@ import ScrollIndicator from "@/utils/ScrollIndicator";
 import Overlay1 from "@/components/duon/overlay/OverLay1";
 
 import gsap from 'gsap';
-// 🚀 1. ScrollTrigger 임포트 추가! (이게 있어야 에러가 안 나)
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 
 export default function Home() {
@@ -15,9 +14,7 @@ export default function Home() {
     const mainContainerRef = useRef(null);
 
     useEffect(() => {
-        // 브라우저 환경에서 안전하게 GSAP 플러그인 등록
         gsap.registerPlugin(ScrollTrigger);
-
         return () => {
             ScrollTrigger.getAll().forEach(trigger => trigger.kill());
         };
@@ -25,13 +22,17 @@ export default function Home() {
 
     const onLoad = (app: any) => {
         splineApp.current = app;
+        // 🚀 디버깅: 스플라인이 현재 인식하고 있는 모든 변수 목록 출력!
+        console.log("🧐 현재 로드된 스플라인 변수 목록:", app.getVariables());
+
+
         const obj = app.findObjectByName('main_paint');
+        const camera = app.findObjectByName('Camera');
 
         if (obj) {
             paintCaseRef.current = obj;
-            console.log("🎉 [1단계] main_paint 로드 성공!", obj);
+            console.log("🎉 주인공 로드 성공!");
 
-            // 🚀 GSAP 타임라인 생성 (스크롤에 맞춰 여러 애니메이션을 동시에 실행)
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: mainContainerRef.current,
@@ -41,38 +42,42 @@ export default function Home() {
                 }
             });
 
-            // 1. 회전(Rotation) 변환: X축 178.7도로 세팅
-            tl.to(obj.rotation, {
+            // 🎬 [주인공 액션]
+            tl.to(obj.rotation, { x: (178.7 - 360) * (Math.PI / 180), ease: "none" }, 0);
+            tl.to(obj.position, { y: -38.3, z: 1866, ease: "none" }, 0);
+            if (camera) {
+                tl.to(camera.position, { z: camera.position.z - 3000, ease: "none" }, 0);
+            }
 
-                // 👇 최종 도달 각도는 같지만, 회전 방향을 반대로 강제함!
-                // (178.7도 도달은 같지만 반대 방향으로 회전)
-                x: (178.7 - 360) * (Math.PI / 180),
+            // =========================================================
+            // 🚀 [최종 해결책] 스플라인 변수(junkOpacity)를 GSAP로 조종!
+            // =========================================================
 
-                ease: "none"
+            // GSAP가 조종할 가짜 객체 (초기값 100%)
+            const fadeProxy = { val: 100 };
+
+            tl.to(fadeProxy, {
+                val: 0, // 스크롤 내리면 0으로!
+                ease: "none",
+                onUpdate: () => {
+                    // 스플라인 변수에 실시간으로 값을 꽂아 넣음!
+                    if (app.setVariable) {
+                        app.setVariable('junkOpacity', fadeProxy.val);
+                    }
+                }
             }, 0);
 
-            // 2. 위치(Position) 변환 (이건 그대로 유지!)
-            tl.to(obj.position, {
-                y: -38.3,
-                z: 1866,
-                ease: "none"
-            }, 0);
         } else {
-            // 혹시라도 오타가 났을 때를 대비한 에러 메시지
             console.warn("⚠️ main_paint를 찾을 수 없습니다!");
         }
-
     };
-
     return (
         <>
             <Overlay1/>
             <ScrollIndicator/>
 
-            {/* 🚀 2 & 3. ref 연결 + height를 300vh로 늘려서 스크롤 공간 확보! (overflow: hidden 제거) */}
-            <main ref={mainContainerRef} style={{ position: 'relative', height: '300vh', width: '100vw' }}>
-
-                {/* 🚀 3. 스플라인 캔버스는 화면에 딱 고정되도록 (sticky) 설정 */}
+            {/* 💡 초기 배경색 지정! 원래 화면과 비슷한 밝은 회색(#f0f0f0 등)으로 세팅해 둬야 검은색으로 자연스럽게 변해 */}
+            <main ref={mainContainerRef} style={{ position: 'relative', height: '300vh', width: '100vw', backgroundColor: '#e5e5e5' }}>
                 <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
                     <Suspense fallback={<div>로딩 중...</div>}>
                         <Spline
