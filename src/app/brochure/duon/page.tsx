@@ -1,12 +1,19 @@
 'use client';
 
 import React, {Suspense, useEffect, useRef} from 'react';
-import Spline from '@splinetool/react-spline';
+
 import ScrollIndicator from "@/utils/ScrollIndicator";
 import Overlay1 from "@/components/duon/overlay/OverLay1";
 
 import gsap from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
+
+import dynamic from 'next/dynamic';
+const Spline = dynamic(() => import('@splinetool/react-spline'), {
+    ssr: false,
+    // 로딩 중일 때 보여줄 UI도 여기서 바로 설정할 수 있어요! (기존 Suspense 역할 대체)
+    loading: () => <div style={{ height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3D 로딩 중...</div>
+});
 
 export default function Home() {
     const splineApp = useRef(null);
@@ -178,12 +185,11 @@ export default function Home() {
 
                     </div>
 
-                    <Suspense fallback={<div>로딩 중...</div>}>
                         <Spline
                             scene="https://prod.spline.design/nTfQzR2xEoTXa0sT/scene.splinecode"
                             onLoad={onLoad}
                         />
-                    </Suspense>
+
                 </div>
             </main>
         </>

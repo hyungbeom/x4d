@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Suspense, useEffect, useRef } from 'react';
-import Spline from '@splinetool/react-spline';
+
 import ScrollIndicator from "@/utils/ScrollIndicator";
 import Overlay1 from "@/components/bdtec/overlay/OverLay1";
 
@@ -10,6 +10,13 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 // 🚀 1. Three.js 라이브러리 불러오기 (좌표 계산용)
 import * as THREE from 'three';
+import dynamic from 'next/dynamic';
+const Spline = dynamic(() => import('@splinetool/react-spline'), {
+    ssr: false,
+    // 로딩 중일 때 보여줄 UI도 여기서 바로 설정할 수 있어요! (기존 Suspense 역할 대체)
+    loading: () => <div style={{ height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3D 로딩 중...</div>
+});
+
 
 export default function Home() {
     const splineApp = useRef(null);
@@ -162,12 +169,12 @@ export default function Home() {
                          BDI - 100
                     </div>
 
-                    <Suspense fallback={<div>로딩 중...</div>}>
+
                         <Spline
                             scene="https://prod.spline.design/TYUnZBzHQ8Pfrt24/scene.splinecode"
                             onLoad={onLoad}
                         />
-                    </Suspense>
+
                 </div>
             </main>
         </>
