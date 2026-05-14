@@ -20,6 +20,7 @@ import NextSection from "@/components/bdtec/NextSection";
 
 import DynamicIsland from "@/utils/DynamicIsland";
 import BdtecBrochureLoader from "@/components/bdtec/BdtecBrochureLoader";
+import {WaterProduct} from "@/resources/model/gemma/WaterProduct";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -40,7 +41,7 @@ export default function Home() {
         <>
             <BdtecBrochureLoader/>
             <main style={{ backgroundColor: 'white' }}>
-            <DynamicIsland/>
+            {/*<DynamicIsland/>*/}
             {/* =======================================================
                 [섹션 A] 기존 3D 홀로그램 스크롤 영역 (z-index: 1)
             ======================================================= */}
@@ -89,7 +90,7 @@ export default function Home() {
                                 gridRef={gridRef}
                             >
                                 <Center>
-                                    <AirProduct/>
+                                    <WaterProduct scale={[2,2,2]} position={[0,0.5,0]}/>
                                 </Center>
                             </GsapModelWrapper>
                         </Stage>
@@ -113,7 +114,7 @@ export default function Home() {
                             autoRotateSpeed={1.5}
                             enableZoom={false}
                             enablePan={false}
-                            enableRotate={false}
+                            enableRotate={true}
                             makeDefault
                             target={[0, 2, 0]}
                             minPolarAngle={Math.PI / 2 - 0.15}

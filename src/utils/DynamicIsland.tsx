@@ -186,7 +186,7 @@ export default function DynamicIsland() {
                             <div style={{ width: '4px', height: '4px', backgroundColor: '#fff', borderRadius: '50%' }} />
                         </div>
                     </div>
-                    <span style={{ color: '#fff', fontSize: '16px', fontWeight: 600, whiteSpace: 'keep-all' }}>Ask BDTec</span>
+                    <span style={{ color: '#fff', fontSize: '16px', fontWeight: 600, whiteSpace: 'keep-all' }}>AI ASK GEMMA</span>
                 </div>
 
                 {/* 2. 확장 내부 패널 */}

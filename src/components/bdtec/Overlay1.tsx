@@ -56,11 +56,16 @@ export default function Overlay1() {
                                 MENU
                             </span>
                         </div>
-                        <img ref={logoRef} src="/model/bdtec/Logo.svg" width={'100%'} alt="" style={{willChange: 'transform', pointerEvents: 'none'}} />
+
+                        <div style={{paddingTop : 50}}>
+                           <div style={{fontSize : 170, fontWeight : 700}}> Istr<span style={{color : '#099fa4'}}>an</span></div>
+                        </div>
+                        <div style={{paddingTop : 100, fontSize : 25, color : 'white', fontWeight : 400, lineHeight : 1.4, paddingLeft : 60}}>
+                           <div>On-line Analyzer</div>
+                            <div>Water quality parameters</div>
+                        </div>
                         <div ref={textRef} style={{float : 'right', fontWeight : 600, fontSize : 13}}>
-                            <div style={{ width: 250, color : 'white', whiteSpace: 'normal', wordBreak: 'keep-all', lineHeight: '1.4em' }}>
-                                Specialized in the management of small-scale air emission facilities, this product tracks operational status, collects data, and provides real-time monitoring.
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -68,17 +73,18 @@ export default function Overlay1() {
 
             {/* 좌측 하단 박스 */}
             <div ref={boxRef} style={{
-                position: 'absolute', bottom: '10px', left: '10px', width: '180px', padding: '10px',
+                position: 'absolute', bottom: '10px', left: '10px', width: '320px', padding: '10px',
                 background: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)',
                 border: '1px solid rgba(255, 255, 255, 0.2)', boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
                 color: '#ffffff', wordBreak: 'keep-all', willChange: 'transform, opacity',
                 pointerEvents: 'none',
             }}>
-                <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '16px' }}>
-                    IoT GATEWAY <br/>(Environmental IoT)<br/>BDI-100
+                <div style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>
+                    Innovation and Technology at your service
                 </div>
-                <div style={{ fontSize: '12px', opacity: 0.9,  whiteSpace: 'normal' }}>
-                    Specialized in the management of small-scale air emission facilities...
+                <div style={{ fontSize: '15px', opacity: 0.9,  whiteSpace: 'normal' }}>
+                    We offer you all the solutions you need to<br/>
+                    keep moving the world forward
                 </div>
             </div>
 
@@ -94,7 +100,9 @@ export default function Overlay1() {
                     pointerEvents: 'none',
                 }}
             >
+                <div style={{paddingRight : 20, paddingBottom : 20}}>
                 <ScrollIndicator/>
+                </div>
             </div>
         </div>
     );
