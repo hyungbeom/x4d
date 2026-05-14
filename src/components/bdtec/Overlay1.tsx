@@ -2,11 +2,8 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { gsap } from "@/lib/brochureGsap";
 import ScrollIndicator from "@/utils/ScrollIndicator";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function Overlay1() {
     const logoRef = useRef<HTMLImageElement>(null);

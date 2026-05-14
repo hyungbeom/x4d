@@ -3,10 +3,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { gsap } from "@/lib/brochureGsap";
 
 export default function ProgressBox() {
     const boxGroupRef = useRef<THREE.Group>(null);

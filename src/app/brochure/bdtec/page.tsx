@@ -1,140 +1,182 @@
-// app/page.tsx (또는 Home.tsx)
-"use client";
+'use client';
 
-import {useEffect, useRef, useState} from 'react';
-import {Canvas} from '@react-three/fiber'
-import {Center, Environment, Grid, OrbitControls, Stage} from '@react-three/drei'
-import {Bloom, EffectComposer, ToneMapping} from '@react-three/postprocessing'
-import {AirProduct} from "@/resources/model/Air_Product";
-import * as THREE from 'three';
+import React, { Suspense, useEffect, useRef } from 'react';
+
+import ScrollIndicator from "@/utils/ScrollIndicator";
+import Overlay1 from "@/components/bdtec/overlay/OverLay1";
+
 import gsap from 'gsap';
-import {ScrollTrigger} from 'gsap/ScrollTrigger';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import Overlay1 from "@/components/bdtec/Overlay1";
-import Overlay2 from "@/components/bdtec/Overlay2";
-import Overlay3 from "@/components/bdtec/Overlay3";
-import GsapModelWrapper from "@/components/bdtec/GsapModelWrapper";
+// 🚀 1. Three.js 라이브러리 불러오기 (좌표 계산용)
+import * as THREE from 'three';
+import dynamic from 'next/dynamic';
+const Spline = dynamic(() => import('@splinetool/react-spline'), {
+    ssr: false,
+    // 로딩 중일 때 보여줄 UI도 여기서 바로 설정할 수 있어요! (기존 Suspense 역할 대체)
+    loading: () => <div style={{ height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3D 로딩 중...</div>
+});
 
-// 💡 방금 만든 새 컴포넌트 불러오기!
-import NextSection from "@/components/bdtec/NextSection";
-
-import DynamicIsland from "@/utils/DynamicIsland";
-import BdtecBrochureLoader from "@/components/bdtec/BdtecBrochureLoader";
-import {WaterProduct} from "@/resources/model/gemma/WaterProduct";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
-    const [isAutoRotate, setIsAutoRotate] = useState(true);
-    const controlsRef = useRef<any>(null);
-    const fogRef = useRef<THREE.Fog>(null);
-    const gridRef = useRef<any>(null);
+    const splineApp = useRef(null);
+    const paintCaseRef = useRef(null);
+    const mainContainerRef = useRef(null);
+
+    // 🚀 2. 따라다닐 HTML 요소를 위한 Ref 추가
+    const htmlRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if ('scrollRestoration' in history) {
-            history.scrollRestoration = 'manual';
-        }
-        window.scrollTo(0, 0);
+        gsap.registerPlugin(ScrollTrigger);
+        return () => {
+            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+            // 컴포넌트가 언마운트될 때 GSAP ticker에서도 제거해주면 완벽해!
+            gsap.ticker.remove(trackPosition);
+        };
     }, []);
+
+    // 매 프레임마다 위치를 추적할 함수를 밖으로 살짝 빼줌 (클린업을 위해)
+    let trackPosition = () => {};
+
+    const onLoad = (app: any) => {
+        splineApp.current = app;
+
+
+        const camera = app.findObjectByName('Camera');
+
+        // =========================================================
+        // 🚀 3. 3D 좌표 -> 2D HTML 좌표 변환 (핵심 로직!)
+        // =========================================================
+        const threeScene = app._scene;
+        const threeCamera = app._camera; // 찐 Three.js 카메라
+
+        if (threeCamera && htmlRef.current) {
+            // 네가 캡처해준 바로 그 좌표!
+            const targetPos = new THREE.Vector3(-155, 350, -261.1);
+            const tempV = new THREE.Vector3();
+
+            trackPosition = () => {
+                if (!htmlRef.current || !threeCamera) return;
+
+                // 1. 타겟 좌표 복사 및 카메라 기준으로 정규화(-1 ~ 1)
+                tempV.copy(targetPos);
+                tempV.project(threeCamera);
+
+                // 2. 만약 카메라 뒤로 객체가 넘어갔다면 HTML 숨기기
+                if (tempV.z > 1) {
+                    htmlRef.current.style.opacity = '0';
+                    return;
+                }
+
+                // 3. 정규화된 좌표를 브라우저의 실제 픽셀(px) 좌표로 변환
+                htmlRef.current.style.opacity = '1';
+                const x = (tempV.x * 0.5 + 0.5) * window.innerWidth;
+                const y = (-(tempV.y * 0.5) + 0.5) * window.innerHeight;
+
+                // 4. HTML 요소 이동시키기
+                htmlRef.current.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, 0)`;
+            };
+
+            // GSAP의 ticker(매 프레임 실행)에 추적 함수를 달아줌!
+            gsap.ticker.add(trackPosition);
+        }
+    };
+
+
+    // 🎯 마커 클릭 시 지정된 스플라인 뷰포인트로 이동
+    const handleMarkerClick = () => {
+        const app = splineApp.current;
+        if (!app) return;
+
+        const realCamera = app._scene?.getObjectByName('Camera');
+
+        if (realCamera) {
+            // 1. 캡처 이미지의 Position 수치
+            const targetX = -950;  // 👈 이 값을 수정했습니다.
+            const targetY = 327.3; // Y값 유지
+            const targetZ = 301.4; // Z값 유지
+
+            // 2. Rotation 수치 (소수점 정리 및 라디안 변환)
+            const rotX = -8.5 * (Math.PI / 180); // 기존 -8.48 -> -8.5 정리
+            const rotY = -29 * (Math.PI / 180);  // 유지
+            const rotZ = -5.3 * (Math.PI / 180); // 기존 -5.29 -> -5.3 정리
+
+            // ... (아래 GSAP 애니메이션 코드는 그대로 유지)
+            // 3. 캡처 이미지의 Zoom 수치
+            const targetZoom = 2.80;
+
+            // 🎬 A. 위치(Position) 애니메이션
+            gsap.to(realCamera.position, {
+                x: targetX,
+                y: targetY,
+                z: targetZ,
+                duration: 1.5,
+                ease: "power3.inOut"
+            });
+
+            // 🎬 B. 회전(Rotation) 애니메이션
+            gsap.to(realCamera.rotation, {
+                x: rotX,
+                y: rotY,
+                z: rotZ,
+                duration: 1.5,
+                ease: "power3.inOut"
+            });
+
+            // 🎬 C. 줌(Zoom) 애니메이션
+            gsap.to(realCamera, {
+                zoom: targetZoom,
+                duration: 1.5,
+                ease: "power3.inOut",
+                onUpdate: () => {
+                    // 🚨 주의: lookAt()은 삭제했습니다!
+                    // 대신 직교 카메라(Orthographic)의 줌이 변하므로 아래 렌더링 업데이트 코드는 꼭 남겨둬야 합니다.
+                    realCamera.updateProjectionMatrix();
+                }
+            });
+
+            console.log("📸 세팅된 뷰포인트로 완벽 이동 완료!");
+        }
+    };
 
     return (
         <>
-            <BdtecBrochureLoader/>
-            <main style={{ backgroundColor: 'white' }}>
-            {/*<DynamicIsland/>*/}
-            {/* =======================================================
-                [섹션 A] 기존 3D 홀로그램 스크롤 영역 (z-index: 1)
-            ======================================================= */}
-            <div
-                className="scroll-container"
-                style={{
-                    position: 'relative',
-                    width: '100vw',
-                    height: '700vh',
-                    backgroundColor: 'black',
-                    touchAction: 'pan-y',
-                }}
-            >
-                <div
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        width: '100vw',
-                        height: '100vh',
-                        pointerEvents: 'none',
-                    }}
-                >
-                    <Overlay1/>
-                    <Overlay2/>
-                    <Overlay3/>
+            <Overlay1 />
+            <ScrollIndicator color={'white'} />
 
-                    <Canvas
-                        flat
-                        shadows
-                        style={{pointerEvents: 'none', touchAction: 'pan-y'}}
-                        camera={{position: [-15, 0, 10], fov: 55}}
+            <main ref={mainContainerRef} style={{ position: 'relative', height: '300vh', width: '100vw', backgroundColor: '#e5e5e5' }}>
+                <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
+
+                    {/* ========================================================= */}
+                    {/* 🚀 4. 3D 좌표를 찰떡같이 따라다닐 HTML UI! */}
+                    {/* ========================================================= */}
+                    <div
+                        ref={htmlRef}
+                        onClick={handleMarkerClick} // 👈 클릭 이벤트 추가!
+                        style={{
+                            position: 'absolute',
+                            top: 0, left: 0,
+                            transform: 'translate(-50%, -50%)',
+                            zIndex: 10,
+                            color: 'white',
+                            cursor: 'pointer',       // 👈 마우스 올리면 손가락 모양
+                            pointerEvents: 'auto',   // 👈 이제 클릭을 인식함!
+                            padding: '10px',
+                            backgroundColor: 'rgba(0,0,0,0.5)',
+                            borderRadius: '8px'
+                        }}
                     >
-                        <ambientLight intensity={1.5}/>
-                        <directionalLight position={[10, 10, 10]} intensity={2} color="#ffffff"/>
-                        <directionalLight position={[-10, 5, -10]} intensity={0.5} color="#ffffff"/>
+                         BDI - 100
+                    </div>
 
-                        <fog ref={fogRef} attach="fog" args={['#d8d8dc', 25, 80]}/>
-                        <Environment background preset="sunset" blur={12}/>
 
-                        <Stage intensity={8.5} environment={'city'} shadows={{type: 'accumulative', bias: -0.001, intensity: Math.PI}} adjustCamera={false}>
-                            <GsapModelWrapper
-                                setIsAutoRotate={setIsAutoRotate}
-                                controlsRef={controlsRef}
-                                fogRef={fogRef}
-                                gridRef={gridRef}
-                            >
-                                <Center>
-                                    <WaterProduct scale={[2,2,2]} position={[0,0.5,0]}/>
-                                </Center>
-                            </GsapModelWrapper>
-                        </Stage>
-
-                        <Grid
-                            ref={gridRef}
-                            renderOrder={-1}
-                            position={[0, -3.2, 0]}
-                            infiniteGrid
-                            cellSize={0.5}
-                            cellThickness={1}
-                            sectionSize={1}
-                            sectionThickness={1.5}
-                            sectionColor={new THREE.Color(0.5, 0.5, 1)}
-                            fadeDistance={35}
+                        <Spline
+                            scene="https://prod.spline.design/TYUnZBzHQ8Pfrt24/scene.splinecode"
+                            onLoad={onLoad}
                         />
 
-                        <OrbitControls
-                            ref={controlsRef}
-                            autoRotate={isAutoRotate}
-                            autoRotateSpeed={1.5}
-                            enableZoom={false}
-                            enablePan={false}
-                            enableRotate={true}
-                            makeDefault
-                            target={[0, 2, 0]}
-                            minPolarAngle={Math.PI / 2 - 0.15}
-                            maxPolarAngle={Math.PI / 2}
-                        />
-
-                        <EffectComposer>
-                            <Bloom luminanceThreshold={2} mipmapBlur/>
-                            <ToneMapping/>
-                        </EffectComposer>
-                    </Canvas>
                 </div>
-            </div>
-
-            {/* =======================================================
-                [섹션 B] 분리된 컴포넌트로 깔끔하게 렌더링!
-            ======================================================= */}
-            <NextSection />
-
-        </main>
+            </main>
         </>
     );
 }

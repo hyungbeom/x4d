@@ -5,11 +5,8 @@ import {Canvas, useThree} from '@react-three/fiber';
 import {Environment} from "@react-three/drei";
 import {SensorCarouselTrack} from "@/components/bdtec/SensorCarouselTrack";
 import {Bloom, EffectComposer, ToneMapping} from "@react-three/postprocessing";
-import gsap from 'gsap';
-import {ScrollTrigger} from 'gsap/ScrollTrigger';
+import { gsap } from "@/lib/brochureGsap";
 import * as THREE from "three";
-
-gsap.registerPlugin(ScrollTrigger);
 
 /** 캐러셀 중심을 ~45° 올려다보는 시점(카메라 낮게 + 약간 Yaw) */
 function ObliqueCarouselCamera() {
@@ -123,7 +120,7 @@ const MiddleBoxSection = forwardRef<HTMLDivElement>((props, ref) => {
                             <SensorCarouselTrack/>
 
                             <EffectComposer>
-                                <Bloom luminanceThreshold={0.5} mipmapBlur/>
+                                {/*<Bloom luminanceThreshold={0.5} mipmapBlur/>*/}
                                 <ToneMapping/>
                             </EffectComposer>
                         </Suspense>

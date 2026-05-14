@@ -21,13 +21,12 @@ body,
   margin: 0;
   padding: 0;
 }
-
-body {
-  background: white;
-  color: black;
-  font-family: 'Inter';
+/* globals.css */
+body, html {
+  margin: 0;
+  padding: 0;
+  /* overflow: hidden; 👈 범인 검거! 과감하게 삭제하거나 주석 처리! */
 }
-
 a {
   color: black;
 }
@@ -55,4 +54,13 @@ canvas {
   opacity: 0;
   touch-action: none;
   animation: fade-in 5s ease 0.5s forwards;
+}
+/* 웹킷 기반 브라우저(크롬, 사파리, 엣지 등)에서 스크롤바 디자인 숨기기 */
+::-webkit-scrollbar {
+  display: none; /* 스크롤 기능은 작동하지만 눈에는 안 보임! */
+}
+
+/* 파이어폭스 등 기타 브라우저 대응 */
+html {
+  scrollbar-width: none;
 }

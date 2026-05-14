@@ -6,11 +6,8 @@ import {SensorA} from '@/resources/model/bdtect/SensorA';
 import {SensorB} from '@/resources/model/bdtect/SensorB';
 import {SensorC} from '@/resources/model/bdtect/SensorC';
 import {SensorD} from '@/resources/model/bdtect/SensorD';
-import gsap from 'gsap';
-import {ScrollTrigger} from 'gsap/ScrollTrigger';
+import { gsap, ScrollTrigger } from "@/lib/brochureGsap";
 import * as THREE from 'three';
-
-gsap.registerPlugin(ScrollTrigger);
 
 /** 슬라이드 간 X 간격 (카메라·모델 크기에 맞게 조정) */
 const SLIDE_GAP = 4.75;

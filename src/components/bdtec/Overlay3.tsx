@@ -1,10 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { gsap } from "@/lib/brochureGsap";
 
 export default function Overlay3() {
     const titleRef = useRef<HTMLDivElement>(null);

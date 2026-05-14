@@ -27,7 +27,31 @@ export default function DynamicIsland() {
     const isFirstRender = useRef(true);
     const prevExpanded = useRef(isExpanded);
     const resetCallRef = useRef<gsap.core.Tween | null>(null);
-    const thinkingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const thinkingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (thinkingTimeoutRef.current) {
+                clearTimeout(thinkingTimeoutRef.current);
+                thinkingTimeoutRef.current = null;
+            }
+            if (resetCallRef.current) {
+                resetCallRef.current.kill();
+                resetCallRef.current = null;
+            }
+            const nodes = [
+                islandRef.current,
+                initialContentRef.current,
+                chatPanelRef.current,
+                inputSectionRef.current,
+                thinkingSectionRef.current,
+                resultSectionRef.current,
+                modalOverlayRef.current,
+                modalContentRef.current,
+            ].filter(Boolean);
+            if (nodes.length) gsap.killTweensOf(nodes);
+        };
+    }, []);
 
     // =======================================================
     // 💡 [Effect 1] 외부 클릭 감지 (아일랜드 닫기)
