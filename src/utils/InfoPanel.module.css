@@ -198,6 +198,7 @@
   }
 }
 
+
 @media (max-width: 768px) {
   .teaser {
     top: calc(120px + env(safe-area-inset-top, 0px));
