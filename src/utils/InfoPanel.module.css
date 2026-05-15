@@ -45,7 +45,7 @@
   transform: translateY(100%);
   opacity: 0;
   overflow-y: auto;
-  z-index: 60;
+  z-index: 110;
 }
 
 .panelMobileFullscreen .title {
@@ -195,5 +195,16 @@
   .detailBtn {
     font-size: 12px;
     padding: 8px 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .teaser {
+    top: calc(120px + env(safe-area-inset-top, 0px));
+    right: 16px;
+    left: 16px;
+    transform: none;
+    max-width: none;
+    align-items: flex-start;
   }
 }
