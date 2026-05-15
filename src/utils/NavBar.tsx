@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import gsap from 'gsap';
 import TransitionLink from "@/utils/TransitionLink";
 
@@ -13,7 +13,7 @@ interface NavBarProps {
     contactLink?: string;
 }
 
-export default function NavBar({ logoSrc, menus, contactLink = "#" }: NavBarProps) {
+export default function NavBar({logoSrc, menus, contactLink = "#"}: NavBarProps) {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
     const pillRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
@@ -22,7 +22,7 @@ export default function NavBar({ logoSrc, menus, contactLink = "#" }: NavBarProp
         if (!pillRef.current || window.innerWidth <= 1024) return;
 
         if (index === null) {
-            gsap.to(pillRef.current, { opacity: 0, duration: 0.3 });
+            gsap.to(pillRef.current, {opacity: 0, duration: 0.3});
             return;
         }
 
@@ -134,23 +134,25 @@ export default function NavBar({ logoSrc, menus, contactLink = "#" }: NavBarProp
                         }
 
                         /* 🚀 모바일 전용 상단 캡슐 (천장에 고정!) */
-                        .mobile-top-bar {
-                            display: flex;
-                            position: fixed; 
-                            /* 🚀🚀🚀 이 부분이 핵심입니다! 기본 여백 10px에 기종별 노치 영역을 알아서 더해줍니다. */
-                            top: max(50px, calc(env(safe-area-inset-top) + 10px));       
-                            left: 50%;
-                            transform: translateX(-50%);
-                            width: 92vw;
-                            justify-content: space-between;
-                            align-items: center;
-                            background-color: #f7fdfc; 
-                            padding: 8px 10px 8px 16px; 
-                            border-radius: 999px; 
-                            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-                            box-sizing: border-box;
-                            z-index: 100; 
-                        }
+                       .mobile-top-bar {
+        display: flex;
+        position: fixed; 
+        
+        /* 태블릿에서는 천장에 딱 붙이거나(0px) 살짝만 띄움(10px) */
+        top: 10px;       
+        
+        left: 50%;
+        transform: translateX(-50%);
+        width: 92vw;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f7fdfc; 
+        padding: 8px 10px 8px 16px; 
+        border-radius: 999px; 
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        box-sizing: border-box;
+        z-index: 100;
+    }
 
                         .mobile-top-bar .logo { padding: 0; }
                         .mobile-top-bar .logo img { height: 20px; }
@@ -193,7 +195,7 @@ export default function NavBar({ logoSrc, menus, contactLink = "#" }: NavBarProp
             {/* 🚀 모바일 전용 상단 캡슐 */}
             <div className="mobile-top-bar">
                 <a href="#" className="logo">
-                    {logoSrc ? <img src={logoSrc} alt="Logo" /> : <span className="logo-placeholder">Logo</span>}
+                    {logoSrc ? <img src={logoSrc} alt="Logo"/> : <span className="logo-placeholder">Logo</span>}
                 </a>
                 <TransitionLink href={contactLink} className="contact-btn" type="blinds">
                     Contact Us
@@ -205,7 +207,7 @@ export default function NavBar({ logoSrc, menus, contactLink = "#" }: NavBarProp
 
                 {/* 🖥️ 데스크탑 로고 */}
                 <a href="#" className="logo">
-                    {logoSrc ? <img src={logoSrc} alt="Logo" /> : <span className="logo-placeholder">Logo</span>}
+                    {logoSrc ? <img src={logoSrc} alt="Logo"/> : <span className="logo-placeholder">Logo</span>}
                 </a>
 
                 {/* 🔗 메뉴 영역 (바닥) */}
@@ -214,7 +216,9 @@ export default function NavBar({ logoSrc, menus, contactLink = "#" }: NavBarProp
                     {menus.map((menu, index) => (
                         <a
                             key={index}
-                            ref={(el) => { itemRefs.current[index] = el; }}
+                            ref={(el) => {
+                                itemRefs.current[index] = el;
+                            }}
                             href="#"
                             onClick={(e) => {
                                 e.preventDefault();
@@ -230,7 +234,7 @@ export default function NavBar({ logoSrc, menus, contactLink = "#" }: NavBarProp
                 </nav>
 
                 {/* 🖥️ 데스크탑 Contact Us */}
-                <div className="contact-wrapper" style={{ marginLeft: '8px' }}>
+                <div className="contact-wrapper" style={{marginLeft: '8px'}}>
                     <TransitionLink href={contactLink} className="contact-btn" type="blinds">
                         Contact Us
                     </TransitionLink>
