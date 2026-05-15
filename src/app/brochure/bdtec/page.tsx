@@ -72,9 +72,11 @@ export default function Home() {
     const onLoad = (app: any) => {
         splineApp.current = app;
         gsap.ticker.add(trackSplineVariable);
-        if (window.innerWidth <= 768) {
-            app.setPixelRatio(1); // 기본값은 보통 기기의 최대치(2나 3)로 설정되어 있음
-        }
+
+        // ❌ 이 부분은 Three.js 전용 코드라 Spline에서는 작동하지 않습니다. 삭제해 주세요!
+        // if (window.innerWidth <= 768) {
+        //     app.setPixelRatio(1);
+        // }
     };
 
     // =========================================================
