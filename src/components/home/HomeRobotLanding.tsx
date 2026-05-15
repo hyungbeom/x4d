@@ -64,7 +64,7 @@ function HomeOverlay() {
 
 export default function HomeRobotLanding() {
     return (
-        <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
+        <div style={{ position: "relative", width: "100dvw", height: "100dvh" }}>
             <HomeOverlay />
 
             <Canvas flat shadows camera={{ position: [-15, 0, 10], fov: 25 }}>

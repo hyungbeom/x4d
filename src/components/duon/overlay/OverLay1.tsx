@@ -10,8 +10,8 @@ export default function Overlay1() {
                         position: fixed;
                         top: 0;
                         left: 0;
-                        width: 100vw;
-                        height: 100vh;
+                        width: 100dvw;
+                        height: 100dvh;
                         z-index: 50;
                         pointer-events: none; /* 뒷배경 클릭 가능하게 */
                     }

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import ScrollIndicator from "@/utils/ScrollIndicator";
 import Overlay1 from "@/components/bdtec/overlay/OverLay1";
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -9,10 +8,11 @@ import dynamic from 'next/dynamic';
 import NavBar from "@/utils/NavBar";
 import InfoPanel from "@/utils/InfoPanel";
 import PageWrapper from "@/utils/PageWrapper";
+import styles from "./page.module.css";
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
-    loading: () => <div style={{ height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3D 로딩 중...</div>
+    loading: () => <div className={styles.splineLoading}>3D 로딩 중...</div>
 });
 
 const panelContents: Record<number, { title: string; desc: string; extra?: string }> = {
@@ -113,54 +113,51 @@ export default function Home() {
     return (
         <>
             <PageWrapper>
-            <main ref={mainContainerRef} style={{ position: 'relative', height: '300vh', width: '100vw', backgroundColor: '#e5e5e5' }}>
-                <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
+                <main ref={mainContainerRef} className={styles.scrollMain}>
+                    <div className={styles.stickyViewport}>
 
-                    {/* ========================================================= */}
-                    {/* 🚀 3. 사라질 요소들을 하나로 묶어주는 래퍼(Wrapper) 적용 */}
-                    {/* ========================================================= */}
-                    {!intro && (
-                        <div ref={introWrapperRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 12 }}>
-                            <Overlay1 />
-
-                            <div style={{ position: 'absolute', bottom: 0, right: 0, padding: 50 }}>
-                                <span
-                                    style={{ backgroundColor: 'blue', color: 'white', padding: '10px 20px', borderRadius: 10, cursor: 'pointer' }}
-                                    onClick={getStart}
-                                >
-                                    비디텍 브로슈어 시작하기
-                                </span>
+                        {!intro && (
+                            <div ref={introWrapperRef} className={styles.introWrapper}>
+                                <div className={styles.overlaySafeZone}>
+                                    <Overlay1 />
+                                </div>
+                                <div className={styles.startBtnContainer}>
+                                    <button type="button" className={styles.startBtn} onClick={getStart}>
+                                        비디텍 브로슈어 시작하기
+                                    </button>
+                                </div>
                             </div>
+                        )}
+
+                        {intro && (
+                            <NavBar
+                                logoSrc="/model/bdtec/logo.svg"
+                                menus={navMenus}
+                                contactLink="/brochure/bdtec/contactus"
+                            />
+                        )}
+
+                        <InfoPanel
+                            isOpen={activePanelId >= 1 && activePanelId <= 5}
+                            title={currentPanelData.title}
+                            desc={currentPanelData.desc}
+                            extra={currentPanelData.extra}
+                            onClose={() => handleVariableChange(0)}
+                        />
+
+                        <div
+                            ref={blurContainerRef}
+                            className={`${styles.blurContainer} ${intro ? styles.blurContainerReady : styles.blurContainerIntro}`}
+                        >
+                            <Spline
+                                scene="https://prod.spline.design/TYUnZBzHQ8Pfrt24/scene.splinecode"
+                                onLoad={onLoad}
+                            />
                         </div>
-                    )}
-
-                    {/* Intro가 완료되었을 때만 NavBar 등장 */}
-                    {intro && (
-                        <NavBar
-                            logoSrc="/model/bdtec/logo.svg"
-                            menus={navMenus}
-                            contactLink="/brochure/bdtec/contactus"
-                        />
-                    )}
-
-                    <InfoPanel
-                        isOpen={activePanelId >= 1 && activePanelId <= 5}
-                        title={currentPanelData.title}
-                        desc={currentPanelData.desc}
-                        extra={currentPanelData.extra}
-                        onClose={() => handleVariableChange(0)}
-                    />
-
-                    {/* 🚀 4. 블러 컨테이너에도 Ref를 달아주어 GSAP으로 제어합니다 */}
-                    <div ref={blurContainerRef} style={{ width: '100%', height: '100%', filter: intro ? 'blur(0px)' : 'blur(5px)' }}>
-                        <Spline
-                            scene="https://prod.spline.design/TYUnZBzHQ8Pfrt24/scene.splinecode"
-                            onLoad={onLoad}
-                        />
                     </div>
-                </div>
-            </main>
+                </main>
             </PageWrapper>
         </>
     );
+
 }

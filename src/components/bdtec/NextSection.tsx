@@ -50,7 +50,7 @@ export default function NextSection() {
                         position: "sticky",
                         top: 0,
                         width: "100%",
-                        height: "100vh",
+                        height: "100dvh",
                         backgroundColor: "#ffffff",
                         zIndex: 10,
                         overflow: "hidden",
@@ -81,7 +81,7 @@ export default function NextSection() {
                 </div>
             </div>
 
-            <div style={{ marginTop: "-100vh", position: "relative", zIndex: 25 }}>
+            <div style={{ marginTop: "-100dvh", position: "relative", zIndex: 25 }}>
                 <MiddleBoxSection ref={middleCanvasWrapperRef} />
             </div>
 

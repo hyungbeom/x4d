@@ -18,7 +18,7 @@ export default function BdtecDataConnectivitySection({ rootRef, textRef, meshRef
             style={{
                 position: "relative",
                 width: "100%",
-                height: "100vh",
+                height: "100dvh",
                 backgroundColor: "#050505",
                 overflow: "hidden",
                 zIndex: 20,

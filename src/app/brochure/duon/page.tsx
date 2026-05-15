@@ -12,7 +12,7 @@ import dynamic from 'next/dynamic';
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
     // 로딩 중일 때 보여줄 UI도 여기서 바로 설정할 수 있어요! (기존 Suspense 역할 대체)
-    loading: () => <div style={{ height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3D 로딩 중...</div>
+    loading: () => <div style={{ height: '100dvh', width: '100dvw', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3D 로딩 중...</div>
 });
 
 export default function Home() {
@@ -156,8 +156,8 @@ export default function Home() {
                 <ScrollIndicator/>
             </div>
 
-            <main ref={mainContainerRef} style={{ position: 'relative', height: '300vh', width: '100vw', backgroundColor: '#e5e5e5' }}>
-                <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
+            <main ref={mainContainerRef} style={{ position: 'relative', height: '300vh', width: '100dvw', backgroundColor: '#e5e5e5' }}>
+                <div style={{ position: 'sticky', top: 0, height: '100dvh', overflow: 'hidden' }}>
 
                     {/* 좌측 상단 텍스트 */}
                     <div ref={textTlRef} style={{ position: 'absolute', top: '100px', left: '20px', zIndex: 10, color: '#333' }} className="flex flex-col gap-1 p-4 bg-white/50 rounded-lg backdrop-blur-sm">

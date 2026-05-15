@@ -14,7 +14,7 @@ export default function BdtecSpecificationsSection({ rootRef }: Props) {
                 position: "relative",
                 zIndex: 30,
                 width: "100%",
-                minHeight: "100vh",
+                minHeight: "100dvh",
                 backgroundColor: "#111111",
                 borderTopLeftRadius: "40px",
                 borderTopRightRadius: "40px",

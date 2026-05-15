@@ -13,8 +13,8 @@ export default function GlobalCanvas() {
                 position: "fixed",
                 top: 0,
                 left: 0,
-                width: "100vw",
-                height: "100vh",
+                width: "100dvw",
+                height: "100dvh",
                 pointerEvents: "none", // DOM 요소(버튼 등) 클릭을 방해하지 않도록 설정
                 zIndex: 1, // 배경으로 보냄
             }}

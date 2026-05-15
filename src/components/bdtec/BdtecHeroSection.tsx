@@ -29,7 +29,7 @@ export default function BdtecHeroSection() {
             className="scroll-container"
             style={{
                 position: "relative",
-                width: "100vw",
+                width: "100dvw",
                 height: "700vh",
                 backgroundColor: "black",
                 touchAction: "pan-y",
@@ -40,8 +40,8 @@ export default function BdtecHeroSection() {
                     position: "fixed",
                     top: 0,
                     left: 0,
-                    width: "100vw",
-                    height: "100vh",
+                    width: "100dvw",
+                    height: "100dvh",
                     pointerEvents: "none",
                 }}
             >

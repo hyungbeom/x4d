@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
-    loading: () => <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3D 로딩 중...</div>
+    loading: () => <div style={{ height: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3D 로딩 중...</div>
 });
 
 export default function Home() {
