@@ -138,7 +138,7 @@ export default function NavBar({ logoSrc, menus, contactLink = "#" }: NavBarProp
                             display: flex;
                             position: fixed; 
                             /* 🚀🚀🚀 이 부분이 핵심입니다! 기본 여백 10px에 기종별 노치 영역을 알아서 더해줍니다. */
-                            top: calc(10px + env(safe-area-inset-top, 0px));       
+                            top: max(50px, calc(env(safe-area-inset-top) + 10px));       
                             left: 50%;
                             transform: translateX(-50%);
                             width: 92vw;
