@@ -9,6 +9,7 @@ import NavBar from "@/utils/NavBar";
 import InfoPanel from "@/utils/InfoPanel";
 import PageWrapper from "@/utils/PageWrapper";
 import styles from "./page.module.css";
+import { Stats } from '@react-three/drei'
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
@@ -136,7 +137,7 @@ export default function Home() {
                                 contactLink="/brochure/bdtec/contactus"
                             />
                         )}
-
+                        <Stats />
                         <InfoPanel
                             isOpen={activePanelId >= 1 && activePanelId <= 5}
                             title={currentPanelData.title}
@@ -147,7 +148,7 @@ export default function Home() {
 
                         <div
                             ref={blurContainerRef}
-                            className={`${styles.blurContainer} ${intro ? styles.blurContainerReady : styles.blurContainerIntro}`}
+                            className={styles.blurContainer}
                         >
                             <Spline
                                 scene="https://prod.spline.design/TYUnZBzHQ8Pfrt24/scene.splinecode"
