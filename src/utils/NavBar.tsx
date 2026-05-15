@@ -136,8 +136,9 @@ export default function NavBar({ logoSrc, menus, contactLink = "#" }: NavBarProp
                         /* 🚀 모바일 전용 상단 캡슐 (천장에 고정!) */
                         .mobile-top-bar {
                             display: flex;
-                            position: fixed; /* 🚀 화면 스크롤과 무관하게 상단 고정 */
-                            top: 20px;       /* 🚀 천장에서 20px 띄움 */
+                            position: fixed; 
+                            /* 🚀🚀🚀 이 부분이 핵심입니다! 기본 여백 10px에 기종별 노치 영역을 알아서 더해줍니다. */
+                            top: calc(10px + env(safe-area-inset-top, 0px));       
                             left: 50%;
                             transform: translateX(-50%);
                             width: 92vw;
@@ -148,7 +149,7 @@ export default function NavBar({ logoSrc, menus, contactLink = "#" }: NavBarProp
                             border-radius: 999px; 
                             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
                             box-sizing: border-box;
-                            z-index: 100; /* 🚀 캔버스나 메뉴보다 항상 위에 오도록 높은 z-index 부여 */
+                            z-index: 100; 
                         }
 
                         .mobile-top-bar .logo { padding: 0; }
@@ -189,7 +190,7 @@ export default function NavBar({ logoSrc, menus, contactLink = "#" }: NavBarProp
                 `}
             </style>
 
-            {/* 🚀 모바일 전용 상단 캡슐 (CSS로 top:20px 에 고정됨) */}
+            {/* 🚀 모바일 전용 상단 캡슐 */}
             <div className="mobile-top-bar">
                 <a href="#" className="logo">
                     {logoSrc ? <img src={logoSrc} alt="Logo" /> : <span className="logo-placeholder">Logo</span>}
