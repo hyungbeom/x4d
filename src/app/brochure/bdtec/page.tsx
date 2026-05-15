@@ -1,180 +1,156 @@
 'use client';
 
-import React, { Suspense, useEffect, useRef } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import ScrollIndicator from "@/utils/ScrollIndicator";
 import Overlay1 from "@/components/bdtec/overlay/OverLay1";
 
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import {ScrollTrigger} from 'gsap/ScrollTrigger';
 
 // 🚀 1. Three.js 라이브러리 불러오기 (좌표 계산용)
-import * as THREE from 'three';
 import dynamic from 'next/dynamic';
+
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
     // 로딩 중일 때 보여줄 UI도 여기서 바로 설정할 수 있어요! (기존 Suspense 역할 대체)
-    loading: () => <div style={{ height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3D 로딩 중...</div>
+    loading: () => <div
+        style={{height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>3D 로딩
+        중...</div>
 });
 
 
 export default function Home() {
+
+    const [intro, setIntro] = useState(false);
     const splineApp = useRef(null);
-    const paintCaseRef = useRef(null);
     const mainContainerRef = useRef(null);
 
-    // 🚀 2. 따라다닐 HTML 요소를 위한 Ref 추가
-    const htmlRef = useRef<HTMLDivElement>(null);
+
+    // 🚀 1. 슬라이드되어 나타날 UI 도화지 Ref
+    const uiPanelRef = useRef<HTMLDivElement>(null);
+    // 🚀 2. 변수 값 변화를 감지하기 위한 이전 상태 저장소
+    const prevState = useRef<number | null>(null);
+
 
     useEffect(() => {
         gsap.registerPlugin(ScrollTrigger);
         return () => {
             ScrollTrigger.getAll().forEach(trigger => trigger.kill());
             // 컴포넌트가 언마운트될 때 GSAP ticker에서도 제거해주면 완벽해!
-            gsap.ticker.remove(trackPosition);
+            // gsap.ticker.remove(trackPosition);
         };
     }, []);
 
-    // 매 프레임마다 위치를 추적할 함수를 밖으로 살짝 빼줌 (클린업을 위해)
-    let trackPosition = () => {};
+
+    const trackSplineVariable = () => {
+        const app: any = splineApp.current;
+        if (!app) return;
+
+        // Spline에서 현재 변수 값을 가져옴 (이름이 Product_State 인지 하나로 통일한 Camera_State 인지 꼭 확인하세요!)
+        const currentState = app.getVariable('Product_State');
+
+        // 변수 값이 이전과 다를 때만(상태가 변했을 때만) 애니메이션 실행
+        if (currentState !== prevState.current) {
+            console.log(`🔄 변수 변경 감지! 현재 값: ${currentState}`);
+
+            if (currentState === 1) {
+                // 변수가 1이면 -> 오른쪽 화면 밖(x: 100%)에 있던 UI를 원래 자리(x: 0)로 슬라이드!
+                gsap.to(uiPanelRef.current, {
+                    x: 0,
+                    opacity: 1,
+                    duration: 0.6,
+                    ease: "power3.out"
+                });
+            } else {
+                // 변수가 1이 아니면 -> 다시 오른쪽 화면 밖으로 숨기기
+                gsap.to(uiPanelRef.current, {
+                    x: '100%',
+                    opacity: 0,
+                    duration: 0.6,
+                    ease: "power3.in"
+                });
+            }
+
+            // 비교를 위해 현재 값을 이전 값으로 저장
+            prevState.current = currentState;
+        }
+    };
+
+
+    // =========================================================
+    // 🚀 [추가됨] React 버튼을 눌렀을 때 Spline 변수를 바꾸는 함수
+    // =========================================================
+    const handleVariableChange = (newValue: number) => {
+        const app = splineApp.current;
+        if (!app) return;
+
+        // 🎯 Spline의 'Product_State' 변수를 내가 원하는 숫자(newValue)로 강제 변경!
+        app.setVariable('Product_State', newValue);
+        console.log(`✅ React에서 Spline 변수를 ${newValue}로 변경했습니다!`);
+    };
 
     const onLoad = (app: any) => {
         splineApp.current = app;
 
-
-        const camera = app.findObjectByName('Camera');
-
-        // =========================================================
-        // 🚀 3. 3D 좌표 -> 2D HTML 좌표 변환 (핵심 로직!)
-        // =========================================================
-        const threeScene = app._scene;
-        const threeCamera = app._camera; // 찐 Three.js 카메라
-
-        if (threeCamera && htmlRef.current) {
-            // 네가 캡처해준 바로 그 좌표!
-            const targetPos = new THREE.Vector3(-155, 350, -261.1);
-            const tempV = new THREE.Vector3();
-
-            trackPosition = () => {
-                if (!htmlRef.current || !threeCamera) return;
-
-                // 1. 타겟 좌표 복사 및 카메라 기준으로 정규화(-1 ~ 1)
-                tempV.copy(targetPos);
-                tempV.project(threeCamera);
-
-                // 2. 만약 카메라 뒤로 객체가 넘어갔다면 HTML 숨기기
-                if (tempV.z > 1) {
-                    htmlRef.current.style.opacity = '0';
-                    return;
-                }
-
-                // 3. 정규화된 좌표를 브라우저의 실제 픽셀(px) 좌표로 변환
-                htmlRef.current.style.opacity = '1';
-                const x = (tempV.x * 0.5 + 0.5) * window.innerWidth;
-                const y = (-(tempV.y * 0.5) + 0.5) * window.innerHeight;
-
-                // 4. HTML 요소 이동시키기
-                htmlRef.current.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, 0)`;
-            };
-
-            // GSAP의 ticker(매 프레임 실행)에 추적 함수를 달아줌!
-            gsap.ticker.add(trackPosition);
-        }
+        // 🚀 4. 로딩이 완료되면 GSAP ticker를 이용해 매 프레임마다 변수 추적 시작!
+        gsap.ticker.add(trackSplineVariable);
     };
 
 
-    // 🎯 마커 클릭 시 지정된 스플라인 뷰포인트로 이동
-    const handleMarkerClick = () => {
-        const app = splineApp.current;
-        if (!app) return;
-
-        const realCamera = app._scene?.getObjectByName('Camera');
-
-        if (realCamera) {
-            // 1. 캡처 이미지의 Position 수치
-            const targetX = -950;  // 👈 이 값을 수정했습니다.
-            const targetY = 327.3; // Y값 유지
-            const targetZ = 301.4; // Z값 유지
-
-            // 2. Rotation 수치 (소수점 정리 및 라디안 변환)
-            const rotX = -8.5 * (Math.PI / 180); // 기존 -8.48 -> -8.5 정리
-            const rotY = -29 * (Math.PI / 180);  // 유지
-            const rotZ = -5.3 * (Math.PI / 180); // 기존 -5.29 -> -5.3 정리
-
-            // ... (아래 GSAP 애니메이션 코드는 그대로 유지)
-            // 3. 캡처 이미지의 Zoom 수치
-            const targetZoom = 2.80;
-
-            // 🎬 A. 위치(Position) 애니메이션
-            gsap.to(realCamera.position, {
-                x: targetX,
-                y: targetY,
-                z: targetZ,
-                duration: 1.5,
-                ease: "power3.inOut"
-            });
-
-            // 🎬 B. 회전(Rotation) 애니메이션
-            gsap.to(realCamera.rotation, {
-                x: rotX,
-                y: rotY,
-                z: rotZ,
-                duration: 1.5,
-                ease: "power3.inOut"
-            });
-
-            // 🎬 C. 줌(Zoom) 애니메이션
-            gsap.to(realCamera, {
-                zoom: targetZoom,
-                duration: 1.5,
-                ease: "power3.inOut",
-                onUpdate: () => {
-                    // 🚨 주의: lookAt()은 삭제했습니다!
-                    // 대신 직교 카메라(Orthographic)의 줌이 변하므로 아래 렌더링 업데이트 코드는 꼭 남겨둬야 합니다.
-                    realCamera.updateProjectionMatrix();
-                }
-            });
-
-            console.log("📸 세팅된 뷰포인트로 완벽 이동 완료!");
-        }
-    };
+    function getStart() {
+        setIntro(true)
+    }
 
     return (
         <>
-            <Overlay1 />
-            <ScrollIndicator color={'white'} />
 
-            <main ref={mainContainerRef} style={{ position: 'relative', height: '300vh', width: '100vw', backgroundColor: '#e5e5e5' }}>
-                <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
 
-                    {/* ========================================================= */}
-                    {/* 🚀 4. 3D 좌표를 찰떡같이 따라다닐 HTML UI! */}
-                    {/* ========================================================= */}
-                    <div
-                        ref={htmlRef}
-                        onClick={handleMarkerClick} // 👈 클릭 이벤트 추가!
-                        style={{
-                            position: 'absolute',
-                            top: 0, left: 0,
-                            transform: 'translate(-50%, -50%)',
-                            zIndex: 10,
-                            color: 'white',
-                            cursor: 'pointer',       // 👈 마우스 올리면 손가락 모양
-                            pointerEvents: 'auto',   // 👈 이제 클릭을 인식함!
-                            padding: '10px',
-                            backgroundColor: 'rgba(0,0,0,0.5)',
-                            borderRadius: '8px'
-                        }}
-                    >
-                         BDI - 100
+            <main ref={mainContainerRef}
+                  style={{position: 'relative', height: '300vh', width: '100vw', backgroundColor: '#e5e5e5'}}>
+
+                <div style={{position: 'sticky', top: 0, height: '100vh', overflow: 'hidden'}}>
+                    {!intro ? <Overlay1/> : <></>}
+
+
+                    <div style={{position: 'absolute', bottom: 0, right: 0, zIndex: 12, padding: 50}}>
+
+                        {!intro ? <span style={{backgroundColor: 'blue', color: 'white', padding: '10px 20px', borderRadius: 10}}
+                               onClick={getStart}>
+                    비디텍 브로슈어 시작하기
+                </span> : <></>}
                     </div>
 
 
+
+
+                    <div
+                        ref={uiPanelRef}
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            right: 0, // 오른쪽에 붙임
+                            width: '400px', // 도화지 너비
+                            height: '100vh',
+                            backgroundColor: 'white',
+                            boxShadow: '-5px 0 15px rgba(0,0,0,0.1)',
+                            zIndex: 20,
+                            padding: '40px',
+                            // 초기 상태: 화면 오른쪽 바깥(100%)으로 밀어두고 투명하게 만듦
+                            transform: 'translateX(100%)',
+                            opacity: 0,
+                        }}
+                    >
+                        <h2>Product 정보 도화지 🎨</h2>
+                        <p>변수가 1이 되어서 짜잔! 하고 나타났습니다.</p>
+                        <p>여기서 HTML/React로 원하는 내용을 마음껏 꾸미세요!</p>
+                    </div>
+                    <div style={{width: '100%', height: '100%', filter: `blur(${intro ?0:5}px)`}}>
                         <Spline
-                            scene="https://prod.spline.design/TYUnZBzHQ8Pfrt24/scene.splinecode"
+                            scene={`https://prod.spline.design/TYUnZBzHQ8Pfrt24/scene.splinecode?v=${Date.now()}`}
                             onLoad={onLoad}
                         />
-
+                    </div>
                 </div>
             </main>
         </>
