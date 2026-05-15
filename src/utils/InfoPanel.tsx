@@ -3,6 +3,8 @@ import gsap from 'gsap';
 import styles from './InfoPanel.module.css';
 
 const COMPACT_BREAKPOINT = '(max-width: 1024px)';
+const MOBILE_BREAKPOINT = '(max-width: 768px)';
+const TABLET_BREAKPOINT = '(min-width: 769px) and (max-width: 1024px)';
 
 interface InfoPanelProps {
     isOpen: boolean;
@@ -19,24 +21,25 @@ function getTeaserPreview(desc: string, extra?: string, maxSentences = 3): strin
     return sentences.slice(0, maxSentences);
 }
 
-function useCompactViewport() {
-    const [isCompact, setIsCompact] = useState(false);
+function useMediaQuery(query: string) {
+    const [matches, setMatches] = useState(false);
 
     useEffect(() => {
-        const mq = window.matchMedia(COMPACT_BREAKPOINT);
-        const update = () => setIsCompact(mq.matches);
+        const mq = window.matchMedia(query);
+        const update = () => setMatches(mq.matches);
         update();
         mq.addEventListener('change', update);
         return () => mq.removeEventListener('change', update);
-    }, []);
+    }, [query]);
 
-    return isCompact;
+    return matches;
 }
 
 export default function InfoPanel({ isOpen, title, desc, extra, onClose }: InfoPanelProps) {
     const panelRef = useRef<HTMLDivElement>(null);
     const teaserRef = useRef<HTMLDivElement>(null);
-    const isCompact = useCompactViewport();
+    const isCompact = useMediaQuery(COMPACT_BREAKPOINT);
+    const isMobile = useMediaQuery(MOBILE_BREAKPOINT);
     const [isExpanded, setIsExpanded] = useState(false);
 
     const showTeaser = isCompact && isOpen && !isExpanded;
@@ -77,7 +80,15 @@ export default function InfoPanel({ isOpen, title, desc, extra, onClose }: InfoP
             }
         });
 
-        mm.add(COMPACT_BREAKPOINT, () => {
+        mm.add(MOBILE_BREAKPOINT, () => {
+            if (isExpanded) {
+                gsap.to(panel, { y: 0, x: 0, opacity: 1, duration: 0.5, ease: 'power3.out' });
+            } else {
+                gsap.to(panel, { y: '100%', x: 0, opacity: 0, duration: 0.4, ease: 'power3.in' });
+            }
+        });
+
+        mm.add(TABLET_BREAKPOINT, () => {
             if (isExpanded) {
                 gsap.to(panel, { y: 0, x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' });
             } else {
@@ -124,7 +135,11 @@ export default function InfoPanel({ isOpen, title, desc, extra, onClose }: InfoP
                 ref={panelRef}
                 className={[
                     styles.panel,
-                    isCompact ? styles.panelMobileSheet : styles.panelDesktop,
+                    isMobile
+                        ? styles.panelMobileFullscreen
+                        : isCompact
+                          ? styles.panelMobileSheet
+                          : styles.panelDesktop,
                     showPanel ? '' : styles.panelHidden,
                 ].join(' ')}
                 aria-hidden={!showPanel}
