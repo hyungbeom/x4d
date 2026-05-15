@@ -134,7 +134,7 @@ export default function Home() {
                         <NavBar
                             logoSrc="/model/bdtec/logo.svg"
                             menus={navMenus}
-                            contactLink="https://www.bdtec.co.kr/page/16"
+                            contactLink="/brochure/bdtec/contactus"
                         />
                     )}
 
