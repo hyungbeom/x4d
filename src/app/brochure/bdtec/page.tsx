@@ -72,6 +72,9 @@ export default function Home() {
     const onLoad = (app: any) => {
         splineApp.current = app;
         gsap.ticker.add(trackSplineVariable);
+        if (window.innerWidth <= 768) {
+            app.setPixelRatio(1); // 기본값은 보통 기기의 최대치(2나 3)로 설정되어 있음
+        }
     };
 
     // =========================================================
