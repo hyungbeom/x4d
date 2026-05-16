@@ -1,6 +1,6 @@
 import React, {useState, useRef, useEffect, useCallback} from 'react';
 import gsap from 'gsap';
-import TransitionLink from "@/utils/TransitionLink";
+import TransitionLink from "@/utils/ui/TransitionLink";
 
 interface MenuItem {
     title: string;

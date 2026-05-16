@@ -1,5 +1,5 @@
 import React from 'react';
-import PageWrapper from "@/utils/PageWrapper";
+import PageWrapper from "@/utils/ui/PageWrapper";
 
 export default function ContactUsPage() {
     return (

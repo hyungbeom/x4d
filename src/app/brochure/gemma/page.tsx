@@ -1,7 +1,7 @@
 'use client'
 
 import Overlay1 from "@/components/bdtec/overlay/OverLay1";
-import ScrollIndicator from "@/utils/ScrollIndicator";
+import ScrollIndicator from "@/utils/ui/ScrollIndicator";
 import React from "react";
 import dynamic from 'next/dynamic';
 

@@ -2,7 +2,7 @@
 
 import React, {Suspense, useEffect, useRef} from 'react';
 
-import ScrollIndicator from "@/utils/ScrollIndicator";
+import ScrollIndicator from "@/utils/ui/ScrollIndicator";
 import Overlay1 from "@/components/duon/overlay/OverLay1";
 
 import gsap from 'gsap';

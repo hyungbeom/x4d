@@ -2,6 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import { Canvas, type CanvasProps } from "@react-three/fiber";
+import { Stats } from "@react-three/drei";
 
 const baseStyle: CSSProperties = { pointerEvents: "none", touchAction: "auto" };
 
@@ -14,6 +15,7 @@ type Props = Omit<CanvasProps, "style"> & {
 export default function BrochureR3fCanvas({ style, shadows = true, children, ...rest }: Props) {
     return (
         <Canvas shadows={shadows} style={{ ...baseStyle, ...style }} {...rest}>
+            {process.env.NODE_ENV === 'development' && <Stats />}
             {children}
         </Canvas>
     );

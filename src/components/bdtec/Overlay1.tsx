@@ -3,7 +3,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { gsap } from "@/lib/brochureGsap";
-import ScrollIndicator from "@/utils/ScrollIndicator";
+import ScrollIndicator from "@/utils/ui/ScrollIndicator";
 
 export default function Overlay1() {
     const logoRef = useRef<HTMLImageElement>(null);
