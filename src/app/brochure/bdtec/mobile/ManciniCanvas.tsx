@@ -28,7 +28,7 @@ export function ManciniCanvas({ quality, children }: any) {
             }}
             camera={{
                 position: [175, 105, 238],
-                zoom: 0.26,
+                zoom: 1,
                 near: -1000,
                 far: 3000,
             }}

@@ -262,14 +262,14 @@ export function SystemModel(props:any) {
                     position={[33.342, -103.896, 86.326]}
                     rotation={[0, 0, -Math.PI]}
                 />
-                <mesh
-                    castShadow
-                    receiveShadow
-                    geometry={nodes.Path_for_Laser.geometry}
-                    material={nodes.Path_for_Laser.material}
-                    position={[-148.376, -118.397, 50.708]}
-                    rotation={[-Math.PI / 2, 0, Math.PI / 2]}
-                />
+                {/*<mesh*/}
+                {/*    castShadow*/}
+                {/*    receiveShadow*/}
+                {/*    geometry={nodes.Path_for_Laser.geometry}*/}
+                {/*    material={nodes.Path_for_Laser.material}*/}
+                {/*    position={[-148.376, -118.397, 50.708]}*/}
+                {/*    rotation={[-Math.PI / 2, 0, Math.PI / 2]}*/}
+                {/*/>*/}
 
                 <mesh
                     castShadow

@@ -72,9 +72,32 @@ export default function Home() {
 
     ], []);
 
+    const PipeLine2 = useMemo(() => [
+        new THREE.Vector3(-140,15,53),
+        new THREE.Vector3(-220,15,53),
+        new THREE.Vector3(-220,15,200),
+        new THREE.Vector3(-358,15,200),
+        new THREE.Vector3(-358,15,50),
+
+    ], []);
 
 
+    const PipeLine3 = useMemo(() => [
+        new THREE.Vector3(75,33,50),
+        new THREE.Vector3(150,33,50),
+        new THREE.Vector3(150,33,-120),
+        new THREE.Vector3(265,33,-120),
+        new THREE.Vector3(265,33,30),
 
+    ], []);
+
+
+    const PipeLine4 = useMemo(() => [
+        new THREE.Vector3(0,33,135),
+        new THREE.Vector3(0,33,-135),
+        new THREE.Vector3(530,33,-135),
+
+    ], []);
 
 
     const navMenus = [
@@ -235,13 +258,10 @@ export default function Home() {
                                     <Tank scale={[70,70,70]} position={[0, 0, 370]} rotation={[0,-Math.PI/2,0]}/>
                                     <AirProduct scale={[20,20,20]} position={[-40,215,45]}/>
                                     <Factory scale={[20,20,20]} position={[-440,0,45]}/>
-                                    <Wifi scale={[150,150,150]} position={[340,0,45]}/>
+                                    <Wifi scale={[150,150,150]} position={[300,0,88]}/>
                                     <SystemModel scale={[100,100,100]} position={[0,130,0]} rotation={[0,0,0]}/>
 
                                     {/*<Tank scale={[70,70,70]}/>*/}
-
-
-
 
 
 
@@ -263,6 +283,31 @@ export default function Home() {
                                         speed={1}
                                     />
 
+                                    <LineObj
+                                        type="type1"
+                                        points={PipeLine2}
+                                        tubeRadius={5}
+                                        lightRadius={3}
+                                        speed={1}
+                                    />
+
+
+                                    <LineObj
+                                        type="type1"
+                                        points={PipeLine3}
+                                        tubeRadius={5}
+                                        lightRadius={3}
+                                        speed={1}
+                                    />
+
+
+                                    <LineObj
+                                        type="type2"
+                                        points={PipeLine4}
+                                        tubeRadius={5}
+                                        lightRadius={3}
+                                        speed={1}
+                                    />
 
 
 
