@@ -157,21 +157,23 @@ export default function LineObj({
     return (
         <group {...props}>
             <mesh>
-                <tubeGeometry args={[tubeMemo.curve, 400, 5, 64, tubeMemo.finalIsClosed]} />
+                {/* 🚀 5 대신 tubeRadius 적용 */}
+                <tubeGeometry args={[tubeMemo.curve, 400, tubeRadius, 64, tubeMemo.finalIsClosed]} />
                 <meshPhysicalMaterial
                     color="#ffffff"
                     transparent={true}
                     transmission={1}
                     opacity={1}
                     roughness={0.05}
-                    thickness={5}
+                    thickness={tubeRadius} // 팁: 유리 재질의 두께감도 tubeRadius에 맞추면 좋습니다
                     ior={1.6}
                     clearcoat={1}
                 />
             </mesh>
 
             <mesh>
-                <tubeGeometry args={[tubeMemo.curve, 400, 1, 16, tubeMemo.finalIsClosed]} />
+                {/* 🚀 1 대신 lightRadius 적용 */}
+                <tubeGeometry args={[tubeMemo.curve, 400, lightRadius, 16, tubeMemo.finalIsClosed]} />
                 <meshStandardMaterial
                     color="#00ffcc"
                     emissive="#00ffcc"

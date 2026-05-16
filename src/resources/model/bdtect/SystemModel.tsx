@@ -1,12 +1,8 @@
-import React, { useMemo } from 'react';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
-import {useGLTF} from "@react-three/drei";
-
+import React, { useRef } from 'react'
+import { useGLTF } from '@react-three/drei'
 
 export function SystemModel(props:any) {
-
-
     const { nodes, materials }:any = useGLTF('/model/bdtec/system.glb')
     return (
         <group {...props} dispose={null}>
@@ -40,52 +36,54 @@ export function SystemModel(props:any) {
                     castShadow
                     receiveShadow
                     geometry={nodes.Cube001.geometry}
-                    material={nodes.Cube001.material}
                     position={[-47.266, -78.853, 46.388]}
                     rotation={[-Math.PI / 2, 0, 0]}
                     scale={[1.203, 1.203, 0.18]}
-                />
+                >
+                    <meshStandardMaterial color="#F2BA79" />
+                </mesh>
+
+                {/* 2. 매끄러운 투명/유리 재질로 변경된 매터리얼 */}
                 <mesh
                     castShadow
                     receiveShadow
                     geometry={nodes.Cube002.geometry}
-
                     position={[-47.266, 0.937, 47.255]}
                     rotation={[Math.PI / 2, 0, 0]}
                     scale={[-1.203, -1.203, -0.704]}
                 >
                     <meshPhysicalMaterial
                         color="#ffffff"
-                        transmission={1}      // 빛 100% 통과 (유지)
+                        transmission={1}
                         transparent={true}
-                        opacity={1}           // 유지
-                        roughness={0}         // 🚀 금속 광택 제거를 위해 가장 매끄럽게 (0)
-                        metalness={0}         // 🚀 명시적으로 금속성 0!
-                        ior={1.5}             // 유지
-                        thickness={0.1}       // 🚀 두께를 아주 얇게 잡아야 덜 단단해 보입니다 (1 -> 0.1)
-                        clearcoat={0}         // 🚀 쨍한 주범! 코팅 제거 (1 -> 0)
+                        opacity={1}
+                        roughness={0}
+                        metalness={0}
+                        ior={1.5}
+                        thickness={0.1}
+                        clearcoat={0}
                         side={THREE.DoubleSide}
                     />
                 </mesh>
+
                 <mesh
                     castShadow
                     receiveShadow
                     geometry={nodes.Cube003.geometry}
-
                     position={[-47.266, -47.497, 47.255]}
                     rotation={[Math.PI / 2, 0, 0]}
                     scale={[-1.203, -1.203, -1.342]}
                 >
                     <meshPhysicalMaterial
                         color="#ffffff"
-                        transmission={1}      // 빛 100% 통과 (유지)
+                        transmission={1}
                         transparent={true}
-                        opacity={1}           // 유지
-                        roughness={0}         // 🚀 금속 광택 제거를 위해 가장 매끄럽게 (0)
-                        metalness={0}         // 🚀 명시적으로 금속성 0!
-                        ior={1.5}             // 유지
-                        thickness={0.1}       // 🚀 두께를 아주 얇게 잡아야 덜 단단해 보입니다 (1 -> 0.1)
-                        clearcoat={0}         // 🚀 쨍한 주범! 코팅 제거 (1 -> 0)
+                        opacity={1}
+                        roughness={0}
+                        metalness={0}
+                        ior={1.5}
+                        thickness={0.1}
+                        clearcoat={0}
                         side={THREE.DoubleSide}
                     />
                 </mesh>
@@ -106,7 +104,9 @@ export function SystemModel(props:any) {
                     position={[-47.183, -157.118, 45.717]}
                     rotation={[-Math.PI / 2, 0, 0]}
                     scale={[1.507, 1.565, 0.098]}
-                />
+                >
+                    <meshStandardMaterial color="#707070" />
+                </mesh>
                 <mesh
                     castShadow
                     receiveShadow
@@ -115,32 +115,52 @@ export function SystemModel(props:any) {
                     position={[-47.183, -118.125, 45.717]}
                     rotation={[-Math.PI / 2, 0, 0]}
                     scale={[1.38, 1.38, 0.388]}
-                />
+                >
+
+
+                        <meshStandardMaterial color="#F2BA79" />
+
+                </mesh>
                 <mesh
                     castShadow
                     receiveShadow
                     geometry={nodes.Cube007.geometry}
-                    material={nodes.Cube007.material}
                     position={[-43.939, -13.86, 47.61]}
                     rotation={[-Math.PI / 2, 0, 0]}
                     scale={[0.697, 0.652, 0.589]}
-                />
+                >
+                    <meshPhysicalMaterial
+                        color="#ffd700"
+                        metalness={1}
+                        roughness={0.2}
+                        clearcoat={0}
+                        side={THREE.DoubleSide}
+                    />
+                </mesh>
+
                 <mesh
                     castShadow
                     receiveShadow
                     geometry={nodes.Cube008.geometry}
-                    material={nodes.Cube008.material}
                     position={[-43.939, -31.946, 47.581]}
                     rotation={[-Math.PI / 2, 0, 0]}
                     scale={[0.856, 0.832, 0.759]}
-                />
+                >
+                    <meshPhysicalMaterial
+                        color="#ffd700"
+                        metalness={1}
+                        roughness={0.2}
+                        clearcoat={0}
+                        side={THREE.DoubleSide}
+                    />
+                </mesh>
                 <mesh
                     castShadow
                     receiveShadow
                     geometry={nodes.Cylinder.geometry}
                     material={nodes.Cylinder.material}
                     position={[-43.939, -13.86, 47.581]}
-                    scale={[1.57, 0.528, 1]}
+                    scale={[1.2, 0.528, 1.2]}
                 />
                 <group position={[454.784, -23.759, 38.256]} scale={0}>
                     <mesh
@@ -149,6 +169,7 @@ export function SystemModel(props:any) {
                         geometry={nodes.Quick_and_Safe_transactions.geometry}
                         material={nodes.Quick_and_Safe_transactions.material}
                         position={[32, 2, 0]}
+                        rotation={[-0.419, 0, 0]}
                         scale={0}
                     />
                     <mesh
@@ -157,6 +178,7 @@ export function SystemModel(props:any) {
                         geometry={nodes.Quick_and_Safe_transactions_2.geometry}
                         material={nodes.Quick_and_Safe_transactions_2.material}
                         position={[32, 2, 0]}
+                        rotation={[-0.419, 0, 0]}
                         scale={0}
                     />
                     <mesh
@@ -165,9 +187,76 @@ export function SystemModel(props:any) {
                         geometry={nodes.Quick_and_Safe_transactions001.geometry}
                         material={nodes.Quick_and_Safe_transactions001.material}
                         position={[32, 2, 0]}
+                        rotation={[-0.419, 0, -1.571]}
                         scale={0}
                     />
                 </group>
+                <group position={[-263.591, -30.283, 394.307]} scale={0}>
+                    <mesh
+                        castShadow
+                        receiveShadow
+                        geometry={nodes.Quick_and_Safe_transactions_2001.geometry}
+                        material={nodes.Quick_and_Safe_transactions_2001.material}
+                        position={[-16, -2, 0]}
+                        rotation={[-0.419, 0, 0]}
+                        scale={0}
+                    />
+                    <mesh
+                        castShadow
+                        receiveShadow
+                        geometry={nodes.Quick_and_Safe_transactions002.geometry}
+                        material={nodes.Quick_and_Safe_transactions002.material}
+                        position={[-16, -2, 0]}
+                        rotation={[-0.419, 0, 0]}
+                        scale={0}
+                    />
+                    <mesh
+                        castShadow
+                        receiveShadow
+                        geometry={nodes.Quick_and_Safe_transactions003.geometry}
+                        material={nodes.Quick_and_Safe_transactions003.material}
+                        position={[-16, -2, 0]}
+                        rotation={[-0.419, 0, -1.571]}
+                        scale={0}
+                    />
+                </group>
+                <group position={[-536.279, -78.255, -28.492]} scale={0}>
+                    <mesh
+                        castShadow
+                        receiveShadow
+                        geometry={nodes.Quick_and_Safe_transactions_2002.geometry}
+                        material={nodes.Quick_and_Safe_transactions_2002.material}
+                        position={[0, 0, -4]}
+                        rotation={[-0.419, 0, 0]}
+                        scale={0}
+                    />
+                    <mesh
+                        castShadow
+                        receiveShadow
+                        geometry={nodes.Quick_and_Safe_transactions004.geometry}
+                        material={nodes.Quick_and_Safe_transactions004.material}
+                        position={[0, 0, -4]}
+                        rotation={[-0.419, 0, 0]}
+                        scale={0}
+                    />
+                    <mesh
+                        castShadow
+                        receiveShadow
+                        geometry={nodes.Quick_and_Safe_transactions005.geometry}
+                        material={nodes.Quick_and_Safe_transactions005.material}
+                        position={[0, 0, -4]}
+                        rotation={[-0.419, 0, -1.571]}
+                        scale={0}
+                    />
+                </group>
+                <mesh
+                    castShadow
+                    receiveShadow
+                    geometry={nodes.Laser_Path.geometry}
+                    material={nodes.Laser_Path.material}
+                    position={[-37.949, -51.8, -24.977]}
+                    rotation={[-Math.PI / 2, 0, 0]}
+                />
                 <group position={[-157.954, -116.426, 52.003]} rotation={[0, -1.571, 0]}>
                     <mesh
                         castShadow
@@ -288,15 +377,38 @@ export function SystemModel(props:any) {
                     position={[33.342, -103.896, 86.326]}
                     rotation={[0, 0, -Math.PI]}
                 />
-                {/*<mesh*/}
-                {/*    castShadow*/}
-                {/*    receiveShadow*/}
-                {/*    geometry={nodes.Path_for_Laser.geometry}*/}
-                {/*    material={nodes.Path_for_Laser.material}*/}
-                {/*    position={[-148.376, -118.397, 50.708]}*/}
-                {/*    rotation={[-Math.PI / 2, 0, Math.PI / 2]}*/}
-                {/*/>*/}
-
+                <mesh
+                    castShadow
+                    receiveShadow
+                    geometry={nodes.Path_for_Laser.geometry}
+                    material={nodes.Path_for_Laser.material}
+                    position={[-148.376, -118.397, 50.708]}
+                    rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+                />
+                <mesh
+                    castShadow
+                    receiveShadow
+                    geometry={nodes['Path_to_Quick_&_Safe'].geometry}
+                    material={nodes['Path_to_Quick_&_Safe'].material}
+                    position={[-148.376, -118.397, 50.708]}
+                    rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+                />
+                <mesh
+                    castShadow
+                    receiveShadow
+                    geometry={nodes.Path001.geometry}
+                    material={nodes.Path001.material}
+                    position={[-37.949, -95.626, -25.733]}
+                    rotation={[-Math.PI / 2, 0, 0]}
+                />
+                <mesh
+                    castShadow
+                    receiveShadow
+                    geometry={nodes.Pipe_Line.geometry}
+                    material={nodes.Pipe_Line.material}
+                    position={[57.053, -102.286, 50.708]}
+                    rotation={[-Math.PI / 2, 0, -Math.PI / 2]}
+                />
                 <mesh
                     castShadow
                     receiveShadow
@@ -313,7 +425,14 @@ export function SystemModel(props:any) {
                     position={[-49.518, -112.402, 157.601]}
                     rotation={[-1.553, 0, 0]}
                 />
-
+                <mesh
+                    castShadow
+                    receiveShadow
+                    geometry={nodes.Pipe_Line001.geometry}
+                    material={nodes.Pipe_Line001.material}
+                    position={[-49.518, -112.402, 157.601]}
+                    rotation={[-1.553, 0, 0]}
+                />
                 <mesh
                     castShadow
                     receiveShadow
@@ -362,7 +481,7 @@ export function SystemModel(props:any) {
                         receiveShadow
                         geometry={nodes.Lock_4.geometry}
                         material={nodes.Lock_4.material}
-                        position={[3, 0, 0]}
+                        position={[3.001, 0, 0]}
                         rotation={[Math.PI / 2, 0, Math.PI / 2]}
                     />
                 </group>
@@ -388,5 +507,6 @@ export function SystemModel(props:any) {
         </group>
     )
 }
+
 
 useGLTF.preload('/model/bdtec/system.glb')

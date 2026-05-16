@@ -18,10 +18,11 @@ import {Environment} from "@react-three/drei";
 import * as THREE from 'three';
 import { Tank } from "@/resources/model/bdtect/Tank";
 import {useFrame} from "@react-three/fiber";
-import { SystemModel } from "@/resources/model/bdtect/SystemModel";
 import {AirProduct} from "@/resources/model/Air_Product";
 import { Factory } from "@/resources/model/bdtect/Factory";
 import {Wifi} from "@/resources/model/bdtect/Wifi";
+import { SystemModel } from "@/resources/model/bdtect/SystemModel";
+import {Modem} from "@/resources/model/bdtect/Modem";
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
@@ -101,6 +102,14 @@ export default function Home() {
 
     ], []);
 
+    const PipeLine5 = useMemo(() => [
+        new THREE.Vector3(-40,80,135),
+        new THREE.Vector3(-40,80,-300),
+        new THREE.Vector3(320,80,-300),
+        new THREE.Vector3(320,80,-135),
+        new THREE.Vector3(530,80,-135),
+
+    ], []);
 
     const navMenus = [
         {
@@ -257,9 +266,19 @@ export default function Home() {
 
                                     <FloatingTankLine/>
 
-                                    <Tank scale={[70,70,70]} position={[0, 0, 370]} rotation={[0,-Math.PI/2,0]}/>
+
                                     <AirProduct scale={[20,20,20]} position={[-40,215,45]}/>
-                                    <Factory scale={[20,20,20]} position={[-440,0,45]}/>
+
+
+                                    <Tank scale={[70,70,70]} position={[0, 0, 370]} rotation={[0,-Math.PI/2,0]}/>
+                                    <Modem scale={[100,100,100]} position={[0,0,450]}/>
+
+
+                                    <Factory scale={[40,40,40]} rotation={[0,-Math.PI/2,0]} position={[-420,0,-20]}/>
+                                    <Modem scale={[100,100,100]} position={[-450,0,80]}/>
+
+
+
                                     <Wifi scale={[150,150,150]} position={[300,0,88]}/>
                                     <SystemModel scale={[100,100,100]} position={[0,130,0]} rotation={[0,0,0]}/>
 
@@ -311,6 +330,15 @@ export default function Home() {
                                         speed={1}
                                         lineWidth={7}
                                     />
+
+                                    <LineObj
+                                        type="type1"
+                                        points={PipeLine5}
+                                        tubeRadius={18}
+                                        lightRadius={15}
+                                        speed={1}
+                                    />
+
 
 
 
