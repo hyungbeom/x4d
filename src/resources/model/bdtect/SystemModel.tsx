@@ -270,19 +270,7 @@ export function SystemModel(props:any) {
                     position={[-148.376, -118.397, 50.708]}
                     rotation={[-Math.PI / 2, 0, Math.PI / 2]}
                 />
-                <mesh
-                    castShadow
-                    receiveShadow
-                    geometry={nodes.Path001.geometry}
-                    position={[-37.949, -95.626, -25.733]}
-                    rotation={[-Math.PI / 2, 0, 0]}
-                >
-                    <meshStandardMaterial
-                    color="#FFA500" // 주황색(Orange) 헥스 코드
-                    roughness={0.4} // 표면 거칠기 (0에 가까울수록 매끈하고 반짝임)
-                    metalness={0.1} // 금속 느낌 (1에 가까울수록 쇳덩이 같아짐)
-                />
-                </mesh>
+
                 <mesh
                     castShadow
                     receiveShadow

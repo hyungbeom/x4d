@@ -52,6 +52,7 @@ export function ManciniCanvas({ quality, children }: any) {
                 return renderer;
             }}
         >
+            <color attach="background" args={['#0a0a0a']} />
             {children}
             <ResizeHandler quality={quality} rendererRef={rendererRef} />
         </Canvas>

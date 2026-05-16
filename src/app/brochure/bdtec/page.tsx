@@ -41,13 +41,15 @@ const panelContents: Record<number, { title: string; desc: string; extra?: strin
     5: {title: "IoT Gateway", desc: "현장의 모든 센서 데이터를 수집하여 클라우드로 전송하는 핵심 허브입니다.", extra: "LTE/5G망을 통한 무중단 통신 환경 구축."}
 };
 
+
+
 export default function Home() {
     const [intro, setIntro] = useState(true);
     const [activePanelId, setActivePanelId] = useState<number>(0);
 
-    const [currentScene, setCurrentScene] = useState("vader");
+
     const [quality, setQuality] = useState("default");
-    const [isPostProcessingEnabled, setIsPostProcessingEnabled] = useState(true);
+
 
     // 🚀 3. 태블릿 및 모바일 기기 여부를 판정할 상태값 추가 (기준: 1024px)
     const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(false);
@@ -58,6 +60,22 @@ export default function Home() {
 
     const introWrapperRef = useRef<HTMLDivElement>(null);
     const blurContainerRef = useRef<HTMLDivElement>(null);
+
+
+
+
+
+
+    const PipeLine1 = useMemo(() => [
+        new THREE.Vector3(-50, 15, 50),
+        new THREE.Vector3(-50, 15, 300),
+
+    ], []);
+
+
+
+
+
 
     const navMenus = [
         {
@@ -216,11 +234,38 @@ export default function Home() {
 
                                     <Tank scale={[70,70,70]} position={[0, 0, 370]} rotation={[0,-Math.PI/2,0]}/>
                                     <AirProduct scale={[20,20,20]} position={[-40,215,45]}/>
-                                    <Factory scale={[20,20,20]} position={[-340,0,45]}/>
+                                    <Factory scale={[20,20,20]} position={[-440,0,45]}/>
                                     <Wifi scale={[150,150,150]} position={[340,0,45]}/>
                                     <SystemModel scale={[100,100,100]} position={[0,130,0]} rotation={[0,0,0]}/>
 
                                     {/*<Tank scale={[70,70,70]}/>*/}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    <LineObj
+                                        type="type1"
+                                        points={PipeLine1}
+                                        tubeRadius={5}
+                                        lightRadius={3}
+                                        speed={1}
+                                    />
+
+
+
+
                                 </ManciniCanvas>
 
 

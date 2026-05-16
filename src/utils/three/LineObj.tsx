@@ -38,6 +38,9 @@ export default function LineObj({
                                     isClosed = false,
                                     type = 'type1',
                                     lineWidth = 2,
+                                    tubeRadius = 5,
+                                    lightRadius = 1,
+                                    speed = 0.15,         // 🚀 2. 기본 속도를 기존과 동일한 0.15로 세팅!
                                     ...props
                                 }: LineObjProps) {
 
@@ -113,7 +116,7 @@ export default function LineObj({
 
     useFrame((state, delta) => {
         if (lineMaskTexture) {
-            lineMaskTexture.offset.x -= delta * 0.15;
+            lineMaskTexture.offset.x -= delta * speed;
         }
     });
 
