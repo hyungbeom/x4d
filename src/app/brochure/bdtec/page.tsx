@@ -93,8 +93,10 @@ export default function Home() {
 
 
     const PipeLine4 = useMemo(() => [
-        new THREE.Vector3(0,33,135),
-        new THREE.Vector3(0,33,-135),
+        new THREE.Vector3(-40,33,135),
+        new THREE.Vector3(-40,33,-300),
+        new THREE.Vector3(320,33,-300),
+        new THREE.Vector3(320,33,-135),
         new THREE.Vector3(530,33,-135),
 
     ], []);
@@ -307,6 +309,7 @@ export default function Home() {
                                         tubeRadius={5}
                                         lightRadius={3}
                                         speed={1}
+                                        lineWidth={7}
                                     />
 
 
