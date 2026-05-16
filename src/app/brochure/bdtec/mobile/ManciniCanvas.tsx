@@ -20,7 +20,7 @@ export function ManciniCanvas({ quality, children }: any) {
             // ❌ [삭제됨] onCreated의 강제 setSize 삭제 (반응형 충돌 방지)
             // ❌ [삭제됨] frameloop={frameloop} 삭제 (기본값인 "always"로 자동 작동)
 
-            dpr={quality === "default" ? 1 : [1, 1.5]}
+            dpr={window.devicePixelRatio}
             // XZ 바닥 그리드가 선이 아니라 면으로 보이도록 +Z 정면이 아닌 비스듬한 시점
             onCreated={({ camera }) => {
                 camera.lookAt(2, -0.6, 0);
