@@ -20,7 +20,7 @@ export function ManciniCanvas({ quality, children }: any) {
             // ❌ [삭제됨] onCreated의 강제 setSize 삭제 (반응형 충돌 방지)
             // ❌ [삭제됨] frameloop={frameloop} 삭제 (기본값인 "always"로 자동 작동)
 
-            dpr={quality === "default" ? 1 : [1, 1.5]}
+            dpr={window.devicePixelRatio}
             camera={{
                 position: [0, 200, 800],
                 zoom: 1,
