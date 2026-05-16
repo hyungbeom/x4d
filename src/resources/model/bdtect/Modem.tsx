@@ -15,7 +15,11 @@ export function Modem(props:any) {
                             material={nodes.Boolean_2.material}
                             position={[62.113, -46.655, -65.529]}
                         >
-                            <meshStandardMaterial color="#3A3F55" />
+                            <meshStandardMaterial
+                                color="#3A3F55"
+                                metalness={0.9}
+                                roughness={0.2}
+                            />
                         </mesh>
                         <mesh
                             castShadow
@@ -91,7 +95,11 @@ export function Modem(props:any) {
                             position={[0, -134.928, -0.349]}
                             rotation={[-Math.PI / 2, 0, 0]}
                         >
-                            <meshStandardMaterial color="#3A3F55" />
+                            <meshStandardMaterial
+                                color="#3A3F55"
+                                metalness={0.9}
+                                roughness={0.2}
+                            />
                         </mesh>
                         <group position={[0, -51.838, -0.349]}>
                             <mesh
@@ -101,7 +109,13 @@ export function Modem(props:any) {
                                 material={nodes.Ellipse.material}
                                 position={[-154.504, -7.677, 106.11]}
                                 rotation={[-Math.PI / 2, 0, 0]}
-                            />
+                            >
+                                <meshStandardMaterial
+                                    color="#157837"
+                                    metalness={0.9}
+                                    roughness={0.2}
+                                />
+                            </mesh>
                             <mesh
                                 castShadow
                                 receiveShadow
@@ -109,7 +123,13 @@ export function Modem(props:any) {
                                 material={nodes.Ellipse_2.material}
                                 position={[154.504, -7.677, 106.11]}
                                 rotation={[-Math.PI / 2, 0, 0]}
-                            />
+                            >
+                                <meshStandardMaterial
+                                    color="#157837"
+                                    metalness={0.9}
+                                    roughness={0.2}
+                                />
+                            </mesh>
                             <mesh
                                 castShadow
                                 receiveShadow
@@ -117,7 +137,13 @@ export function Modem(props:any) {
                                 material={nodes.Ellipse_2001.material}
                                 position={[154.504, -7.677, -106.11]}
                                 rotation={[-Math.PI / 2, 0, 0]}
-                            />
+                            >
+                                <meshStandardMaterial
+                                    color="#157837"
+                                    metalness={0.9}
+                                    roughness={0.2}
+                                />
+                            </mesh>
                             <mesh
                                 castShadow
                                 receiveShadow
@@ -125,7 +151,13 @@ export function Modem(props:any) {
                                 material={nodes.Ellipse001.material}
                                 position={[-154.504, -7.677, -106.11]}
                                 rotation={[-Math.PI / 2, 0, 0]}
-                            />
+                            >
+                                <meshStandardMaterial
+                                    color="#157837"
+                                    metalness={0.9}
+                                    roughness={0.2}
+                                />
+                            </mesh>
                         </group>
                         <group position={[3.996, 84.105, 77.455]}>
                             <mesh
@@ -135,7 +167,14 @@ export function Modem(props:any) {
                                 material={nodes.Shape_0.material}
                                 position={[-27.471, -64.63, -15.01]}
                                 rotation={[0, 0, Math.PI / 4]}
-                            />
+                            >
+                                <meshStandardMaterial
+                                    color="#157837"
+                                    metalness={0.9}
+                                    roughness={0.2}
+                                />
+
+                            </mesh>
                             <mesh
                                 castShadow
                                 receiveShadow
@@ -143,7 +182,13 @@ export function Modem(props:any) {
                                 material={nodes.Shape_1.material}
                                 position={[-59.362, -31.891, -15]}
                                 rotation={[0, 0, Math.PI / 4]}
-                            />
+                            >
+                                <meshStandardMaterial
+                                    color="#157837"
+                                    metalness={0.9}
+                                    roughness={0.2}
+                                />
+                            </mesh>
                             <mesh
                                 castShadow
                                 receiveShadow
@@ -151,7 +196,13 @@ export function Modem(props:any) {
                                 material={nodes.Shape_2.material}
                                 position={[-91.676, 0.424, -14.99]}
                                 rotation={[0, 0, Math.PI / 4]}
-                            />
+                            >
+                                <meshStandardMaterial
+                                    color="#157837"
+                                    metalness={0.9}
+                                    roughness={0.2}
+                                />
+                            </mesh>
                         </group>
                     </group>
                 </group>
