@@ -4,19 +4,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import Overlay1 from "@/components/bdtec/overlay/OverLay1";
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import dynamic from 'next/dynamic';
 import NavBar from "@/utils/ui/NavBar";
 import InfoPanel from "@/utils/ui/InfoPanel";
 import PageWrapper from "@/utils/ui/PageWrapper";
 import styles from "./page.module.css";
 import { DomStats } from "@/utils/DevStats";
-import MobileScene from "./mobile/Mobile";
+import MobileScene from "@/app/brochure/bdtec/mobile/Mobile";
 
 
-const Spline = dynamic(() => import('@splinetool/react-spline'), {
-    ssr: false,
-    loading: () => <div className={styles.splineLoading}>3D 로딩 중...</div>
-});
 
 const panelContents: Record<number, { title: string; desc: string; extra?: string }> = {
     1: { title: "BDI-100", desc: "24시간 지속적인 모니터링으로 집진상태 판단과 측정 시스템을 제공합니다.", extra: "온도/차압/전류 등 환경 데이터를 안전하게 전송합니다." },
@@ -27,14 +22,14 @@ const panelContents: Record<number, { title: string; desc: string; extra?: strin
 };
 
 export default function Home() {
-    const [intro, setIntro] = useState(true);
+    const [intro, setIntro] = useState(false);
     const [activePanelId, setActivePanelId] = useState<number>(0);
     const [quality, setQuality] = useState("default");
-    const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(false);
 
-    const splineApp = useRef(null);
+    // 🚀 1. 기기 타입을 3가지로 세분화하여 관리합니다.
+    const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+
     const mainContainerRef = useRef(null);
-    const prevState = useRef<number | null>(null);
     const introWrapperRef = useRef<HTMLDivElement>(null);
     const blurContainerRef = useRef<HTMLDivElement>(null);
 
@@ -49,51 +44,36 @@ export default function Home() {
     useEffect(() => {
         gsap.registerPlugin(ScrollTrigger);
 
+        // 🚀 2. 창 크기에 따라 기기 판별 (기준은 필요에 따라 수정하세요)
         const handleResize = () => {
-            setIsMobileOrTablet(window.innerWidth <= 1024);
+            const width = window.innerWidth;
+            if (width <= 768) {
+                setDeviceType('mobile');     // 세로로 긴 모바일
+            } else if (width <= 1024) {
+                setDeviceType('tablet');     // 애매한 태블릿 비율
+            } else {
+                setDeviceType('desktop');    // 가로로 넓은 데스크탑
+            }
         };
 
-        handleResize();
+        handleResize(); // 초기 1회 실행
         window.addEventListener('resize', handleResize);
 
         return () => {
             ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-            gsap.ticker.remove(trackSplineVariable);
             window.removeEventListener('resize', handleResize);
         };
     }, []);
 
-    const trackSplineVariable = () => {
-        const app: any = splineApp.current;
-        if (!app) return;
-
-        const currentState = app.getVariable('Product_State');
-
-        if (currentState !== prevState.current) {
-            setActivePanelId(currentState);
-            prevState.current = currentState;
-        }
-    };
-
     const handleVariableChange = (newValue: number) => {
         setActivePanelId(newValue);
-        const app: any = splineApp.current;
-        if (app) {
-            app.setVariable('Product_State', newValue);
-        }
-    };
-
-    const onLoad = (app: any) => {
-        splineApp.current = app;
-        gsap.ticker.add(trackSplineVariable);
+        // Spline 관련 코드는 완전히 삭제되었습니다.
     };
 
     function getStart() {
         if (introWrapperRef.current) {
             gsap.to(introWrapperRef.current, {
-                opacity: 0,
-                duration: 1,
-                ease: "power2.inOut",
+                opacity: 0, duration: 1, ease: "power2.inOut",
                 onComplete: () => setIntro(true)
             });
         } else {
@@ -102,9 +82,7 @@ export default function Home() {
 
         if (blurContainerRef.current) {
             gsap.to(blurContainerRef.current, {
-                filter: "blur(0px)",
-                duration: 1,
-                ease: "power2.inOut"
+                filter: "blur(0px)", duration: 1, ease: "power2.inOut"
             });
         }
     }
@@ -130,11 +108,7 @@ export default function Home() {
                     )}
 
                     {intro && (
-                        <NavBar
-                            logoSrc="/model/bdtec/logo.svg"
-                            menus={navMenus}
-                            contactLink="/brochure/bdtec/contactus"
-                        />
+                        <NavBar logoSrc="/model/bdtec/logo.svg" menus={navMenus} contactLink="/brochure/bdtec/contactus" />
                     )}
                     {process.env.NODE_ENV === 'development' && <DomStats />}
 
@@ -148,18 +122,14 @@ export default function Home() {
 
                     <div
                         ref={blurContainerRef}
-                        className={`${styles.blurContainer} ${intro ? styles.blurContainerReady : styles.blurContainerIntro} ${isMobileOrTablet ? styles.blurContainer3dTouch : ''}`}
+                        className={`${styles.blurContainer} ${intro ? styles.blurContainerReady : styles.blurContainerIntro} ${deviceType !== 'desktop' ? styles.blurContainer3dTouch : ''}`}
                     >
-                        {isMobileOrTablet ? (
-                            // 📱 캡슐화된 모바일 씬 컴포넌트 호출
-                            <MobileScene quality={quality} activePanelId={activePanelId}/>
-                        ) : (
-                            // 🖥️ 데스크탑 환경: 기존 화려한 오리지널 Spline 적용
-                            <Spline
-                                scene="https://prod.spline.design/TYUnZBzHQ8Pfrt24/scene.splinecode"
-                                onLoad={onLoad}
-                            />
-                        )}
+                        {/* 🚀 3. R3F 씬으로 deviceType 프롭스를 전달합니다. Spline은 사라졌습니다! */}
+                        <MobileScene
+                            quality={quality}
+                            activePanelId={activePanelId}
+                            deviceType={deviceType} // 'desktop' | 'tablet' | 'mobile
+                        />
                     </div>
                 </div>
             </main>

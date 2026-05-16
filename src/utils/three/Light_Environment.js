@@ -1,5 +1,4 @@
 import { Environment } from "@react-three/drei";
-import { OrbitControls } from "@react-three/drei";
 
 export function Light_Environment() {
   return (
@@ -16,18 +15,6 @@ export function Light_Environment() {
         shadow-camera-bottom={-3}
         shadow-camera-left={-3}
         shadow-bias={-0.002}
-      />
-      <OrbitControls
-        target={[2, -0.6, 0]}
-        // zoomSpeed={0.8}
-        // screenSpacePanning={false}
-        dampingFactor={0.08}
-        // maxPolarAngle={Math.PI / 1.75}
-        // minPolarAngle={Math.PI / 2.7}
-        // maxDistance={2.4}
-        // minDistance={1}
-        // minZoom={0.5}
-        // maxZoom={1}
       />
       <Environment
         preset="warehouse"

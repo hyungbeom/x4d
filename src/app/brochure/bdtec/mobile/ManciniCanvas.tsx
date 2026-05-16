@@ -21,13 +21,8 @@ export function ManciniCanvas({ quality, children }: any) {
             // ❌ [삭제됨] frameloop={frameloop} 삭제 (기본값인 "always"로 자동 작동)
 
             dpr={window.devicePixelRatio}
-            // XZ 바닥 그리드가 선이 아니라 면으로 보이도록 +Z 정면이 아닌 비스듬한 시점
-            onCreated={({ camera }) => {
-                camera.lookAt(2, -0.6, 0);
-                camera.updateProjectionMatrix();
-            }}
             camera={{
-                position: [175, 105, 238],
+                position: [0, 200, 800],
                 zoom: 1,
                 near: -1000,
                 far: 3000,
@@ -54,7 +49,7 @@ export function ManciniCanvas({ quality, children }: any) {
         >
             <color attach="background" args={['#0a0a0a']} />
             {children}
-            <ResizeHandler quality={quality} rendererRef={rendererRef} />
+            {/*<ResizeHandler quality={quality} rendererRef={rendererRef} />*/}
         </Canvas>
     );
 }
