@@ -7,7 +7,7 @@ import { ResizeHandler } from "@/utils/three/ResizeHandler";
 extend(THREE);
 
 export function ManciniCanvas({ quality, children }: any) {
-    const rendererRef = useRef();
+    const rendererRef = useRef(null);
 
     // ❌ [삭제됨] frameloop 상태 관리는 이제 필요 없습니다!
 
@@ -33,7 +33,7 @@ export function ManciniCanvas({ quality, children }: any) {
                 far: 2600,
             }}
             shadows={"variance"}
-            gl={async (props) => {
+            gl={async (props:any) => {
                 const renderer = new THREE.WebGPURenderer({
                     ...props,
                     powerPreference: "high-performance",

@@ -1,37 +1,34 @@
 'use client';
 
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 
-// 🚀 [해결] 스플라인 특유의 '구름 노멀 맵'을 코드로 직접 생성합니다.
-const createCloudNoiseMap = (size = 256) => {
+// 🚀 일정 길이(7%)의 선명한 막대기를 표현하기 위한 투명도 맵 생성
+const createSegmentAlphaMap = () => {
     const canvas = document.createElement('canvas');
-    canvas.width = size; canvas.height = size;
+    canvas.width = 1024; // 경계선을 선명하게 하기 위해 고해상도 사용
+    canvas.height = 8;
     const ctx = canvas.getContext('2d')!;
 
-    // 구름 형태를 위한 미세한 패턴 그리기
-    const imageData = ctx.createImageData(size, size);
-    for (let i = 0; i < size * size * 4; i += 4) {
-        // 부드러운 노이즈 생성 (RGB는 Normal 방향, A는 투명도)
-        const v = Math.random() * 255;
-        imageData.data[i] = v;     // R (X 변형)
-        imageData.data[i + 1] = v; // G (Y 변형)
-        imageData.data[i + 2] = 255; // B (정면)
-        imageData.data[i + 3] = v > 100 ? v : 0; // A (구름 형태 가리기)
-    }
-    ctx.putImageData(imageData, 0, 0);
+    // 1. 전체를 투명하게(안 보이게) 칠함
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 2. 전체 길이의 딱 7% 구간만 하얗게(보이게) 칠함
+    ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+    ctx.fillRect(0, 0, canvas.width * 0.07, canvas.height);
 
     const tex = new THREE.CanvasTexture(canvas);
-    tex.wrapS = THREE.RepeatWrapping; // 🚀 핵심: 무한 반복되도록 설정
+    tex.wrapS = THREE.RepeatWrapping; // 텍스처가 무한 반복되도록 설정
     tex.wrapT = THREE.RepeatWrapping;
     return tex;
 };
 
 export default function SplineTubeObject(props: any) {
-    // 1. Spline 수치 업데이트 (Width 131.2, Height 218.7, Corner 28)
+    // 1. Spline의 최신 수치 반영 (Width 139.9, Height 128.8, Corner 20)
     const curve = useMemo(() => {
-        const width = 131.2, height = 218.7, cornerRadius = 28;
+        const width = 139.9, height = 128.8, cornerRadius = 20;
         const path = new THREE.Path();
         const x = -width / 2; const y = -height / 2;
 
@@ -49,47 +46,46 @@ export default function SplineTubeObject(props: any) {
         return new THREE.CatmullRomCurve3(points3d, true, 'centripetal');
     }, []);
 
-    // 2. 🚀 스플라인의 "구름 노멀 맵" 생성
-    const cloudNoiseTexture = useMemo(() => createCloudNoiseMap(), []);
+    // 2. 7% 길이의 막대기 텍스처
+    const segmentAlphaTexture = useMemo(() => createSegmentAlphaMap(), []);
 
-    // 3. 🚀 매 프레임 구름 텍스처 좌표(Offset) 애니메이션
+    // 3. 🚀 매 프레임 막대기 이동 애니메이션 (스플라인의 Offset 애니메이션 역할)
     useFrame((state, delta) => {
-        // 스플라인 속도와 맞추기 (예: 1초에 0.1 이동)
-        cloudNoiseTexture.offset.x += delta * 0.1;
+        // 8초에 한 바퀴 도는 속도 (1초에 0.125 이동)
+        // 반대 방향으로 돌고 싶다면 += 대신 -= 를 사용하세요.
+        segmentAlphaTexture.offset.x -= delta * 0.125;
     });
 
     return (
         <group {...props}>
-            {/* ⚪️ 1. 메인 유리 튜브 (본체) */}
+            {/* ⚪️ 1. 바깥쪽 투명한 본체 유리관 (반지름 5) */}
             <mesh>
                 <tubeGeometry args={[curve, 150, 5, 64, true]} />
                 <meshPhysicalMaterial
                     color="#ffffff"
-                    transparent={true}       // 🚀 [해결] 유리가 영롱하게 보이려면 true!
-                    transmission={1}         // 완전한 유리관 투명도
+                    transparent={true}       // 유리의 투명함 유지
+                    transmission={1}         // 완전한 유리 재질 활성화
                     opacity={1}
-                    roughness={0.05}         // 유리 표면 매끄러움
-                    thickness={5}            // 유리 두께감
-                    ior={1.5}                // 유리 굴절률
-                    reflectivity={0.9}       // 반사도 (Matcap 느낌)
-                    envMapIntensity={2.0}    // 환경 반사 증폭
+                    roughness={0.05}
+                    thickness={5}            // 굴절 두께감
+                    ior={1.6}                // 테두리 반사를 위한 굴절률
+                    reflectivity={0.9}
+                    envMapIntensity={2.0}    // 환경(도시 등) 반사 증폭
                     clearcoat={1}
                     clearcoatRoughness={0.1}
                 />
             </mesh>
 
-            {/* 🟢 2. 유리관 내부의 흐르는 구름 튜브 (반지름 5.01로 아주 살짝 띄움) */}
+            {/* 🟢 2. 유리관 안쪽을 돌아다니는 연두색 막대기 (반지름 1로 더 얇게) */}
+            {/* 바깥쪽 유리(5)보다 얇게 만들어서 유리관 내부를 타고 도는 것처럼 연출 */}
             <mesh>
-                <tubeGeometry args={[curve, 150, 5.01, 64, true]} />
-                <meshPhysicalMaterial
+                <tubeGeometry args={[curve, 150, 1.5, 64, true]} />
+                <meshBasicMaterial
                     color="#00ffcc"           // 스플라인의 형광 연두색
-                    normalMap={cloudNoiseTexture} // 🚀 [해결] 구름 텍스처를 노멀 맵에 입힘!
-                    transparent={true}        // 구름 구간만 보이게 함
-                    opacity={0.8}
-                    roughness={0.1}
-                    envMapIntensity={0.5}     // 구름은 반사를 줄임
-                    depthWrite={false}        // 뒤쪽 깨짐 방지
-                    toneMapped={false}        // 칙칙해지지 않게 원본 형광색 유지
+                    alphaMap={segmentAlphaTexture} // 🚀 핵심: 7%만 보이게 자르는 마스크
+                    transparent={true}
+                    depthWrite={false}        // 내부 객체가 유리와 겹쳐 깨지는 현상 방지
+                    toneMapped={false}        // 색상이 칙칙해지지 않게 원본 발광색 유지
                 />
             </mesh>
         </group>
