@@ -4,30 +4,39 @@ import React, { useMemo } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 
-// 🚀 일정 길이(7%)의 선명한 막대기를 표현하기 위한 투명도 맵 생성
-const createSegmentAlphaMap = () => {
+// 🚀 칼같이 잘린 2x10 사이즈 막대기용 마스크 텍스처 생성
+const createLineMaskTexture = (pathLength: number, targetLength: number) => {
     const canvas = document.createElement('canvas');
-    canvas.width = 1024; // 경계선을 선명하게 하기 위해 고해상도 사용
-    canvas.height = 8;
+    canvas.width = 2048; // 초고해상도로 경계를 날카롭게 만듭니다.
+    canvas.height = 4;
     const ctx = canvas.getContext('2d')!;
 
-    // 1. 전체를 투명하게(안 보이게) 칠함
-    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    // 1. 전체 투명하게 초기화
+    ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // 2. 전체 길이의 딱 7% 구간만 하얗게(보이게) 칠함
+    // 2. 전체 궤도 길이(pathLength) 대비 막대기 길이(targetLength=10)의 비율 계산
+    const ratio = targetLength / pathLength;
+    const lineWidthInPixels = canvas.width * ratio;
+
+    // 3. 딱 그 비율(길이 10)만큼만 하얗게(불투명하게) 칠함
     ctx.fillStyle = 'rgba(255, 255, 255, 1)';
-    ctx.fillRect(0, 0, canvas.width * 0.07, canvas.height);
+    ctx.fillRect(0, 0, lineWidthInPixels, canvas.height);
 
     const tex = new THREE.CanvasTexture(canvas);
-    tex.wrapS = THREE.RepeatWrapping; // 텍스처가 무한 반복되도록 설정
+    tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
+
+    // 흐릿하게 번지지 않고 단단한 직사각형 형태를 유지하도록 필터 설정
+    tex.magFilter = THREE.NearestFilter;
+    tex.minFilter = THREE.NearestFilter;
+
     return tex;
 };
 
 export default function SplineTubeObject(props: any) {
-    // 1. Spline의 최신 수치 반영 (Width 139.9, Height 128.8, Corner 20)
-    const curve = useMemo(() => {
+    // 1. Spline 궤도(Path) 생성
+    const { curve, pathLength } = useMemo(() => {
         const width = 139.9, height = 128.8, cornerRadius = 20;
         const path = new THREE.Path();
         const x = -width / 2; const y = -height / 2;
@@ -43,49 +52,56 @@ export default function SplineTubeObject(props: any) {
         path.quadraticCurveTo(x, y, x + cornerRadius, y);
 
         const points3d = path.getPoints(150).map((p) => new THREE.Vector3(p.x, p.y, 0));
-        return new THREE.CatmullRomCurve3(points3d, true, 'centripetal');
+        const curve = new THREE.CatmullRomCurve3(points3d, true, 'centripetal');
+
+        // 궤도의 총 길이 계산 (마스크 텍스처 비율 계산용)
+        const pathLength = curve.getLength();
+
+        return { curve, pathLength };
     }, []);
 
-    // 2. 7% 길이의 막대기 텍스처
-    const segmentAlphaTexture = useMemo(() => createSegmentAlphaMap(), []);
+    // 2. 목표 길이 10을 가진 선 마스크 생성
+    const lineMaskTexture = useMemo(() => createLineMaskTexture(pathLength, 10), [pathLength]);
 
-    // 3. 🚀 매 프레임 막대기 이동 애니메이션 (스플라인의 Offset 애니메이션 역할)
+    // 3. 매 프레임 선 이동 애니메이션
     useFrame((state, delta) => {
-        // 8초에 한 바퀴 도는 속도 (1초에 0.125 이동)
-        // 반대 방향으로 돌고 싶다면 += 대신 -= 를 사용하세요.
-        segmentAlphaTexture.offset.x -= delta * 0.125;
+        // 이동 속도 (0.1이면 10초에 한 바퀴)
+        lineMaskTexture.offset.x -= delta * 0.1;
     });
 
     return (
         <group {...props}>
-            {/* ⚪️ 1. 바깥쪽 투명한 본체 유리관 (반지름 5) */}
+            {/* ⚪️ 1. 바깥쪽 투명한 유리 본체 (반지름 5) */}
             <mesh>
-                <tubeGeometry args={[curve, 150, 5, 64, true]} />
+                <tubeGeometry args={[curve, 200, 5, 64, true]} />
                 <meshPhysicalMaterial
                     color="#ffffff"
-                    transparent={true}       // 유리의 투명함 유지
-                    transmission={1}         // 완전한 유리 재질 활성화
+                    transparent={true}
+                    transmission={1}         // 완전 투명 유리
                     opacity={1}
                     roughness={0.05}
-                    thickness={5}            // 굴절 두께감
-                    ior={1.6}                // 테두리 반사를 위한 굴절률
-                    reflectivity={0.9}
-                    envMapIntensity={2.0}    // 환경(도시 등) 반사 증폭
+                    thickness={5}
+                    ior={1.6}                // 굴절률 (테두리 맺힘 효과)
                     clearcoat={1}
-                    clearcoatRoughness={0.1}
                 />
             </mesh>
 
-            {/* 🟢 2. 유리관 안쪽을 돌아다니는 연두색 막대기 (반지름 1로 더 얇게) */}
-            {/* 바깥쪽 유리(5)보다 얇게 만들어서 유리관 내부를 타고 도는 것처럼 연출 */}
+            {/* 🟢 2. 내부를 타고 도는 2x10 사이즈의 연두색 선 */}
+            {/* 반지름을 1로 설정하여 폭을 2로 만듦. (길이는 위에서 10으로 맞춤) */}
             <mesh>
-                <tubeGeometry args={[curve, 150, 1.5, 64, true]} />
-                <meshBasicMaterial
-                    color="#00ffcc"           // 스플라인의 형광 연두색
-                    alphaMap={segmentAlphaTexture} // 🚀 핵심: 7%만 보이게 자르는 마스크
-                    transparent={true}
-                    depthWrite={false}        // 내부 객체가 유리와 겹쳐 깨지는 현상 방지
-                    toneMapped={false}        // 색상이 칙칙해지지 않게 원본 발광색 유지
+                <tubeGeometry args={[curve, 200, 1, 16, true]} />
+                <meshStandardMaterial
+                    color="#00ffcc"
+                    emissive="#00ffcc"
+                    emissiveIntensity={2}
+                    alphaMap={lineMaskTexture}
+
+                    // 🚀 수정 2: 투명도(transparent)를 끄고, 알파테스트(alphaTest)를 켭니다!
+                    transparent={false}
+                    alphaTest={0.5} // 하얀색(1) 부분만 남기고 검은색(0) 부분은 가위로 잘라버림
+
+                    side={THREE.DoubleSide}      // 안쪽 면도 렌더링
+                    toneMapped={false}
                 />
             </mesh>
         </group>
