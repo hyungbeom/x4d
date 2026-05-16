@@ -28,6 +28,9 @@ export default function Home() {
 
     // 🚀 1. 기기 타입을 3가지로 세분화하여 관리합니다.
     const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+    const [autoTour, setAutoTour] = useState(false);
+
+    const AUTO_TOUR_INTERVAL_MS = 5000;
 
     const mainContainerRef = useRef(null);
     const introWrapperRef = useRef<HTMLDivElement>(null);
@@ -67,8 +70,31 @@ export default function Home() {
 
     const handleVariableChange = (newValue: number) => {
         setActivePanelId(newValue);
-        // Spline 관련 코드는 완전히 삭제되었습니다.
     };
+
+    const handleAutoTourToggle = () => {
+        setAutoTour((prev) => {
+            const next = !prev;
+            if (next) {
+                setActivePanelId((panelId) => (panelId < 1 ? 1 : panelId));
+            }
+            return next;
+        });
+    };
+
+    useEffect(() => {
+        if (!autoTour || !intro) return;
+
+        const tick = () => {
+            setActivePanelId((prev) => {
+                if (prev < 1 || prev >= 5) return 1;
+                return prev + 1;
+            });
+        };
+
+        const intervalId = window.setInterval(tick, AUTO_TOUR_INTERVAL_MS);
+        return () => window.clearInterval(intervalId);
+    }, [autoTour, intro]);
 
     function getStart() {
         if (introWrapperRef.current) {
@@ -108,7 +134,16 @@ export default function Home() {
                     )}
 
                     {intro && (
-                        <NavBar logoSrc="/model/bdtec/logo.svg" menus={navMenus} contactLink="/brochure/bdtec/contactus" />
+                        <NavBar
+                            logoSrc="/model/bdtec/logo.svg"
+                            menus={navMenus}
+                            contactLink="/brochure/bdtec/contactus"
+                            activeIndex={
+                                activePanelId >= 1 && activePanelId <= 5 ? activePanelId - 1 : null
+                            }
+                            autoTour={autoTour}
+                            onAutoTourToggle={handleAutoTourToggle}
+                        />
                     )}
                     {process.env.NODE_ENV === 'development' && <DomStats />}
 
