@@ -20,6 +20,8 @@ import { Tank } from "@/resources/model/bdtect/Tank";
 import {useFrame} from "@react-three/fiber";
 import { SystemModel } from "@/resources/model/bdtect/SystemModel";
 import {AirProduct} from "@/resources/model/Air_Product";
+import { Factory } from "@/resources/model/bdtect/Factory";
+import {Wifi} from "@/resources/model/bdtect/Wifi";
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
@@ -214,6 +216,8 @@ export default function Home() {
 
                                     <Tank scale={[70,70,70]} position={[0, 0, 370]} rotation={[0,-Math.PI/2,0]}/>
                                     <AirProduct scale={[20,20,20]} position={[-40,215,45]}/>
+                                    <Factory scale={[20,20,20]} position={[-340,0,45]}/>
+                                    <Wifi scale={[150,150,150]} position={[340,0,45]}/>
                                     <SystemModel scale={[100,100,100]} position={[0,130,0]} rotation={[0,0,0]}/>
 
                                     {/*<Tank scale={[70,70,70]}/>*/}

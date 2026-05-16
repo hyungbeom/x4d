@@ -37,8 +37,8 @@ export function ManciniCanvas({ quality, children }: any) {
                 const renderer = new THREE.WebGPURenderer({
                     ...props,
                     powerPreference: "high-performance",
-                    antialias: false,
-                    alpha: false,
+                    antialias: true,
+                    alpha: true,
                     stencil: false,
                 });
 

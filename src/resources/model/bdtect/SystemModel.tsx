@@ -1,7 +1,12 @@
-import React, { useRef } from 'react'
-import { useGLTF } from '@react-three/drei'
+import React, { useMemo } from 'react';
+import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
+import {useGLTF} from "@react-three/drei";
+
 
 export function SystemModel(props:any) {
+
+
     const { nodes, materials }:any = useGLTF('/model/bdtec/system.glb')
     return (
         <group {...props} dispose={null}>
@@ -118,7 +123,6 @@ export function SystemModel(props:any) {
                         geometry={nodes.Quick_and_Safe_transactions.geometry}
                         material={nodes.Quick_and_Safe_transactions.material}
                         position={[32, 2, 0]}
-                        rotation={[-0.419, 0, 0]}
                         scale={0}
                     />
                     <mesh
@@ -127,7 +131,6 @@ export function SystemModel(props:any) {
                         geometry={nodes.Quick_and_Safe_transactions_2.geometry}
                         material={nodes.Quick_and_Safe_transactions_2.material}
                         position={[32, 2, 0]}
-                        rotation={[-0.419, 0, 0]}
                         scale={0}
                     />
                     <mesh
@@ -136,7 +139,6 @@ export function SystemModel(props:any) {
                         geometry={nodes.Quick_and_Safe_transactions001.geometry}
                         material={nodes.Quick_and_Safe_transactions001.material}
                         position={[32, 2, 0]}
-                        rotation={[-0.419, 0, -1.571]}
                         scale={0}
                     />
                 </group>
@@ -271,27 +273,16 @@ export function SystemModel(props:any) {
                 <mesh
                     castShadow
                     receiveShadow
-                    geometry={nodes['Path_to_Quick_&_Safe'].geometry}
-                    material={nodes['Path_to_Quick_&_Safe'].material}
-                    position={[-148.376, -118.397, 50.708]}
-                    rotation={[-Math.PI / 2, 0, Math.PI / 2]}
-                />
-                <mesh
-                    castShadow
-                    receiveShadow
                     geometry={nodes.Path001.geometry}
-                    material={nodes.Path001.material}
                     position={[-37.949, -95.626, -25.733]}
                     rotation={[-Math.PI / 2, 0, 0]}
+                >
+                    <meshStandardMaterial
+                    color="#FFA500" // 주황색(Orange) 헥스 코드
+                    roughness={0.4} // 표면 거칠기 (0에 가까울수록 매끈하고 반짝임)
+                    metalness={0.1} // 금속 느낌 (1에 가까울수록 쇳덩이 같아짐)
                 />
-                <mesh
-                    castShadow
-                    receiveShadow
-                    geometry={nodes.Pipe_Line.geometry}
-                    material={nodes.Pipe_Line.material}
-                    position={[57.053, -102.286, 50.708]}
-                    rotation={[-Math.PI / 2, 0, -Math.PI / 2]}
-                />
+                </mesh>
                 <mesh
                     castShadow
                     receiveShadow
@@ -308,14 +299,7 @@ export function SystemModel(props:any) {
                     position={[-49.518, -112.402, 157.601]}
                     rotation={[-1.553, 0, 0]}
                 />
-                <mesh
-                    castShadow
-                    receiveShadow
-                    geometry={nodes.Pipe_Line001.geometry}
-                    material={nodes.Pipe_Line001.material}
-                    position={[-49.518, -112.402, 157.601]}
-                    rotation={[-1.553, 0, 0]}
-                />
+
                 <mesh
                     castShadow
                     receiveShadow
@@ -364,7 +348,7 @@ export function SystemModel(props:any) {
                         receiveShadow
                         geometry={nodes.Lock_4.geometry}
                         material={nodes.Lock_4.material}
-                        position={[3.001, 0, 0]}
+                        position={[3, 0, 0]}
                         rotation={[Math.PI / 2, 0, Math.PI / 2]}
                     />
                 </group>
