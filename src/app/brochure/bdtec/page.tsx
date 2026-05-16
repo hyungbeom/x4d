@@ -9,7 +9,12 @@ import InfoPanel from "@/utils/ui/InfoPanel";
 import PageWrapper from "@/utils/ui/PageWrapper";
 import styles from "./page.module.css";
 import { DomStats } from "@/utils/DevStats";
-import MobileScene from "@/app/brochure/bdtec/mobile/Mobile";
+import dynamic from "next/dynamic";
+
+const MobileScene = dynamic(() => import("@/app/brochure/bdtec/mobile/Mobile"), {
+    ssr: false,
+    loading: () => null,
+});
 
 
 
