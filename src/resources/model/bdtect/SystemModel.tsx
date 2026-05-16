@@ -27,15 +27,15 @@ export function SystemModel(props:any) {
                         position={[-7.599, -0.495, 0]}
                     />
                 </group>
-                <mesh
-                    castShadow
-                    receiveShadow
-                    geometry={nodes.Cube.geometry}
-                    material={nodes.Cube.material}
-                    position={[-43.939, -100.314, 46.05]}
-                    rotation={[-Math.PI / 2, 0, 0]}
-                    scale={[1.203, 1.203, 0.179]}
-                />
+                {/*<mesh*/}
+                {/*    castShadow*/}
+                {/*    receiveShadow*/}
+                {/*    geometry={nodes.Cube.geometry}*/}
+                {/*    material={nodes.Cube.material}*/}
+                {/*    position={[-43.939, -100.314, 46.05]}*/}
+                {/*    rotation={[-Math.PI / 2, 0, 0]}*/}
+                {/*    scale={[1.203, 1.203, 0.179]}*/}
+                {/*/>*/}
                 <mesh
                     castShadow
                     receiveShadow
