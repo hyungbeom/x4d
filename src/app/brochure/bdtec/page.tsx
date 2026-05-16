@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import Overlay1 from "@/components/bdtec/overlay/OverLay1";
 import gsap from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
@@ -12,15 +12,16 @@ import styles from "./page.module.css";
 import {DomStats} from "@/utils/DevStats";
 import {ManciniCanvas} from "@/app/brochure/bdtec/mobile/ManciniCanvas";
 import {Light_Environment} from "@/utils/three/Light_Environment";
-import SplineTubeObject from "@/utils/three/SplineTubeObject";
-import { BdtecWebGpuBackdropGrid } from "@/utils/three/BdtecWebGpuBackdropGrid";
-import { Environment } from "@react-three/drei";
+import LineObj from "@/utils/three/LineObj";
+import {BdtecWebGpuBackdropGrid} from "@/utils/three/BdtecWebGpuBackdropGrid";
+import {Environment} from "@react-three/drei";
+import * as THREE from 'three';
+import { Tank } from "@/resources/model/bdtect/Tank";
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
     loading: () => <div className={styles.splineLoading}>3D 로딩 중...</div>
 });
-
 
 
 const panelContents: Record<number, { title: string; desc: string; extra?: string }> = {
@@ -154,6 +155,15 @@ export default function Home() {
 
     const currentPanelData = panelContents[activePanelId] || {title: "", desc: "", extra: ""};
 
+    const tankSurroundPoints = useMemo(() => [
+
+        new THREE.Vector3(-200, 40, -70),
+        new THREE.Vector3(-200, 40, 200),
+        new THREE.Vector3(0, 40, 200),
+        new THREE.Vector3(0, 40, -70),
+        new THREE.Vector3(-200, 40, -70),
+    ], []);
+
     return (
         <>
             <PageWrapper>
@@ -197,12 +207,24 @@ export default function Home() {
                             {isMobileOrTablet ? (
                                 // 📱 태블릿 / 모바일 환경: 사용자가 커스텀한 R3F WebGPU Canvas 적용
                                 <ManciniCanvas quality={quality}>
-                                    <Environment preset="city" blur={0} />
+                                    <Environment preset="city" blur={0}/>
 
 
                                     <Light_Environment/>
-                                    <BdtecWebGpuBackdropGrid />
-                                    <SplineTubeObject scale={1} rotation={[0, 0, 0]} />
+                                    <BdtecWebGpuBackdropGrid/>
+
+
+                                    <LineObj
+                                        type="type1"
+                                        points={tankSurroundPoints}
+                                        tubeRadius={3}  // 유리관 두께 조절 (옵션)
+                                        lightRadius={1} // 빛 두께 조절 (옵션)
+                                    />
+
+
+                                    <Tank scale={[70,70,70]} position={[-110.34, -38.00, 63.80]}/>
+
+                                    {/*<Tank scale={[70,70,70]}/>*/}
                                 </ManciniCanvas>
 
 

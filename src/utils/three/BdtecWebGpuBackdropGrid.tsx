@@ -5,12 +5,12 @@ import * as THREE from 'three';
 
 /** WebGPU: drei `<Grid>`는 ShaderMaterial이라 NodeMaterial 파이프와 호환되지 않음 → GridHelper 사용 */
 export function BdtecWebGpuBackdropGrid({
-    size = 920,
+    size = 3000,
     cellDivisions = 56,
     centerLineColor = 0x00c9ba,
     gridColor = 0x6a9e96,
     /** 튜브(XY 평면) 아래 XZ 바닥 — 튜브 하단(~-114)보다 낮게 */
-    position = [0, -158, 0] as [number, number, number],
+    position = [0, -38.00, 0] as [number, number, number],
 }: {
     size?: number;
     cellDivisions?: number;
