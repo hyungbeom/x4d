@@ -27,15 +27,15 @@ export function SystemModel(props:any) {
                         position={[-7.599, -0.495, 0]}
                     />
                 </group>
-                {/*<mesh*/}
-                {/*    castShadow*/}
-                {/*    receiveShadow*/}
-                {/*    geometry={nodes.Cube.geometry}*/}
-                {/*    material={nodes.Cube.material}*/}
-                {/*    position={[-43.939, -100.314, 46.05]}*/}
-                {/*    rotation={[-Math.PI / 2, 0, 0]}*/}
-                {/*    scale={[1.203, 1.203, 0.179]}*/}
-                {/*/>*/}
+                <mesh
+                    castShadow
+                    receiveShadow
+                    geometry={nodes.Cube.geometry}
+                    material={nodes.Cube.material}
+                    position={[-43.939, -100.314, 46.05]}
+                    rotation={[-Math.PI / 2, 0, 0]}
+                    scale={[1.203, 1.203, 0.179]}
+                />
                 <mesh
                     castShadow
                     receiveShadow
@@ -49,20 +49,46 @@ export function SystemModel(props:any) {
                     castShadow
                     receiveShadow
                     geometry={nodes.Cube002.geometry}
-                    material={nodes.Cube002.material}
+
                     position={[-47.266, 0.937, 47.255]}
                     rotation={[Math.PI / 2, 0, 0]}
                     scale={[-1.203, -1.203, -0.704]}
-                />
+                >
+                    <meshPhysicalMaterial
+                        color="#ffffff"
+                        transmission={1}      // 빛 100% 통과 (유지)
+                        transparent={true}
+                        opacity={1}           // 유지
+                        roughness={0}         // 🚀 금속 광택 제거를 위해 가장 매끄럽게 (0)
+                        metalness={0}         // 🚀 명시적으로 금속성 0!
+                        ior={1.5}             // 유지
+                        thickness={0.1}       // 🚀 두께를 아주 얇게 잡아야 덜 단단해 보입니다 (1 -> 0.1)
+                        clearcoat={0}         // 🚀 쨍한 주범! 코팅 제거 (1 -> 0)
+                        side={THREE.DoubleSide}
+                    />
+                </mesh>
                 <mesh
                     castShadow
                     receiveShadow
                     geometry={nodes.Cube003.geometry}
-                    material={nodes.Cube003.material}
+
                     position={[-47.266, -47.497, 47.255]}
                     rotation={[Math.PI / 2, 0, 0]}
                     scale={[-1.203, -1.203, -1.342]}
-                />
+                >
+                    <meshPhysicalMaterial
+                        color="#ffffff"
+                        transmission={1}      // 빛 100% 통과 (유지)
+                        transparent={true}
+                        opacity={1}           // 유지
+                        roughness={0}         // 🚀 금속 광택 제거를 위해 가장 매끄럽게 (0)
+                        metalness={0}         // 🚀 명시적으로 금속성 0!
+                        ior={1.5}             // 유지
+                        thickness={0.1}       // 🚀 두께를 아주 얇게 잡아야 덜 단단해 보입니다 (1 -> 0.1)
+                        clearcoat={0}         // 🚀 쨍한 주범! 코팅 제거 (1 -> 0)
+                        side={THREE.DoubleSide}
+                    />
+                </mesh>
                 <mesh
                     castShadow
                     receiveShadow
