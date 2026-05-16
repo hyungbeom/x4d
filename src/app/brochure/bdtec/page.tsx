@@ -17,6 +17,8 @@ import {BdtecWebGpuBackdropGrid} from "@/utils/three/BdtecWebGpuBackdropGrid";
 import {Environment} from "@react-three/drei";
 import * as THREE from 'three';
 import { Tank } from "@/resources/model/bdtect/Tank";
+import {useFrame} from "@react-three/fiber";
+import { SystemModel } from "@/resources/model/bdtect/SystemModel";
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
@@ -155,14 +157,7 @@ export default function Home() {
 
     const currentPanelData = panelContents[activePanelId] || {title: "", desc: "", extra: ""};
 
-    const tankSurroundPoints = useMemo(() => [
 
-        new THREE.Vector3(-200, 40, -70),
-        new THREE.Vector3(-200, 40, 200),
-        new THREE.Vector3(0, 40, 200),
-        new THREE.Vector3(0, 40, -70),
-        new THREE.Vector3(-200, 40, -70),
-    ], []);
 
     return (
         <>
@@ -214,15 +209,11 @@ export default function Home() {
                                     <BdtecWebGpuBackdropGrid/>
 
 
-                                    <LineObj
-                                        type="type1"
-                                        points={tankSurroundPoints}
-                                        tubeRadius={3}  // 유리관 두께 조절 (옵션)
-                                        lightRadius={1} // 빛 두께 조절 (옵션)
-                                    />
+                                    <FloatingTankLine/>
 
+                                    <Tank scale={[70,70,70]} position={[0, 0, 370]} rotation={[0,-Math.PI/2,0]}/>
 
-                                    <Tank scale={[70,70,70]} position={[-110.34, -38.00, 63.80]}/>
+                                    <SystemModel scale={[100,100,100]} position={[0,130,0]} rotation={[0,0,0]}/>
 
                                     {/*<Tank scale={[70,70,70]}/>*/}
                                 </ManciniCanvas>
@@ -240,5 +231,47 @@ export default function Home() {
                 </main>
             </PageWrapper>
         </>
+    );
+}
+
+
+
+
+function FloatingTankLine() {
+    // 그룹을 제어하기 위한 이름표(ref)를 만듭니다.
+    const groupRef = useRef<THREE.Group>(null);
+
+    const tankSurroundPoints = useMemo(() => [
+        new THREE.Vector3(-200, 40, -70),
+        new THREE.Vector3(-200, 40, 200),
+        new THREE.Vector3(0, 40, 200),
+        new THREE.Vector3(0, 40, -70),
+        new THREE.Vector3(-200, 40, -70),
+    ], []);
+
+    // 🚀 매 프레임마다 실행되는 애니메이션 로직
+    useFrame((state) => {
+        if (groupRef.current) {
+            // state.clock.elapsedTime은 흘러간 시간입니다.
+            // Math.sin(시간 * 속도) * 높이
+
+            const speed = 3;       // 1. 위아래로 움직이는 속도 (숫자가 클수록 빠름)
+            const amplitude = 10;   // 2. 위아래로 움직이는 폭 (숫자가 클수록 높이 올라감)
+
+            // Y축(위아래) 위치를 사인 곡선을 따라 부드럽게 변경합니다.
+            groupRef.current.position.y = Math.sin(state.clock.elapsedTime * speed) * amplitude;
+        }
+    });
+
+    return (
+        // 🚀 애니메이션을 적용할 그룹에 ref를 달아줍니다.
+        <group ref={groupRef}>
+            <LineObj
+                type="type1"
+                points={tankSurroundPoints}
+                tubeRadius={3}
+                lightRadius={1}
+            />
+        </group>
     );
 }

@@ -10,7 +10,7 @@ export function BdtecWebGpuBackdropGrid({
     centerLineColor = 0x00c9ba,
     gridColor = 0x6a9e96,
     /** 튜브(XY 평면) 아래 XZ 바닥 — 튜브 하단(~-114)보다 낮게 */
-    position = [0, -38.00, 0] as [number, number, number],
+    position = [0, 0, 0] as [number, number, number],
 }: {
     size?: number;
     cellDivisions?: number;
