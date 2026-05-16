@@ -28,9 +28,9 @@ export function ManciniCanvas({ quality, children }: any) {
             }}
             camera={{
                 position: [175, 105, 238],
-                zoom: 2,
-                near: -600,
-                far: 2600,
+                zoom: 0.26,
+                near: -1000,
+                far: 3000,
             }}
             shadows={"variance"}
             gl={async (props:any) => {

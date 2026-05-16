@@ -19,6 +19,7 @@ import * as THREE from 'three';
 import { Tank } from "@/resources/model/bdtect/Tank";
 import {useFrame} from "@react-three/fiber";
 import { SystemModel } from "@/resources/model/bdtect/SystemModel";
+import {AirProduct} from "@/resources/model/Air_Product";
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
     ssr: false,
@@ -212,7 +213,7 @@ export default function Home() {
                                     <FloatingTankLine/>
 
                                     <Tank scale={[70,70,70]} position={[0, 0, 370]} rotation={[0,-Math.PI/2,0]}/>
-
+                                    <AirProduct scale={[20,20,20]} position={[-40,215,45]}/>
                                     <SystemModel scale={[100,100,100]} position={[0,130,0]} rotation={[0,0,0]}/>
 
                                     {/*<Tank scale={[70,70,70]}/>*/}
