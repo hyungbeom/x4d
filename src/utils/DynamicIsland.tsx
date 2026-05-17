@@ -216,7 +216,7 @@ export default function DynamicIsland({
 
             const question = chatInput.trim();
             setSubmittedMessage(question);
-            setMode('thinking'); // 먼저 생각 중 모드로 전환
+            setMode('result');
             setChatInput("");
             setAiResponse(""); // 이전 답변 초기화
 
@@ -340,20 +340,36 @@ export default function DynamicIsland({
                         </div>
                     </div>
 
-                    {/* C. 결과 모드 (AI 응답 렌더링) */}
+                    {/* C. 결과 모드 — 질문 + 답변 */}
                     <div ref={resultSectionRef} style={{ position: 'absolute', inset: paddingIsland, display: 'flex', flexDirection: 'column', opacity: 0, transform: 'translateY(10px)', pointerEvents: mode === 'result' ? 'auto' : 'none', gap: isMobile ? '6px' : '10px' }}>
-                        <div style={{ flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: isMobile ? '12px' : '20px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: isMobile ? '12px' : '20px', display: 'flex', gap: isMobile ? '10px' : '15px', position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: isMobile ? '12px' : '20px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: isMobile ? '12px' : '20px', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', minHeight: 0 }}>
                             <div onClick={() => setIsExpanded(false)} style={{ position: 'absolute', top: isMobile ? '10px' : '15px', right: isMobile ? '10px' : '15px', color: '#888', cursor: 'pointer', fontSize: isMobile ? '10px' : '14px' }}>✕</div>
 
-                            {/* 프로필 이미지 아이콘 */}
-                            <div style={{ width: isMobile ? '35px' : '45px', height: isMobile ? '35px' : '45px', backgroundColor: '#e0e0e0', borderRadius: '12px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>🤖</div>
-
-                            {/* 🌟 AI 답변이 렌더링되는 영역 (스크롤 처리) */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '4px' : '6px', overflowY: 'auto', flex: 1, paddingRight: '10px' }}>
-                                <span style={{ color: '#5ea2e6', fontSize: fzText, fontWeight: 600 }}>AI 영업사원</span>
-                                <span style={{ color: '#fff', fontSize: isMobile ? '11px' : '13px', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
-                                    {aiResponse || "답변을 불러오는 중입니다..."}
-                                </span>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '10px' : '14px', overflowY: 'auto', flex: 1, minHeight: 0, paddingRight: '10px', paddingTop: isMobile ? '4px' : '8px' }}>
+                                {submittedMessage ? (
+                                    <p
+                                        style={{
+                                            margin: 0,
+                                            color: 'rgba(255, 255, 255, 0.88)',
+                                            fontSize: isMobile ? '11px' : '13px',
+                                            lineHeight: 1.45,
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        {submittedMessage}
+                                    </p>
+                                ) : null}
+                                <p
+                                    style={{
+                                        margin: 0,
+                                        color: '#fff',
+                                        fontSize: isMobile ? '12px' : '14px',
+                                        lineHeight: 1.55,
+                                        whiteSpace: 'pre-wrap',
+                                    }}
+                                >
+                                    {aiResponse || '답변을 불러오는 중입니다...'}
+                                </p>
                             </div>
                         </div>
                         {/* 다시 질문하기 버튼 */}

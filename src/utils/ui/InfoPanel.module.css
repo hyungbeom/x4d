@@ -7,14 +7,23 @@
   background-color: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  min-height: 0;
+}
+
+.companyListWrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin-top: 4px;
+  padding-right: 2px;
 }
 
 .panelDesktop {
   top: 0;
   right: 0;
-  width: 400px;
+  width: min(440px, 92vw);
   height: 100dvh;
-  padding: 60px 40px;
+  padding: 60px 28px 40px;
   box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
   transform: translateX(100%);
   opacity: 0;

@@ -17,6 +17,7 @@ import {SceneLoadingProvider} from "@/utils/three/SceneLoadingContext";
 import {WorldModel} from "@/resources/model/progist/WorldModel";
 import NavBar from "@/utils/ui/NavBar";
 import InfoPanel from "@/utils/ui/InfoPanel";
+import { SAMPLE_COMPANIES } from "@/data/progist/sampleCompanies";
 import infoPanelStyles from "@/utils/ui/InfoPanel.module.css";
 import BdtecSceneHeroCopy from "@/components/bdtec/BdtecSceneHeroCopy";
 import {
@@ -305,6 +306,7 @@ export default function Home() {
                         onAutoTourToggle={handleAutoTourToggle}
                         showAiAsk
                         aiCompanyId="envex"
+                        onLogoClick={() => handleVariableChange(0)}
                     />
 
                     {activePanelId >= 1 && activePanelId <= PANEL_COUNT && (
@@ -326,6 +328,7 @@ export default function Home() {
                         onClose={() => handleVariableChange(0)}
                         teaserClassName={infoPanelStyles.teaserAboveBottomNav}
                         detailButtonLabel="기업리스트 보기"
+                        companies={SAMPLE_COMPANIES}
                     />
                 </div>
             </main>

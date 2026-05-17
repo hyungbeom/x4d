@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import CompanyList from '@/components/progist/CompanyList';
+import type { CompanyListItem } from '@/data/progist/sampleCompanies';
 import styles from './InfoPanel.module.css';
 
 const COMPACT_BREAKPOINT = '(max-width: 1024px)';
@@ -16,6 +18,8 @@ interface InfoPanelProps {
     teaserClassName?: string;
     /** 티저 CTA 버튼 문구 */
     detailButtonLabel?: string;
+    /** 있으면 확장 시 기업 리스트 표시 */
+    companies?: CompanyListItem[];
 }
 
 function getTeaserPreview(desc: string, extra?: string, maxSentences = 3): string[] {
@@ -47,6 +51,7 @@ export default function InfoPanel({
     onClose,
     teaserClassName,
     detailButtonLabel = '자세히 보기',
+    companies,
 }: InfoPanelProps) {
     const panelRef = useRef<HTMLDivElement>(null);
     const teaserRef = useRef<HTMLDivElement>(null);
@@ -167,8 +172,17 @@ export default function InfoPanel({
                 </div>
 
                 <h2 className={styles.title}>{title}</h2>
-                <p className={styles.desc}>{desc}</p>
-                {extra && <p className={styles.extra}>{extra}</p>}
+
+                {companies && companies.length > 0 ? (
+                    <div className={styles.companyListWrap}>
+                        <CompanyList companies={companies} />
+                    </div>
+                ) : (
+                    <>
+                        <p className={styles.desc}>{desc}</p>
+                        {extra && <p className={styles.extra}>{extra}</p>}
+                    </>
+                )}
             </div>
         </>
     );

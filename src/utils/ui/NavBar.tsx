@@ -28,6 +28,8 @@ interface NavBarProps {
     /** 모바일 상단 바에 AI ASK(DynamicIsland) 표시 */
     showAiAsk?: boolean;
     aiCompanyId?: string;
+    /** 로고 클릭 시 (예: 전체 보기 패널 0) */
+    onLogoClick?: () => void;
 }
 
 export default function NavBar({
@@ -41,6 +43,7 @@ export default function NavBar({
     compact = false,
     showAiAsk = false,
     aiCompanyId = 'bdtec',
+    onLogoClick,
 }: NavBarProps) {
     const [activeIndexLocal, setActiveIndexLocal] = useState<number | null>(null);
     const activeIndex = activeIndexProp ?? activeIndexLocal;
@@ -97,7 +100,16 @@ export default function NavBar({
 
     const logoBlock = (
         <div className="logo-cluster">
-            <a href="#" className="logo" onClick={(e) => e.preventDefault()}>
+            <a
+                href="#"
+                className="logo"
+                onClick={(e) => {
+                    e.preventDefault();
+                    setActiveIndexLocal(null);
+                    onLogoClick?.();
+                }}
+                aria-label="전체 보기로 이동"
+            >
                 {logoSrc ? <img src={logoSrc} alt="Logo" /> : <span className="logo-placeholder">Logo</span>}
             </a>
             {autoToggleButton}
