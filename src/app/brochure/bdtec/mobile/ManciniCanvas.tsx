@@ -9,7 +9,7 @@ import { BdtecSceneLoadingReporter } from "@/app/brochure/bdtec/mobile/BdtecScen
 import { useBdtecSceneLoadingActions } from "@/app/brochure/bdtec/BdtecSceneLoadingContext";
 
 export function ManciniCanvas({ quality, children }: { quality: string; children: React.ReactNode }) {
-    const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+    const rendererRef = useRef<null>(null);
     const { setWebgpuReady } = useBdtecSceneLoadingActions();
     const [clientReady, setClientReady] = useState(false);
     const [dpr, setDpr] = useState(1);
@@ -22,7 +22,7 @@ export function ManciniCanvas({ quality, children }: { quality: string; children
     useEffect(() => {
         return () => {
             setWebgpuReady(false);
-            const renderer = rendererRef.current;
+            const renderer:any = rendererRef.current;
             if (renderer) {
                 renderer.dispose();
                 rendererRef.current = null;
