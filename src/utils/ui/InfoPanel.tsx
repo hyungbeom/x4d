@@ -14,6 +14,8 @@ interface InfoPanelProps {
     onClose: () => void;
     /** 하단 네비 위 등 레이아웃용 티저 위치 조정 */
     teaserClassName?: string;
+    /** 티저 CTA 버튼 문구 */
+    detailButtonLabel?: string;
 }
 
 function getTeaserPreview(desc: string, extra?: string, maxSentences = 3): string[] {
@@ -37,7 +39,15 @@ function useMediaQuery(query: string) {
     return matches;
 }
 
-export default function InfoPanel({ isOpen, title, desc, extra, onClose, teaserClassName }: InfoPanelProps) {
+export default function InfoPanel({
+    isOpen,
+    title,
+    desc,
+    extra,
+    onClose,
+    teaserClassName,
+    detailButtonLabel = '자세히 보기',
+}: InfoPanelProps) {
     const panelRef = useRef<HTMLDivElement>(null);
     const teaserRef = useRef<HTMLDivElement>(null);
     const isCompact = useMediaQuery(COMPACT_BREAKPOINT);
@@ -132,7 +142,7 @@ export default function InfoPanel({ isOpen, title, desc, extra, onClose, teaserC
                         onClick={() => setIsExpanded(true)}
                         disabled={!showTeaser}
                     >
-                        자세히 보기
+                        {detailButtonLabel}
                     </button>
                 </div>
             )}

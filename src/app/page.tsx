@@ -303,6 +303,8 @@ export default function Home() {
                         }
                         autoTour={autoTour}
                         onAutoTourToggle={handleAutoTourToggle}
+                        showAiAsk
+                        aiCompanyId="envex"
                     />
 
                     {activePanelId >= 1 && activePanelId <= PANEL_COUNT && (
@@ -323,6 +325,7 @@ export default function Home() {
                         extra={currentPanelData.extra}
                         onClose={() => handleVariableChange(0)}
                         teaserClassName={infoPanelStyles.teaserAboveBottomNav}
+                        detailButtonLabel="기업리스트 보기"
                     />
                 </div>
             </main>

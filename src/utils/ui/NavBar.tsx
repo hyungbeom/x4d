@@ -1,7 +1,11 @@
+'use client';
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import TransitionLink from "@/utils/ui/TransitionLink";
-import DynamicIsland from "@/utils/DynamicIsland";
+
+const DynamicIsland = dynamic(() => import('@/utils/DynamicIsland'), { ssr: false });
 
 export interface MenuItem {
     title: string;
@@ -21,6 +25,9 @@ interface NavBarProps {
     iconMode?: boolean;
     /** 하단 바 높이·패딩 축소 */
     compact?: boolean;
+    /** 모바일 상단 바에 AI ASK(DynamicIsland) 표시 */
+    showAiAsk?: boolean;
+    aiCompanyId?: string;
 }
 
 export default function NavBar({
@@ -32,6 +39,8 @@ export default function NavBar({
     onAutoTourToggle,
     iconMode = false,
     compact = false,
+    showAiAsk = false,
+    aiCompanyId = 'bdtec',
 }: NavBarProps) {
     const [activeIndexLocal, setActiveIndexLocal] = useState<number | null>(null);
     const activeIndex = activeIndexProp ?? activeIndexLocal;
@@ -288,15 +297,16 @@ export default function NavBar({
                             width: 92vw;
                         }
 
-                        .mobile-top-bar {
-                            display: flex;
-                            position: fixed;
-                            top: 10px;
-                            left: 50%;
-                            transform: translateX(-50%);
-                            width: 92vw;
-                            justify-content: space-between;
-                            align-items: center;
+                    .mobile-top-bar {
+                        display: flex;
+                        position: fixed;
+                        top: 10px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        width: 92vw;
+                        justify-content: flex-start;
+                        align-items: center;
+                        gap: 8px;
                             background-color: #f7fdfc;
                             padding: 8px 10px 8px 12px;
                             border-radius: 999px;
@@ -312,6 +322,8 @@ export default function NavBar({
                         .mobile-top-bar .contact-btn {
                             padding: 10px 20px;
                             font-size: 13px;
+                            margin-left: auto;
+                            flex-shrink: 0;
                         }
 
                         .navbar-wrapper > .logo-cluster,
@@ -376,6 +388,24 @@ export default function NavBar({
                     .mobile-top-bar--compact .contact-btn {
                         padding: 7px 14px;
                         font-size: 11px;
+                        margin-left: 0;
+                    }
+
+                    .mobile-top-bar__ai {
+                        flex-shrink: 0;
+                        width: 112px;
+                        height: 32px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        position: relative;
+                        margin-left: auto;
+                        margin-right: 8px;
+                    }
+
+                    .mobile-top-bar .logo-cluster {
+                        flex: 0 1 auto;
+                        min-width: 0;
                     }
                 `}
             </style>
@@ -383,8 +413,11 @@ export default function NavBar({
             <div className={`mobile-top-bar${compact ? ' mobile-top-bar--compact' : ''}`}>
                 {logoBlock}
 
-
-                {/*<DynamicIsland/>*/}
+                {showAiAsk && (
+                    <div className="mobile-top-bar__ai">
+                        <DynamicIsland placement="inline" companyId={aiCompanyId} />
+                    </div>
+                )}
 
                 <TransitionLink href={contactLink} className="contact-btn" type="blinds">
                     Contact Us

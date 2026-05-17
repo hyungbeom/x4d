@@ -21,17 +21,28 @@ function useWindowSize() {
     return windowSize;
 }
 
-export default function DynamicIsland() {
+type DynamicIslandProps = {
+    /** fixed: 상단 중앙 플로팅(기본) · inline: 상단 바 안에 배치 */
+    placement?: 'fixed' | 'inline';
+    companyId?: string;
+};
+
+export default function DynamicIsland({
+    placement = 'fixed',
+    companyId: companyIdProp = 'bdtec',
+}: DynamicIslandProps) {
     const { width } = useWindowSize();
     const isMobile = width <= 768;
+    const isInline = placement === 'inline';
+    const isCompactClosed = isMobile || isInline;
 
     // 모바일/PC 반응형 크기 변수
     const fzTitle = isMobile ? '12px' : '16px';
     const fzText = isMobile ? '11px' : '15px';
     const paddingIsland = isMobile ? '12px' : '25px';
 
-    const closedWidth = isMobile ? '110px' : '200px';
-    const closedHeight = isMobile ? '32px' : '50px';
+    const closedWidth = isInline ? '112px' : isMobile ? '110px' : '200px';
+    const closedHeight = isInline ? '32px' : isMobile ? '32px' : '50px';
 
     const openInputHeight = isMobile ? '200px' : '350px';
     const openThinkingHeight = isMobile ? '110px' : '200px';
@@ -51,6 +62,8 @@ export default function DynamicIsland() {
 
     // 2. 상태(State) 관리
     const [isExpanded, setIsExpanded] = useState(false);
+    /** inline: 상단 바 슬롯에 붙어 있는 상태 (닫힘 애니메이션 끝난 뒤만 true) */
+    const [inlineDocked, setInlineDocked] = useState(true);
     const [mode, setMode] = useState<'input' | 'thinking' | 'result'>('input');
     const [chatInput, setChatInput] = useState("");
     const [submittedMessage, setSubmittedMessage] = useState("");
@@ -58,7 +71,7 @@ export default function DynamicIsland() {
 
     // 🌟 백엔드 연동 관련 추가 상태
     const [aiResponse, setAiResponse] = useState(""); // AI가 보내주는 실시간 텍스트 누적
-    const [companyId, setCompanyId] = useState("bdtec"); // 현재 대화할 회사 (필요시 변경 가능)
+    const [companyId] = useState(companyIdProp);
     const eventSourceRef = useRef<EventSource | null>(null); // 통신 객체 보관용
 
     const [chatId] = useState(() => Math.random().toString(36).substring(2, 12));
@@ -104,6 +117,8 @@ export default function DynamicIsland() {
         if (resetCallRef.current) resetCallRef.current.kill();
 
         if (isExpanded) {
+            if (isInline) setInlineDocked(false);
+
             const targetHeight = mode === 'input' ? openInputHeight
                 : mode === 'thinking' ? openThinkingHeight
                     : openResultHeight;
@@ -119,7 +134,25 @@ export default function DynamicIsland() {
             }
 
             gsap.to(chatPanelRef.current, { opacity: 0, duration: 0.2 });
-            gsap.to(islandRef.current, { width: closedWidth, height: closedHeight, borderRadius: '25px', duration: 0.5, ease: "power3.inOut", delay: 0.1 });
+            gsap.to(islandRef.current, {
+                width: closedWidth,
+                maxWidth: closedWidth,
+                height: closedHeight,
+                borderRadius: '25px',
+                duration: 0.5,
+                ease: 'power3.inOut',
+                delay: 0.1,
+                onComplete: () => {
+                    if (!isInline || !islandRef.current) return;
+                    gsap.set(islandRef.current, {
+                        width: closedWidth,
+                        maxWidth: closedWidth,
+                        height: closedHeight,
+                        borderRadius: '25px',
+                    });
+                    setInlineDocked(true);
+                },
+            });
             gsap.to(initialContentRef.current, { opacity: 1, duration: 0.3, delay: 0.4 });
 
             resetCallRef.current = gsap.delayedCall(0.6, () => {
@@ -130,7 +163,7 @@ export default function DynamicIsland() {
                 gsap.set([thinkingSectionRef.current, resultSectionRef.current], { opacity: 0, y: 10 });
             });
         }
-    }, [isExpanded, mode, isMobile]);
+    }, [isExpanded, mode, isMobile, isInline, closedWidth, closedHeight]);
 
     // 💡 [Effect 3] Mode 전환 애니메이션
     useEffect(() => {
@@ -227,14 +260,28 @@ export default function DynamicIsland() {
             <div
                 ref={islandRef}
                 style={{
-                    position: 'fixed', top: '10px', left: '50%', transform: 'translateX(-50%)',
-                    zIndex: 9999, cursor: isExpanded ? 'default' : 'pointer', overflow: 'hidden',
-                    width: closedWidth, height: closedHeight,
+                    position: isInline && inlineDocked ? 'relative' : 'fixed',
+                    top: isInline && inlineDocked ? undefined : '10px',
+                    left: isInline && inlineDocked ? undefined : '50%',
+                    transform: isInline && inlineDocked ? undefined : 'translateX(-50%)',
+                    flexShrink: isInline && inlineDocked ? 0 : undefined,
+                    zIndex: 9999,
+                    cursor: isExpanded ? 'default' : 'pointer',
+                    overflow: 'hidden',
+                    width: isInline && inlineDocked ? '100%' : closedWidth,
+                    height: isInline && inlineDocked ? '100%' : closedHeight,
+                    minWidth: isInline && inlineDocked ? closedWidth : undefined,
                     backgroundColor: 'rgba(20, 20, 20, 0.85)',
-                    backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '25px',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '25px',
                     boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: isInline && inlineDocked ? '0 10px' : '0 12px',
+                    boxSizing: 'border-box',
                 }}
                 onClick={(e) => {
                     if (isExpanded && chatPanelRef.current && chatPanelRef.current.contains(e.target as Node)) return;
@@ -245,18 +292,19 @@ export default function DynamicIsland() {
                 <div
                     ref={initialContentRef}
                     style={{
-                        display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '8px', position: 'absolute',
+                        display: 'flex', alignItems: 'center',                         gap: isCompactClosed ? '6px' : '8px', position: 'absolute',
                         opacity: 1, pointerEvents: isExpanded ? 'none' : 'auto',
+                        whiteSpace: 'nowrap',
                     }}
                 >
-                    <div style={{ position: 'relative', width: isMobile ? '12px' : '20px', height: isMobile ? '8px' : '14px' }}>
-                        <div style={{ width: isMobile ? '3px' : '4px', height: isMobile ? '3px' : '4px', backgroundColor: '#fff', borderRadius: '50%', position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)' }} />
+                    <div style={{ position: 'relative', width: isCompactClosed ? '12px' : '20px', height: isCompactClosed ? '8px' : '14px', flexShrink: 0 }}>
+                        <div style={{ width: isCompactClosed ? '3px' : '4px', height: isCompactClosed ? '3px' : '4px', backgroundColor: '#fff', borderRadius: '50%', position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)' }} />
                         <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', position: 'absolute', bottom: 0 }}>
-                            <div style={{ width: isMobile ? '3px' : '4px', height: isMobile ? '3px' : '4px', backgroundColor: '#fff', borderRadius: '50%' }} />
-                            <div style={{ width: isMobile ? '3px' : '4px', height: isMobile ? '3px' : '4px', backgroundColor: '#fff', borderRadius: '50%' }} />
+                            <div style={{ width: isCompactClosed ? '3px' : '4px', height: isCompactClosed ? '3px' : '4px', backgroundColor: '#fff', borderRadius: '50%' }} />
+                            <div style={{ width: isCompactClosed ? '3px' : '4px', height: isCompactClosed ? '3px' : '4px', backgroundColor: '#fff', borderRadius: '50%' }} />
                         </div>
                     </div>
-                    <span style={{ color: '#fff', fontSize: isMobile ? '11px' : '16px', fontWeight: 600, whiteSpace: 'keep-all', letterSpacing: isMobile ? '-0.5px' : 'normal' }}>AI ASK</span>
+                    <span style={{ color: '#fff', fontSize: isCompactClosed ? '11px' : '16px', fontWeight: 600, whiteSpace: 'nowrap', letterSpacing: isCompactClosed ? '-0.5px' : 'normal' }}>AI ASK</span>
                 </div>
 
                 {/* 2. 확장 내부 패널 */}
