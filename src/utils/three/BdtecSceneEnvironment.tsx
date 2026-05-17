@@ -24,9 +24,11 @@ function skyboxScaleForCamera(camera: THREE.Camera) {
 function HdriSkyMesh({
                          texture,
                          blur,
+                         intensity, // 밝기 동기화를 위해 추가
                      }: {
     texture: THREE.Texture;
     blur: number;
+    intensity: number;
 }) {
     const meshRef = useRef<THREE.Mesh>(null);
 
@@ -35,17 +37,18 @@ function HdriSkyMesh({
         const roughness = THREE.MathUtils.clamp(blur, 0, 1);
 
         return new THREE.MeshPhysicalMaterial({
-            envMap: texture, // PMREM 없이 텍스처를 직접 전달
+
             roughness,
             metalness: 1, // 배경을 거울처럼 100% 반사하도록 1로 설정
-            color: 0x000000, // 디퓨즈(Diffuse) 색상의 간섭을 막기 위해 검은색으로 설정
+            color: 0xffffff, // 디퓨즈(Diffuse) 색상의 간섭을 막기 위해 검은색으로 설정
+            envMapIntensity: intensity,
             side: THREE.BackSide,
             depthWrite: false,
             depthTest: false,
             fog: false,
             toneMapped: true,
         });
-    }, [texture, blur]);
+    }, [texture, blur, intensity]);
 
     useLayoutEffect(() => {
         return () => {
@@ -111,7 +114,11 @@ export function BdtecSceneEnvironment({
     // useEnvironment는 기본적으로 Suspense를 타므로 텍스처가 존재함을 보장합니다.
     if (!texture) return null;
 
-    return <HdriSkyMesh texture={texture as THREE.Texture} blur={blur} />;
+    return <HdriSkyMesh
+        texture={texture as THREE.Texture}
+        blur={blur}
+        intensity={environmentIntensity} // 💡 추가됨
+    />
 }
 
 BdtecSceneEnvironment.preload = (options?: { preset?: any }) => {
