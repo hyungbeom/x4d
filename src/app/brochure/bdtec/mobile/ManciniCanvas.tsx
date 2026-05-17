@@ -1,14 +1,12 @@
 'use client';
 
-import { Canvas, extend } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
-import * as THREE from "three/webgpu";
-import { ResizeHandler } from "@/utils/three/ResizeHandler";
-import { SceneLoadingReporter } from "@/utils/three/SceneLoadingReporter";
-import { useBdtecSceneLoadingActions } from "@/utils/three/SceneLoadingContext";
-
-// @ts-ignore
-extend(THREE);
+import { Canvas } from '@react-three/fiber';
+import { useEffect, useRef, useState } from 'react';
+import * as THREE from 'three';
+import { WebGPURenderer } from 'three/webgpu';
+import { ResizeHandler } from '@/utils/three/ResizeHandler';
+import { SceneLoadingReporter } from '@/utils/three/SceneLoadingReporter';
+import { useBdtecSceneLoadingActions } from '@/utils/three/SceneLoadingContext';
 
 export function ManciniCanvas({
     quality,
@@ -17,10 +15,12 @@ export function ManciniCanvas({
 }: {
     quality: string;
     children: React.ReactNode;
-    /** Canvas clear color — 로딩·투명 영역용 */
     backgroundColor?: string;
 }) {
-    const rendererRef = useRef<THREE.WebGPURenderer | null>(null);
+    const rendererRef = useRef<WebGPURenderer | null>(null);
+    const backgroundColorRef = useRef(backgroundColor);
+    backgroundColorRef.current = backgroundColor;
+
     const { setWebgpuReady } = useBdtecSceneLoadingActions();
     const [clientReady, setClientReady] = useState(false);
     const [dpr, setDpr] = useState(1);
@@ -43,40 +43,39 @@ export function ManciniCanvas({
 
     if (!clientReady) return null;
 
-
     return (
         <Canvas
             orthographic
-            style={{ width: "100vw", height: "100vh", display: "block", touchAction: "none" }}
+            style={{ width: '100vw', height: '100vh', display: 'block', touchAction: 'none' }}
             dpr={dpr}
             camera={{
                 position: [0, 200, 800],
                 zoom: 1,
                 near: -1000,
                 far: 500000,
-                fov: 25
+                fov: 25,
             }}
-            shadows={"variance"}
-            gl={async (props: Record<string, unknown>) => {
-                const renderer = new THREE.WebGPURenderer({
-                    ...props,
-                    powerPreference: "high-performance",
+            shadows="variance"
+            gl={async (props) => {
+                const { powerPreference: _ignored, ...rest } = props as Record<string, unknown>;
+                const renderer = new WebGPURenderer({
+                    ...rest,
                     antialias: true,
                     alpha: true,
                     stencil: false,
                 });
 
                 await renderer.init();
-                rendererRef.current = renderer as never;
+                rendererRef.current = renderer;
                 return renderer;
             }}
-            onCreated={({ gl }) => {
+            onCreated={({ scene, gl }) => {
+                scene.background = new THREE.Color(backgroundColorRef.current);
                 gl.toneMapping = THREE.ACESFilmicToneMapping;
                 gl.toneMappingExposure = 1.1;
                 setWebgpuReady(true);
             }}
         >
-            <color attach="background" args={[backgroundColor]} />
             <SceneLoadingReporter />
             {children}
             <ResizeHandler quality={quality} rendererRef={rendererRef} />

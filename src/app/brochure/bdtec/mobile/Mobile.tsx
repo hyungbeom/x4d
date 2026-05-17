@@ -175,7 +175,7 @@ export default function BdtecScene({quality, activePanelId, deviceType}: BdtecSc
 
             <Suspense fallback={null}>
                 {/*<SceneEnvironment preset="forest" blur={1} environmentIntensity={0.8}/>*/}
-                <SceneEnvironment/>
+                <SceneEnvironment colorTop="#0a0a0a" colorBottom="#121820" opaque />
                 <Light_Environment />
                 <BrochureGrid
                     cellSize={32}

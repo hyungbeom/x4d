@@ -1,0 +1,137 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: rgba(8, 28, 48, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.modal {
+  width: min(100%, 400px);
+  max-height: min(72dvh, 520px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f8fcff 0%, #e8f4fc 100%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 16px 40px rgba(15, 45, 61, 0.22);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #123d52;
+}
+
+.closeBtn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(18, 61, 82, 0.08);
+  color: #123d52;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.searchRow {
+  display: flex;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(14, 116, 144, 0.25);
+  background: #fff;
+  color: #0f2d3d;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.input:focus {
+  outline: 2px solid rgba(14, 165, 233, 0.45);
+  outline-offset: 1px;
+}
+
+.findBtn {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.message {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #3d6b82;
+}
+
+.resultList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  max-height: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.resultItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(14, 116, 144, 0.15);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.resultBooth {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #ff9a4d 0%, #f97316 100%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.resultLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #123d52;
+  line-height: 1.35;
+}
