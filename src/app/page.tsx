@@ -7,23 +7,14 @@ import * as THREE from 'three';
 import {ManciniCanvas} from "@/app/brochure/bdtec/mobile/ManciniCanvas";
 import {SceneEnvironment} from "@/utils/three/SceneEnvironment";
 import {Light_Environment} from "@/utils/three/Light_Environment";
-import {BrochureGrid} from "@/utils/three/BrochureGrid";
-import {AirProduct} from "@/resources/model/Air_Product";
-import {Tank} from "@/resources/model/bdtect/Tank";
-import {Modem} from "@/resources/model/bdtect/Modem";
 import {SplineSmokeParticles} from "@/utils/three/SplineParticles";
-import {Factory} from "@/resources/model/bdtect/Factory";
-import {Wifi} from "@/resources/model/bdtect/Wifi";
-import {SystemModel} from "@/resources/model/bdtect/SystemModel";
-import {DataModel} from "@/resources/model/bdtect/Data";
-import LineObj from "@/utils/three/LineObj";
 import {SceneReadyGate} from "@/utils/three/SceneReadyGate";
 import type CameraControlsImpl from "camera-controls";
 import CameraHelper from "@/utils/three/CamHelper";
 import gsap from "gsap";
 import {ScrollTrigger} from "gsap/ScrollTrigger";
 import {SceneLoadingProvider} from "@/utils/three/SceneLoadingContext";
-import {WorldModel} from "@/resources/model/progist/WorldMode";
+import {WorldModel} from "@/resources/model/progist/WorldModel";
 import NavBar from "@/utils/ui/NavBar";
 import InfoPanel from "@/utils/ui/InfoPanel";
 import infoPanelStyles from "@/utils/ui/InfoPanel.module.css";
@@ -283,13 +274,17 @@ export default function Home() {
                     />
 
                     <div className={styles.canvasLayer}>
-                        <ManciniCanvas quality="default">
+                        <ManciniCanvas quality="default" backgroundColor="#b8dff5">
                             <CameraController activePanelId={activePanelId} deviceType={deviceType} />
 
                             <Suspense fallback={null}>
-                                <SceneEnvironment />
+                                <SceneEnvironment colorTop="#7ec8ef" colorBottom="#e8f6ff" />
                                 <Light_Environment />
                                 <WorldModel />
+                                {/*<SplineSmokeParticles*/}
+                                {/*    spawnPosition={[-260, 1200,900]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정*/}
+                                {/*    count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)*/}
+                                {/*/>*/}
                                 <SceneReadyGate />
                             </Suspense>
                         </ManciniCanvas>

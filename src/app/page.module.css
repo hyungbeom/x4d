@@ -3,7 +3,13 @@
   width: 100dvw;
   height: 100dvh;
   overflow: hidden;
-  background-color: #e5e5e5;
+  background: linear-gradient(
+    180deg,
+    #8ecfef 0%,
+    #b3e0f7 38%,
+    #d4effa 72%,
+    #f0f9ff 100%
+  );
 }
 
 .stickyViewport {

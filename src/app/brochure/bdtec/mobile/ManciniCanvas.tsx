@@ -10,7 +10,16 @@ import { useBdtecSceneLoadingActions } from "@/utils/three/SceneLoadingContext";
 // @ts-ignore
 extend(THREE);
 
-export function ManciniCanvas({ quality, children }: { quality: string; children: React.ReactNode }) {
+export function ManciniCanvas({
+    quality,
+    children,
+    backgroundColor = '#0a0a0a',
+}: {
+    quality: string;
+    children: React.ReactNode;
+    /** Canvas clear color — 로딩·투명 영역용 */
+    backgroundColor?: string;
+}) {
     const rendererRef = useRef<THREE.WebGPURenderer | null>(null);
     const { setWebgpuReady } = useBdtecSceneLoadingActions();
     const [clientReady, setClientReady] = useState(false);
@@ -67,7 +76,7 @@ export function ManciniCanvas({ quality, children }: { quality: string; children
                 setWebgpuReady(true);
             }}
         >
-            <color attach="background" args={['#0a0a0a']} />
+            <color attach="background" args={[backgroundColor]} />
             <SceneLoadingReporter />
             {children}
             <ResizeHandler quality={quality} rendererRef={rendererRef} />

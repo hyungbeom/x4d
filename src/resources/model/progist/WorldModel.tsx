@@ -99,7 +99,18 @@ export function WorldModel(props) {
                     geometry={nodes.Water_all.geometry}
                     material={materials.A1}
                     position={[20.406, -90.909, -1.914]}
-                />
+                >
+                    <meshPhysicalMaterial
+                        color="#88ccff"       // 맑고 연한 하늘색
+                        transmission={0.9}    // 💡 핵심: 유리의 투명도 (1에 가까울수록 완전 투명한 유리)
+                        transparent={true}    // 투명 속성 활성화
+                        opacity={1}           // transmission을 쓸 때는 opacity를 1로 두는 것이 자연스럽습니다.
+                        roughness={0.1}       // 표면의 거칠기 (낮을수록 매끈한 유리/물 표면)
+                        metalness={0.1}       // 살짝 반사광을 더해주기 위해 약간만 부여
+                        ior={1.33}            // 💡 빛의 굴절률 (1.33은 실제 물의 굴절률, 1.5는 유리입니다)
+                        thickness={2.0}       // 굴절의 깊이감 (모델의 두께에 따라 숫자를 조절해 보세요)
+                    />
+                </mesh>
                 <mesh
                     name="Water_Quality_Land"
                     castShadow
