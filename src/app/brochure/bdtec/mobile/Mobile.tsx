@@ -139,11 +139,11 @@ function CameraController({activePanelId, deviceType}: { activePanelId: number; 
                 smoothTime={CAMERA_TRANSITION_SMOOTH_TIME}
                 draggingSmoothTime={0.12}
             />
-            <CameraHelper
-                controlsRef={cameraControlsRef}
-                activePanelId={activePanelId}
-                deviceType={deviceType}
-            />
+            {/*<CameraHelper*/}
+            {/*    controlsRef={cameraControlsRef}*/}
+            {/*    activePanelId={activePanelId}*/}
+            {/*    deviceType={deviceType}*/}
+            {/*/>*/}
         </>
     );
 }
