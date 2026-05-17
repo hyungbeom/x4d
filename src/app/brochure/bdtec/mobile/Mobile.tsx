@@ -5,7 +5,8 @@ import { useBdtecSceneLoadingActions } from '@/app/brochure/bdtec/BdtecSceneLoad
 import { BdtecSceneReadyGate } from '@/app/brochure/bdtec/mobile/BdtecSceneReadyGate';
 import * as THREE from 'three';
 import { useFrame } from "@react-three/fiber";
-import { CameraControls, Grid } from "@react-three/drei";
+import { CameraControls } from "@react-three/drei";
+import { BdtecBrochureGrid } from "@/utils/three/BdtecBrochureGrid";
 import { BdtecSceneEnvironment } from "@/utils/three/BdtecSceneEnvironment";
 import type CameraControlsImpl from 'camera-controls';
 
@@ -166,16 +167,11 @@ export default function BdtecScene({ quality, activePanelId, deviceType }: Bdtec
             <Suspense fallback={null}>
                 <BdtecSceneEnvironment preset="sunset" blur={0.35} environmentIntensity={1.15} />
                 {/*<Light_Environment />*/}
-                <Grid
-                    infiniteGrid
+                <BdtecBrochureGrid
                     cellSize={32}
                     sectionSize={160}
-                    fadeDistance={2200}
-                    fadeStrength={1.4}
                     cellColor="#5a6d8f"
                     sectionColor="#b3c4f5"
-                    followCamera
-                    renderOrder={-1}
                 />
 
                 <FloatingTankLine />

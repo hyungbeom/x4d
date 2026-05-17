@@ -41,8 +41,8 @@ export function ManciniCanvas({ quality, children }: { quality: string; children
             camera={{
                 position: [0, 200, 800],
                 zoom: 1,
-                near: -1000,
-                far: 3000,
+                near: -25000,
+                far: 25000,
             }}
             shadows
             gl={{
