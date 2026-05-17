@@ -212,6 +212,38 @@ export const MAP_CAMERA_ALL_POINTS: MapCameraPointConfig[] = [
     ...MAP_CAMERA_POINTS,
 ];
 
+export type MapSearchableCompany = {
+    booth: string;
+    label: string;
+};
+
+/** 맵 검색용 기업 목록 (오버라이드 반영된 부스·라벨) */
+export function getMapSearchableCompanies(): MapSearchableCompany[] {
+    const seen = new Set<string>();
+    const list: MapSearchableCompany[] = [];
+
+    for (const point of MAP_CAMERA_POINTS) {
+        if (!point.booth || !point.label) continue;
+        const key = point.booth.toUpperCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        list.push({ booth: point.booth, label: point.label });
+    }
+
+    return list.sort((a, b) => a.booth.localeCompare(b.booth, undefined, { numeric: true }));
+}
+
+export function searchMapCompanies(query: string): MapSearchableCompany[] {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+
+    return getMapSearchableCompanies().filter((company) => {
+        const booth = company.booth.toLowerCase();
+        const label = company.label.toLowerCase();
+        return booth.includes(q) || label.includes(q) || label.replace(/\s/g, '').includes(q.replace(/\s/g, ''));
+    });
+}
+
 /** 맵 위 mark.gltf 배치 목록 — boothFilter 있으면 해당 부스만 */
 export function getMapBoothMarkPlacements(boothFilter?: string | null): MapBoothMarkPlacement[] {
     const all = MAP_CAMERA_POINTS.filter((point) => point.booth && point.markPosition).map(

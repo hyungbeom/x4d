@@ -1,7 +1,7 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { CameraControls } from '@react-three/drei';
 import type CameraControlsImpl from 'camera-controls';
 import { ManciniCanvas } from '@/app/brochure/bdtec/mobile/ManciniCanvas';
@@ -11,6 +11,7 @@ import { SceneEnvironment } from '@/utils/three/SceneEnvironment';
 import { Light_Environment } from '@/utils/three/Light_Environment';
 import { SceneReadyGate } from '@/utils/three/SceneReadyGate';
 import MapSceneLoader from '@/components/map/MapSceneLoader';
+import MapCompanySearchModal from '@/components/map/MapCompanySearchModal';
 import {
     SceneLoadingProvider,
     useBdtecSceneLoadingActions,
@@ -44,11 +45,11 @@ function MapScene({ deviceType, booth }: { deviceType: DeviceType; booth: string
                 smoothTime={0.45}
                 draggingSmoothTime={0.12}
             />
-            <CameraHelper
-                controlsRef={cameraControlsRef}
-                activePanelId={0}
-                deviceType={deviceType}
-            />
+            {/*<CameraHelper*/}
+            {/*    controlsRef={cameraControlsRef}*/}
+            {/*    activePanelId={0}*/}
+            {/*    deviceType={deviceType}*/}
+            {/*/>*/}
             <MapModel skipAutoFit={hasBoothCamera} />
             <MapBoothMarks booth={booth} />
         </>
@@ -56,12 +57,23 @@ function MapScene({ deviceType, booth }: { deviceType: DeviceType; booth: string
 }
 
 function MapPageContent() {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const navigate = usePageTransition();
     const { setModuleReady, reset } = useBdtecSceneLoadingActions();
     const booth = useMemo(() => searchParams.get('booth') ?? '', [searchParams]);
     const [deviceType, setDeviceType] = useState<DeviceType>('desktop');
     const [sceneRevealed, setSceneRevealed] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+
+    const goToBooth = useCallback(
+        (boothCode: string) => {
+            const code = boothCode.trim();
+            if (!code) return;
+            router.replace(`/map?booth=${encodeURIComponent(code)}`);
+        },
+        [router],
+    );
 
     useEffect(() => {
         reset();

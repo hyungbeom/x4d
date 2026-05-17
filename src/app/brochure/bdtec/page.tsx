@@ -75,6 +75,11 @@ export default function Home() {
         setActivePanelId(newValue);
     };
 
+    const handleLogoClick = () => {
+        setAutoTour(false);
+        handleVariableChange(0);
+    };
+
     const handleNextPanel = () => {
         setActivePanelId((prev) => {
             if (prev < 1 || prev >= 5) return 1;
@@ -158,6 +163,7 @@ export default function Home() {
                             }
                             autoTour={autoTour}
                             onAutoTourToggle={handleAutoTourToggle}
+                            onLogoClick={handleLogoClick}
                         />
                         <button
                             type="button"
