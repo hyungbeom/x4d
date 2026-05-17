@@ -1,5 +1,6 @@
 'use client';
 
+import * as THREE from "three/webgpu";
 import { Canvas } from "@react-three/fiber";
 import { Bloom, EffectComposer, ToneMapping } from "@react-three/postprocessing";
 import { useEffect, useRef, useState } from "react";
@@ -45,16 +46,29 @@ export function ManciniCanvas({ quality, children }: { quality: string; children
                 far: 25000,
             }}
             shadows
-            gl={{
-                powerPreference: "high-performance",
-                antialias: true,
-                alpha: false,
+            gl={async (props:any) => {
+                const renderer = new THREE.WebGPURenderer({
+                    ...props,
+                    powerPreference: "high-performance",
+                    antialias: true,
+                    alpha: true,
+                    stencil: false,
+                });
+
+                // 엔진 초기화가 끝날 때까지 대기
+                await renderer.init();
+
+                console.log("🔥 R3F v9 WebGPU 엔진 가동 완료 (Orthographic 모드)");
+
+                // ResizeHandler에서 쓸 수 있게 ref에 연결
+                rendererRef.current = renderer as any;
+                return renderer;
             }}
             onCreated={({ gl }) => {
                 gl.toneMappingExposure = 1.1;
                 gl.setClearColor(0x1a2030, 1);
                 rendererRef.current = gl;
-                setWebgpuReady(true);
+                // setWebgpuReady(true);
             }}
         >
             <BdtecSceneLoadingReporter />
