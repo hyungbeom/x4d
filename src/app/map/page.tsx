@@ -110,8 +110,25 @@ function MapPageContent() {
                         >
                             ← 브로슈어로
                         </button>
+                        {deviceType === 'mobile' ? (
+                            <button
+                                type="button"
+                                className={styles.findCompanyBtn}
+                                onClick={() => setSearchOpen(true)}
+                            >
+                                기업찾기
+                            </button>
+                        ) : (
+                            <span className={styles.topBarSpacer} aria-hidden />
+                        )}
                         {booth ? <span className={styles.boothTag}>부스 {booth}</span> : null}
                     </div>
+
+                    <MapCompanySearchModal
+                        open={searchOpen}
+                        onClose={() => setSearchOpen(false)}
+                        onSelectBooth={goToBooth}
+                    />
 
                     <div className={styles.canvasLayer}>
                         <ManciniCanvas quality="default" backgroundColor="#b8dff5">

@@ -35,11 +35,32 @@
   left: 16px;
   right: 16px;
   z-index: 50;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
   pointer-events: none;
+}
+
+.topBarSpacer {
+  display: block;
+}
+
+.findCompanyBtn {
+  justify-self: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.88);
+  color: #0d4a6a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(14, 116, 144, 0.15);
 }
 
 .topBar > * {
@@ -47,6 +68,7 @@
 }
 
 .backBtn {
+  justify-self: start;
   padding: 8px 14px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.85);
@@ -61,6 +83,7 @@
 }
 
 .boothTag {
+  justify-self: end;
   padding: 6px 12px;
   border-radius: 8px;
   background: linear-gradient(180deg, #ff9a4d 0%, #f97316 100%);

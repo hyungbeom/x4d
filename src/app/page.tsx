@@ -30,6 +30,13 @@ import {
 } from "@/components/progist/ProgistNavIcons";
 import PageWrapper from "@/utils/ui/PageWrapper";
 import styles from "./page.module.css";
+import {CHAirModel} from "@/resources/model/progist/CHAirModel";
+import {CHEarthModel} from "@/resources/model/progist/CHEarthModel";
+import {CHLeafModel} from "@/resources/model/progist/CHLeafModel";
+import {CHMicroscopeModel} from "@/resources/model/progist/CHMicroscopeModel";
+import {CHWaterModel} from "@/resources/model/progist/CHWaterModel";
+import {AirShip} from "@/resources/model/progist/AirShip";
+import {Cloud} from "@/resources/model/progist/Cloud";
 
 
 type CameraSnapshot = { c: [number, number, number]; t: [number, number, number]; z: number };
@@ -284,6 +291,13 @@ export default function Home() {
                                 <SceneEnvironment colorTop="#7ec8ef" colorBottom="#e8f6ff" />
                                 <Light_Environment />
                                 <WorldModel />
+                                <CHAirModel position={[-50,40,-90]}/>
+                                <CHEarthModel position={[98,12,-70]}/>
+                                <CHLeafModel position={[-46,8,112]}/>
+                                <CHMicroscopeModel position={[122,8,40]}/>
+                                <AirShip position={[122,230,40]} scale={[1.5,1.5,1.5]}  rotation={[0,Math.PI/5,0]}/>
+                                <CHWaterModel position={[-132,15,35]} rotation={[0,Math.PI/4,0]}/>
+                                <Cloud scale={[7,7,7]} position={[0,120,0]} rotation={[0,Math.PI/4,0]} />
                                 {/*<SplineSmokeParticles*/}
                                 {/*    spawnPosition={[-260, 1200,900]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정*/}
                                 {/*    count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)*/}
