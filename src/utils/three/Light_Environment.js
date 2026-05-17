@@ -11,7 +11,7 @@ export function Light_Environment() {
       />
       <directionalLight
         position={[320, 520, 280]}
-        intensity={1.8}
+        intensity={4.8}
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-camera-near={10}

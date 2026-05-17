@@ -174,14 +174,14 @@ export default function BdtecScene({quality, activePanelId, deviceType}: BdtecSc
             <CameraController activePanelId={activePanelId} deviceType={deviceType}/>
 
             <Suspense fallback={null}>
-                <BdtecSceneEnvironment preset="sunset" blur={0} environmentIntensity={1.15}/>
-                {/*<Light_Environment />*/}
-                {/*<BdtecBrochureGrid*/}
-                {/*    cellSize={32}*/}
-                {/*    sectionSize={160}*/}
-                {/*    cellColor="#5a6d8f"*/}
-                {/*    sectionColor="#b3c4f5"*/}
-                {/*/>*/}
+                {/*<BdtecSceneEnvironment preset="forest" blur={1} environmentIntensity={0.8}/>*/}
+                <Light_Environment />
+                <BdtecBrochureGrid
+                    cellSize={32}
+                    sectionSize={160}
+                    cellColor="#5a6d8f"
+                    sectionColor="#b3c4f5"
+                />
 
                 <FloatingTankLine/>
 

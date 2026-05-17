@@ -6,25 +6,27 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 function skyboxScaleForCamera(camera: THREE.Camera) {
+    let scale = 5000;
+
     if (camera instanceof THREE.OrthographicCamera) {
         const w = (camera.right - camera.left) / camera.zoom;
         const h = (camera.top - camera.bottom) / camera.zoom;
         const depth = camera.far - camera.near;
-        return Math.hypot(w, h, depth) * 0.65;
-    }
-    if (camera instanceof THREE.PerspectiveCamera) {
+        scale = Math.hypot(w, h, depth) * 0.65;
+    } else if (camera instanceof THREE.PerspectiveCamera) {
         const dist = Math.max(Math.abs(camera.position.z), camera.far * 0.25);
         const vFov = (camera.fov * Math.PI) / 180;
-        return dist * Math.tan(vFov * 0.5) * 2.5;
+        scale = dist * Math.tan(vFov * 0.5) * 2.5;
     }
-    return 5000;
-}
 
-/** PMREM 의존성 제거, 네이티브 envMap + roughness 활용 */
+    // 🚨 핵심 해결책: 스케일이 카메라의 Far(최대 가시거리)를 넘지 않도록 제한합니다.
+    // 카메라 far 값의 90% 크기로 설정해서 클리핑을 방지합니다.
+    return Math.min(scale, camera.far * 0.9);
+}
 function HdriSkyMesh({
                          texture,
                          blur,
-                         intensity, // 밝기 동기화를 위해 추가
+                         intensity,
                      }: {
     texture: THREE.Texture;
     blur: number;
@@ -34,21 +36,18 @@ function HdriSkyMesh({
 
     const material = useMemo(() => {
         if (!texture) return null;
-        const roughness = THREE.MathUtils.clamp(blur, 0, 1);
 
-        return new THREE.MeshPhysicalMaterial({
+        texture.mapping = THREE.EquirectangularReflectionMapping;
 
-            roughness,
-            metalness: 1, // 배경을 거울처럼 100% 반사하도록 1로 설정
-            color: 0xffffff, // 디퓨즈(Diffuse) 색상의 간섭을 막기 위해 검은색으로 설정
-            envMapIntensity: intensity,
-            side: THREE.BackSide,
+        // 💡 핵심: MeshPhysicalMaterial 대신 빛 계산이 필요 없는 MeshBasicMaterial 사용
+        return new THREE.MeshBasicMaterial({
+            envMap: texture,
+            side: THREE.DoubleSide, // 💡 핵심: BackSide 대신 DoubleSide를 써서 면 뒤집힘 이슈를 원천 차단!
             depthWrite: false,
             depthTest: false,
-            fog: false,
-            toneMapped: true,
+            color: 0xffffff,
         });
-    }, [texture, blur, intensity]);
+    }, [texture]);
 
     useLayoutEffect(() => {
         return () => {
@@ -60,32 +59,26 @@ function HdriSkyMesh({
         const mesh = meshRef.current;
         if (!mesh) return;
 
-        // 1. 카메라 위치 따라가기
         mesh.position.copy(state.camera.position);
-
-        // 2. 스케일 계산
         const scale = skyboxScaleForCamera(state.camera);
 
-        // 3. X축 스케일을 반전시켜서 좌우가 뒤집힌 이미지를 원래대로 복구
-        mesh.scale.set(-scale, scale, scale);
+        // 💡 핵심: 일단 음수(-scale)를 빼고 양수로만 렌더링해 봅니다.
+        mesh.scale.set(scale, scale, scale);
     });
 
     if (!material) return null;
 
     return (
-        <mesh ref={meshRef} frustumCulled={false} renderOrder={-10}>
+        <mesh ref={meshRef} frustumCulled={false} renderOrder={-10} >
             <sphereGeometry args={[1, 64, 32]} />
             <primitive object={material} attach="material" />
         </mesh>
     );
 }
 
-/**
- * HDRI — 모델 IBL(scene.environment) + 직교 카메라용 배경 스카이박스
- */
 export function BdtecSceneEnvironment({
                                           preset = 'sunset',
-                                          blur = 0.35,
+                                          blur = 1,
                                           environmentIntensity = 1.15,
                                       }: {
     preset?: any;
@@ -111,13 +104,12 @@ export function BdtecSceneEnvironment({
         };
     }, [texture, scene, environmentIntensity]);
 
-    // useEnvironment는 기본적으로 Suspense를 타므로 텍스처가 존재함을 보장합니다.
     if (!texture) return null;
 
     return <HdriSkyMesh
         texture={texture as THREE.Texture}
         blur={blur}
-        intensity={environmentIntensity} // 💡 추가됨
+        intensity={environmentIntensity}
     />
 }
 
