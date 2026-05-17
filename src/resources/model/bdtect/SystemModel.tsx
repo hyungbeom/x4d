@@ -1,10 +1,32 @@
 import * as THREE from 'three';
 import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
+import {useFrame} from "@react-three/fiber";
 
 export function SystemModel(props:any) {
     const { nodes, materials }:any = useGLTF('/model/bdtec/system.glb')
-    return (
+
+
+    const panel:any = useRef(null)
+    const panel2:any = useRef(null)
+    const panel3:any = useRef(null)
+    const ellipse:any = useRef(null)
+    const enter:any = useRef(null)
+
+
+    useFrame((state:any, delta:number) => {
+        const t = (1 + Math.sin(state.clock.elapsedTime * 2)) / 2
+        panel.current.color.setRGB(2 + t * 20, 2, 20 + t * 50)
+        panel2.current.color.setRGB(2 + t * 20, 2, 20 + t * 50)
+        panel3.current.color.setRGB(2 + t * 20, 2, 20 + t * 50)
+
+        ellipse.current.color.setRGB(0, 5 + t * 20, 0);
+        enter.current.color.setRGB(0, 5 + t * 20, 0);
+    });
+
+
+
+        return (
         <group {...props} dispose={null}>
             <group scale={0.01}>
                 <group position={[12.623, -110.893, 156.094]}>
@@ -14,14 +36,28 @@ export function SystemModel(props:any) {
                         geometry={nodes.Ellipse.geometry}
                         material={nodes.Ellipse.material}
                         position={[25.099, 0.495, 0]}
-                    />
+                    >
+                        <meshPhysicalMaterial
+                            ref={ellipse}
+                            toneMapped={false}
+                            transparent={true}
+                            opacity={1}
+                        />
+                    </mesh>
                     <mesh
                         castShadow
                         receiveShadow
                         geometry={nodes.Rectangle003.geometry}
                         material={nodes.Rectangle003.material}
                         position={[-7.599, -0.495, 0]}
-                    />
+                    >
+                        <meshPhysicalMaterial
+                            ref={enter}
+                            toneMapped={false}
+                            transparent={true}
+                            opacity={1}
+                        />
+                    </mesh>
                 </group>
                 <mesh
                     castShadow
@@ -373,42 +409,23 @@ export function SystemModel(props:any) {
                     castShadow
                     receiveShadow
                     geometry={nodes.Path.geometry}
-                    material={nodes.Path.material}
+
                     position={[33.342, -103.896, 86.326]}
                     rotation={[0, 0, -Math.PI]}
-                />
-                <mesh
-                    castShadow
-                    receiveShadow
-                    geometry={nodes.Path_for_Laser.geometry}
-                    material={nodes.Path_for_Laser.material}
-                    position={[-148.376, -118.397, 50.708]}
-                    rotation={[-Math.PI / 2, 0, Math.PI / 2]}
-                />
-                <mesh
-                    castShadow
-                    receiveShadow
-                    geometry={nodes['Path_to_Quick_&_Safe'].geometry}
-                    material={nodes['Path_to_Quick_&_Safe'].material}
-                    position={[-148.376, -118.397, 50.708]}
-                    rotation={[-Math.PI / 2, 0, Math.PI / 2]}
-                />
-                <mesh
-                    castShadow
-                    receiveShadow
-                    geometry={nodes.Path001.geometry}
-                    material={nodes.Path001.material}
-                    position={[-37.949, -95.626, -25.733]}
-                    rotation={[-Math.PI / 2, 0, 0]}
-                />
-                <mesh
-                    castShadow
-                    receiveShadow
-                    geometry={nodes.Pipe_Line.geometry}
-                    material={nodes.Pipe_Line.material}
-                    position={[57.053, -102.286, 50.708]}
-                    rotation={[-Math.PI / 2, 0, -Math.PI / 2]}
-                />
+                >
+                    <meshPhysicalMaterial
+                        color="#4da6ff"
+                        transmission={1}
+                        opacity={1}
+                        transparent={true}
+                        roughness={0.05}
+                        metalness={0.1}
+                        ior={1.5}
+                        thickness={1.5}
+                    />
+                </mesh>
+
+
                 <mesh
                     castShadow
                     receiveShadow
@@ -440,7 +457,14 @@ export function SystemModel(props:any) {
                     material={nodes.Rectangle.material}
                     position={[58.508, -118.672, 106.652]}
                     rotation={[-Math.PI / 2, Math.PI / 2, 0]}
-                />
+                >
+                    <meshPhysicalMaterial
+                        ref={panel}
+                        toneMapped={false}
+                        transparent={true}
+                        opacity={1}
+                    />
+                </mesh>
                 <mesh
                     castShadow
                     receiveShadow
@@ -448,7 +472,15 @@ export function SystemModel(props:any) {
                     material={nodes.Rectangle001.material}
                     position={[58.508, -118.672, 117.449]}
                     rotation={[-Math.PI / 2, Math.PI / 2, 0]}
-                />
+                >
+
+                    <meshPhysicalMaterial
+                        ref={panel2}
+                        toneMapped={false}
+                        transparent={true}
+                        opacity={1}
+                    />
+                </mesh>
                 <mesh
                     castShadow
                     receiveShadow
@@ -456,7 +488,14 @@ export function SystemModel(props:any) {
                     material={nodes.Rectangle002.material}
                     position={[58.508, -118.672, 127.094]}
                     rotation={[-Math.PI / 2, Math.PI / 2, 0]}
-                />
+                >
+                    <meshPhysicalMaterial
+                        ref={panel3}
+                        toneMapped={false}
+                        transparent={true}
+                        opacity={1}
+                    />
+                </mesh>
                 <group position={[-38.676, -96.426, -76.602]} rotation={[0, -1.571, 0]}>
                     <mesh
                         castShadow

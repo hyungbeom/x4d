@@ -1,16 +1,18 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useBdtecSceneLoadingActions } from '@/app/brochure/bdtec/BdtecSceneLoadingContext';
+import { BdtecSceneReadyGate } from '@/app/brochure/bdtec/mobile/BdtecSceneReadyGate';
 import * as THREE from 'three';
 import { useFrame } from "@react-three/fiber";
-import { CameraControls, Environment } from "@react-three/drei";
+import { CameraControls, Grid } from "@react-three/drei";
+import { BdtecSceneEnvironment } from "@/utils/three/BdtecSceneEnvironment";
 import type CameraControlsImpl from 'camera-controls';
 
 // 3D 환경 및 커스텀 컴포넌트
 import { ManciniCanvas } from "@/app/brochure/bdtec/mobile/ManciniCanvas";
 import { Light_Environment } from "@/utils/three/Light_Environment";
 import LineObj from "@/utils/three/LineObj";
-import { BdtecWebGpuBackdropGrid } from "@/utils/three/BdtecWebGpuBackdropGrid";
 
 // 3D 모델
 import { Tank } from "@/resources/model/bdtect/Tank";
@@ -19,6 +21,8 @@ import { Factory } from "@/resources/model/bdtect/Factory";
 import { Wifi } from "@/resources/model/bdtect/Wifi";
 import { SystemModel } from "@/resources/model/bdtect/SystemModel";
 import { Modem } from "@/resources/model/bdtect/Modem";
+import {DataModel} from "@/resources/model/bdtect/Data";
+import {SplineParticles, SplineSmokeParticles} from "@/utils/three/SplineParticles";
 
 // ... (FloatingTankLine 컴포넌트 유지) ...
 function FloatingTankLine() {
@@ -87,10 +91,10 @@ function CameraController({ activePanelId, deviceType }: { activePanelId: number
         },
         4: { desktop: { c: [300, 50, 350], t: [300, 0, 88], z: 1 },
             tablet: { c: [300, 80, 450], t: [300, 0, 88], z: 1 },
-            mobile: { c: [525.1, 279.1, 448.5], t: [277.6, 170.6, 55.0], z: 1.29 }
+            mobile: { c: [525.1, 279.1, 448.5], t: [277.6, 170.6, 55.0], z: 1.09 }
         },
         5: { desktop: { c: [0, 150, 300], t: [0, 100, 0], z: 1 }, tablet: { c: [0, 200, 400], t: [0, 100, 0], z: 1 },
-            mobile: { c: [829.8, 232.1, 22.1], t: [678.6, 118.4, -162.8], z: 1.00 }
+            mobile: { c: [744.1, 285.8, 61.6], t: [588.6, 168.6, -117.6], z: 1.00 }
         },
     } satisfies Record<number, Record<DeviceType, CameraSnapshot>>), []);
 
@@ -103,7 +107,9 @@ function CameraController({ activePanelId, deviceType }: { activePanelId: number
         const deviceTypeChanged = prevDeviceTypeRef.current !== deviceType;
         prevDeviceTypeRef.current = deviceType;
 
-        if (!hasInitializedRef.current || deviceTypeChanged) {
+        const mode = !hasInitializedRef.current || deviceTypeChanged ? 'snap' : 'transition';
+
+        if (mode === 'snap') {
             applyCameraSnapshot(controls, snapshot);
             hasInitializedRef.current = true;
         } else {
@@ -123,11 +129,11 @@ function CameraController({ activePanelId, deviceType }: { activePanelId: number
                 smoothTime={CAMERA_TRANSITION_SMOOTH_TIME}
                 draggingSmoothTime={0.12}
             />
-            <CameraHelper
-                controlsRef={cameraControlsRef}
-                activePanelId={activePanelId}
-                deviceType={deviceType}
-            />
+            {/*<CameraHelper*/}
+            {/*    controlsRef={cameraControlsRef}*/}
+            {/*    activePanelId={activePanelId}*/}
+            {/*    deviceType={deviceType}*/}
+            {/*/>*/}
         </>
     );
 }
@@ -139,35 +145,88 @@ interface BdtecSceneProps {
 }
 
 export default function BdtecScene({ quality, activePanelId, deviceType }: BdtecSceneProps) {
+    const { setModuleReady } = useBdtecSceneLoadingActions();
+
+    useEffect(() => {
+        setModuleReady(true);
+        BdtecSceneEnvironment.preload({ preset: 'sunset' });
+        return () => setModuleReady(false);
+    }, [setModuleReady]);
+
     const PipeLine1 = useMemo(() => [new THREE.Vector3(-50, 15, 50), new THREE.Vector3(-50, 15, 300)], []);
     const PipeLine2 = useMemo(() => [new THREE.Vector3(-140, 15, 53), new THREE.Vector3(-220, 15, 53), new THREE.Vector3(-220, 15, 200), new THREE.Vector3(-358, 15, 200), new THREE.Vector3(-358, 15, 50)], []);
     const PipeLine3 = useMemo(() => [new THREE.Vector3(75, 33, 50), new THREE.Vector3(150, 33, 50), new THREE.Vector3(150, 33, -120), new THREE.Vector3(265, 33, -120), new THREE.Vector3(265, 33, 30)], []);
     const PipeLine4 = useMemo(() => [new THREE.Vector3(-40, 33, 135), new THREE.Vector3(-40, 33, -300), new THREE.Vector3(320, 33, -300), new THREE.Vector3(320, 33, -135), new THREE.Vector3(530, 33, -135)], []);
-    const PipeLine5 = useMemo(() => [new THREE.Vector3(-40, 80, 135), new THREE.Vector3(-40, 80, -300), new THREE.Vector3(320, 80, -300), new THREE.Vector3(320, 80, -135), new THREE.Vector3(530, 80, -135)], []);
+    const PipeLine5 = useMemo(() => [new THREE.Vector3(-40, 80, 135), new THREE.Vector3(-40, 80, -300), new THREE.Vector3(320, 80, -300), new THREE.Vector3(320, 80, -135), new THREE.Vector3(570, 80, -135)], []);
 
     return (
         <ManciniCanvas quality={quality}>
-            {/* 🚀 CameraControls와 Helper를 품은 컨트롤러! */}
             <CameraController activePanelId={activePanelId} deviceType={deviceType} />
 
-            <Environment preset="city" blur={0} />
-            <Light_Environment />
-            <BdtecWebGpuBackdropGrid />
-            <FloatingTankLine />
+            <Suspense fallback={null}>
+                <BdtecSceneEnvironment preset="sunset" blur={0.35} environmentIntensity={1.15} />
+                {/*<Light_Environment />*/}
+                <Grid
+                    infiniteGrid
+                    cellSize={32}
+                    sectionSize={160}
+                    fadeDistance={2200}
+                    fadeStrength={1.4}
+                    cellColor="#5a6d8f"
+                    sectionColor="#b3c4f5"
+                    followCamera
+                    renderOrder={-1}
+                />
 
-            <AirProduct scale={[20, 20, 20]} position={[-40, 215, 45]} />
-            <Tank scale={[70, 70, 70]} position={[0, 0, 370]} rotation={[0, -Math.PI / 2, 0]} />
-            <Modem scale={[100, 100, 100]} position={[0, 0, 450]} />
-            <Factory scale={[40, 40, 40]} rotation={[0, -Math.PI / 2, 0]} position={[-420, 0, -20]} />
-            <Modem scale={[100, 100, 100]} position={[-450, 0, 80]} />
-            <Wifi scale={[150, 150, 150]} position={[300, 0, 88]} />
-            <SystemModel scale={[100, 100, 100]} position={[0, 130, 0]} rotation={[0, 0, 0]} />
+                <FloatingTankLine />
 
-            <LineObj type="type1" points={PipeLine1} tubeRadius={5} lightRadius={3} speed={1} />
-            <LineObj type="type1" points={PipeLine2} tubeRadius={5} lightRadius={3} speed={1} />
-            <LineObj type="type1" points={PipeLine3} tubeRadius={5} lightRadius={3} speed={1} />
-            <LineObj type="type2" points={PipeLine4} tubeRadius={5} lightRadius={3} speed={1} lineWidth={7} />
-            <LineObj type="type1" points={PipeLine5} tubeRadius={18} lightRadius={15} speed={1} />
+                <AirProduct scale={[20, 20, 20]} position={[-40, 215, 45]} />
+                <Tank scale={[70, 70, 70]} position={[0, 0, 370]} rotation={[0, -Math.PI / 2, 0]} />
+                <Modem scale={[100, 100, 100]} position={[0, 0, 450]} />
+                <SplineSmokeParticles
+                    spawnPosition={[-350, 200, -5]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정
+                    count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)
+                />
+                <SplineSmokeParticles
+                    spawnPosition={[-350, 200, -45]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정
+                    count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)
+                />
+
+                <SplineSmokeParticles
+                    spawnPosition={[-310, 200, -45]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정
+                    count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)
+                />
+                <SplineSmokeParticles
+                    spawnPosition={[-310, 200, -5]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정
+                    count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)
+                />
+
+                <SplineSmokeParticles
+                    spawnPosition={[-545, 110, 20]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정
+                    count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)
+                />
+                <SplineSmokeParticles
+                    spawnPosition={[-545, 110, -20]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정
+                    count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)
+                />
+                <SplineSmokeParticles
+                    spawnPosition={[-545, 110, -60]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정
+                    count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)
+                />
+                <Factory scale={[40, 40, 40]} rotation={[0, -Math.PI / 2, 0]} position={[-420, 0, -20]} />
+                <Modem scale={[100, 100, 100]} position={[-450, 0, 80]} />
+                <Wifi scale={[150, 150, 150]} position={[300, 0, 88]} />
+                <SystemModel scale={[100, 100, 100]} position={[0, 130, 0]} rotation={[0, 0, 0]} />
+                <DataModel scale={[50, 50, 50]} position={[590, 0, -30]} rotation={[0,  Math.PI / 2, 0]} />
+
+                <LineObj type="type1" points={PipeLine1} tubeRadius={5} lightRadius={3} speed={1} />
+                <LineObj type="type1" points={PipeLine2} tubeRadius={5} lightRadius={3} speed={1} />
+                <LineObj type="type1" points={PipeLine3} tubeRadius={5} lightRadius={3} speed={1} />
+                <LineObj type="type2" points={PipeLine4} tubeRadius={5} lightRadius={3} speed={1} lineWidth={7} />
+                <LineObj type="type1" points={PipeLine5} tubeRadius={18} lightRadius={15} speed={1} />
+
+                <BdtecSceneReadyGate />
+            </Suspense>
         </ManciniCanvas>
     );
 }
@@ -250,7 +309,6 @@ function CameraHelper({
             const t = new THREE.Vector3();
             controlsRef.current.getTarget(t);
 
-            // 화면에 보여줄 텍스트 (deviceType·panelId는 cameraConfig 슬롯과 일치해야 함)
             textDiv.innerText =
                 `[ panel ${activePanelId} · ${deviceType} ]\n` +
                 `c: [${c.x.toFixed(1)}, ${c.y.toFixed(1)}, ${c.z.toFixed(1)}],\n` +

@@ -8,9 +8,9 @@ export function ResizeHandler({ quality, rendererRef }) {
       }
     };
 
+    handleResize();
     window.addEventListener("resize", handleResize);
 
-    // Cleanup
     return () => window.removeEventListener("resize", handleResize);
   }, [quality]);
 

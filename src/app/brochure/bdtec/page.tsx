@@ -8,15 +8,9 @@ import NavBar from "@/utils/ui/NavBar";
 import InfoPanel from "@/utils/ui/InfoPanel";
 import PageWrapper from "@/utils/ui/PageWrapper";
 import styles from "./page.module.css";
-import { DomStats } from "@/utils/DevStats";
-import dynamic from "next/dynamic";
-
-const MobileScene = dynamic(() => import("@/app/brochure/bdtec/mobile/Mobile"), {
-    ssr: false,
-    loading: () => null,
-});
-
-
+import BdtecBrochureLoader from "@/components/bdtec/BdtecBrochureLoader";
+import { BdtecSceneLoadingProvider } from "@/app/brochure/bdtec/BdtecSceneLoadingContext";
+import BdtecScene from "@/app/brochure/bdtec/mobile/Mobile";
 
 const panelContents: Record<number, { title: string; desc: string; extra?: string }> = {
     1: { title: "BDI-100", desc: "24시간 지속적인 모니터링으로 집진상태 판단과 측정 시스템을 제공합니다.", extra: "온도/차압/전류 등 환경 데이터를 안전하게 전송합니다." },
@@ -27,13 +21,14 @@ const panelContents: Record<number, { title: string; desc: string; extra?: strin
 };
 
 export default function Home() {
-    const [intro, setIntro] = useState(false);
+    const [intro, setIntro] = useState(true);
     const [activePanelId, setActivePanelId] = useState<number>(0);
     const [quality, setQuality] = useState("default");
 
     // 🚀 1. 기기 타입을 3가지로 세분화하여 관리합니다.
     const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
     const [autoTour, setAutoTour] = useState(false);
+    const [sceneRevealed, setSceneRevealed] = useState(false);
 
     const AUTO_TOUR_INTERVAL_MS = 5000;
 
@@ -55,13 +50,9 @@ export default function Home() {
         // 🚀 2. 창 크기에 따라 기기 판별 (기준은 필요에 따라 수정하세요)
         const handleResize = () => {
             const width = window.innerWidth;
-            if (width <= 768) {
-                setDeviceType('mobile');     // 세로로 긴 모바일
-            } else if (width <= 1024) {
-                setDeviceType('tablet');     // 애매한 태블릿 비율
-            } else {
-                setDeviceType('desktop');    // 가로로 넓은 데스크탑
-            }
+            const next =
+                width <= 768 ? 'mobile' : width <= 1024 ? 'tablet' : 'desktop';
+            setDeviceType(next);
         };
 
         handleResize(); // 초기 1회 실행
@@ -121,7 +112,9 @@ export default function Home() {
     const currentPanelData = panelContents[activePanelId] || { title: "", desc: "", extra: "" };
 
     return (
-        <PageWrapper>
+        <BdtecSceneLoadingProvider>
+            <BdtecBrochureLoader onGone={() => setSceneRevealed(true)} />
+            <PageWrapper>
             <main ref={mainContainerRef} className={styles.scrollMain}>
                 <div className={styles.stickyViewport}>
 
@@ -150,7 +143,7 @@ export default function Home() {
                             onAutoTourToggle={handleAutoTourToggle}
                         />
                     )}
-                    {process.env.NODE_ENV === 'development' && <DomStats />}
+                    {/*{process.env.NODE_ENV === 'development' && <DomStats />}*/}
 
                     <InfoPanel
                         isOpen={activePanelId >= 1 && activePanelId <= 5}
@@ -162,17 +155,18 @@ export default function Home() {
 
                     <div
                         ref={blurContainerRef}
-                        className={`${styles.blurContainer} ${intro ? styles.blurContainerReady : styles.blurContainerIntro} ${deviceType !== 'desktop' ? styles.blurContainer3dTouch : ''}`}
+                        className={`${styles.blurContainer} ${intro ? styles.blurContainerReady : styles.blurContainerIntro} ${deviceType !== 'desktop' ? styles.blurContainer3dTouch : ''} ${sceneRevealed ? styles.blurContainerVisible : styles.blurContainerHidden}`}
                     >
                         {/* 🚀 3. R3F 씬으로 deviceType 프롭스를 전달합니다. Spline은 사라졌습니다! */}
-                        <MobileScene
+                        <BdtecScene
                             quality={quality}
                             activePanelId={activePanelId}
-                            deviceType={deviceType} // 'desktop' | 'tablet' | 'mobile
+                            deviceType={deviceType}
                         />
                     </div>
                 </div>
             </main>
         </PageWrapper>
+        </BdtecSceneLoadingProvider>
     );
 }

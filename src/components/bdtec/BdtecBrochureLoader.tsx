@@ -1,11 +1,14 @@
 "use client";
 
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {useProgress} from "@react-three/drei";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+    isBdtecSceneFullyReady,
+    useBdtecSceneLoadingState,
+} from "@/app/brochure/bdtec/BdtecSceneLoadingContext";
 import { gsap, ScrollTrigger } from "@/lib/brochureGsap";
 
-const AFTER_READY_MS = 3000;
-const FORCE_DONE_MS = 14_000;
+const AFTER_READY_MS = 600;
+const FORCE_DONE_MS = 18_000;
 
 function resourceLabel(item: string) {
     if (!item) return "초기화";
@@ -21,23 +24,57 @@ function resourceLabel(item: string) {
 
 type Phase = "loading" | "exit" | "gone";
 
-export default function BdtecBrochureLoader() {
-    const {active, progress, item, total} = useProgress();
+type BdtecBrochureLoaderProps = {
+    onGone?: () => void;
+};
+
+export default function BdtecBrochureLoader({ onGone }: BdtecBrochureLoaderProps) {
+    const loading = useBdtecSceneLoadingState();
+    const { moduleReady, canvasMounted, webgpuReady, suspenseReady, active, progress, item } =
+        loading;
+
     const shellRef = useRef<HTMLDivElement>(null);
     const barFillRef = useRef<HTMLDivElement>(null);
-    const mountAt = useRef(Date.now());
     const [phase, setPhase] = useState<Phase>("loading");
     const doneRef = useRef(false);
-    const sawLoadingRef = useRef(false);
-    const snapRef = useRef({active: false, pct: 0, total: 0});
 
-    const pct = useMemo(() => {
+    const fullyReady = isBdtecSceneFullyReady(loading);
+
+    const assetPct = useMemo(() => {
         const p = Number.isFinite(progress) ? progress : 0;
         return Math.min(100, Math.max(0, Math.round(p)));
     }, [progress]);
+
+    /** 단계별 최소 진행률 + drei 에셋 진행률 */
+    const pct = useMemo(() => {
+        let floor = 0;
+        if (moduleReady) floor = 12;
+        if (canvasMounted) floor = Math.max(floor, 22);
+        if (webgpuReady) floor = Math.max(floor, 35);
+        if (suspenseReady) floor = Math.max(floor, 72);
+        if (fullyReady) return 100;
+        const blended = active ? Math.max(floor, assetPct * 0.85) : Math.max(floor, assetPct);
+        return Math.min(99, Math.round(blended));
+    }, [moduleReady, canvasMounted, webgpuReady, suspenseReady, fullyReady, active, assetPct]);
+
     const label = useMemo(() => resourceLabel(item), [item]);
 
-    snapRef.current = {active, pct, total};
+    const statusLine = useMemo(() => {
+        if (!moduleReady) return "3D 모듈을 불러오는 중…";
+        if (!canvasMounted) return "렌더러를 연결하는 중…";
+        if (!webgpuReady) return "3D 렌더러 초기화 중…";
+        if (active) {
+            return (
+                <>
+                    <span style={{ color: "#c5cad3" }}>{label}</span>
+                    <span style={{ opacity: 0.65 }}> · 로딩 중</span>
+                </>
+            );
+        }
+        if (!suspenseReady) return "3D 오브젝트를 배치하는 중…";
+        if (pct < 100) return "리소스 마무리 중…";
+        return <span style={{ color: "#9aa3b0" }}>로드 완료 — 잠시 후 화면을 표시합니다</span>;
+    }, [moduleReady, canvasMounted, webgpuReady, suspenseReady, active, label, pct]);
 
     const runExit = useCallback(() => {
         if (doneRef.current) return;
@@ -45,6 +82,7 @@ export default function BdtecBrochureLoader() {
         const shell = shellRef.current;
         if (!shell) {
             setPhase("gone");
+            onGone?.();
             return;
         }
         setPhase("exit");
@@ -58,9 +96,10 @@ export default function BdtecBrochureLoader() {
                 shell.style.pointerEvents = "none";
                 shell.style.visibility = "hidden";
                 setPhase("gone");
+                onGone?.();
             },
         });
-    }, []);
+    }, [onGone]);
 
     useEffect(() => {
         const bar = barFillRef.current;
@@ -78,32 +117,11 @@ export default function BdtecBrochureLoader() {
     }, []);
 
     useEffect(() => {
-        if (active) sawLoadingRef.current = true;
-    }, [active]);
-
-    useEffect(() => {
         if (phase !== "loading" || doneRef.current) return;
-        const assetsDone = !active && pct >= 100;
-        if (!assetsDone) return;
+        if (!fullyReady) return;
         const t = window.setTimeout(() => runExit(), AFTER_READY_MS);
         return () => window.clearTimeout(t);
-    }, [active, pct, phase, runExit]);
-
-    useEffect(() => {
-        if (phase !== "loading" || doneRef.current) return;
-        let afterReady: number | undefined;
-        const t = window.setTimeout(() => {
-            if (doneRef.current) return;
-            const {active: a, total: tot} = snapRef.current;
-            if (!a && !sawLoadingRef.current && tot === 0) {
-                afterReady = window.setTimeout(() => runExit(), AFTER_READY_MS);
-            }
-        }, 2200);
-        return () => {
-            window.clearTimeout(t);
-            if (afterReady !== undefined) window.clearTimeout(afterReady);
-        };
-    }, [phase, runExit]);
+    }, [fullyReady, phase, runExit]);
 
     useEffect(() => {
         if (phase !== "loading" || doneRef.current) return;
@@ -162,42 +180,40 @@ export default function BdtecBrochureLoader() {
             >
                 3D 씬을 준비하고 있습니다
             </h1>
-            <p style={{margin: "0 0 28px", color: "#8b919c", fontSize: "clamp(13px, 1.4vw, 15px)"}}>
-                {active ? (
-                    <>
-                        <span style={{color: "#c5cad3"}}>{label}</span>
-                        <span style={{opacity: 0.65}}> · 로딩 중</span>
-                    </>
-                ) : pct >= 100 ? (
-                    <span style={{color: "#9aa3b0"}}>로드 완료 — 잠시 후 화면을 표시합니다</span>
-                ) : (
-                    <span style={{color: "#9aa3b0"}}>리소스 대기 중…</span>
-                )}
+            <p style={{ margin: "0 0 28px", color: "#8b919c", fontSize: "clamp(13px, 1.4vw, 15px)" }}>
+                {statusLine}
             </p>
 
-            <div
-                style={{
-                    width: "min(420px, 86vw)",
-                    height: "4px",
-                    borderRadius: "999px",
-                    background: "rgba(255,255,255,0.08)",
-                    overflow: "hidden",
-                }}
-            >
-                <div
-                    ref={barFillRef}
-                    style={{
-                        height: "100%",
-                        width: "0%",
-                        borderRadius: "999px",
-                        background: "linear-gradient(90deg, #0ae448, #3ddb7c)",
-                        boxShadow: "0 0 24px rgba(10, 228, 72, 0.35)",
-                    }}
-                />
-            </div>
-            <p style={{marginTop: "14px", fontVariantNumeric: "tabular-nums", color: "#6d7380", fontSize: "13px"}}>
+            <LoaderProgressBar barFillRef={barFillRef} />
+
+            <p style={{ marginTop: "14px", fontVariantNumeric: "tabular-nums", color: "#6d7380", fontSize: "13px" }}>
                 {pct}%
             </p>
+        </div>
+    );
+}
+
+function LoaderProgressBar({ barFillRef }: { barFillRef: React.RefObject<HTMLDivElement | null> }) {
+    return (
+        <div
+            style={{
+                width: "min(420px, 86vw)",
+                height: "4px",
+                borderRadius: "999px",
+                background: "rgba(255,255,255,0.08)",
+                overflow: "hidden",
+            }}
+        >
+            <div
+                ref={barFillRef}
+                style={{
+                    height: "100%",
+                    width: "0%",
+                    borderRadius: "999px",
+                    background: "linear-gradient(90deg, #0ae448, #3ddb7c)",
+                    boxShadow: "0 0 24px rgba(10, 228, 72, 0.35)",
+                }}
+            />
         </div>
     );
 }
