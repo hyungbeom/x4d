@@ -12,6 +12,8 @@ interface InfoPanelProps {
     desc: string;
     extra?: string;
     onClose: () => void;
+    /** 하단 네비 위 등 레이아웃용 티저 위치 조정 */
+    teaserClassName?: string;
 }
 
 function getTeaserPreview(desc: string, extra?: string, maxSentences = 3): string[] {
@@ -35,7 +37,7 @@ function useMediaQuery(query: string) {
     return matches;
 }
 
-export default function InfoPanel({ isOpen, title, desc, extra, onClose }: InfoPanelProps) {
+export default function InfoPanel({ isOpen, title, desc, extra, onClose, teaserClassName }: InfoPanelProps) {
     const panelRef = useRef<HTMLDivElement>(null);
     const teaserRef = useRef<HTMLDivElement>(null);
     const isCompact = useMediaQuery(COMPACT_BREAKPOINT);
@@ -110,7 +112,11 @@ export default function InfoPanel({ isOpen, title, desc, extra, onClose }: InfoP
     return (
         <>
             {isCompact && isOpen && (
-                <div ref={teaserRef} className={styles.teaser} style={{ opacity: 0 }}>
+                <div
+                    ref={teaserRef}
+                    className={[styles.teaser, teaserClassName].filter(Boolean).join(' ')}
+                    style={{ opacity: 0 }}
+                >
                     <h3 className={styles.teaserTitle}>{title}</h3>
                     <p className={styles.teaserDesc}>
                         {teaserLines.map((line, i) => (

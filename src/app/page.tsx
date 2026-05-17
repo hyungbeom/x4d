@@ -25,6 +25,17 @@ import {ScrollTrigger} from "gsap/ScrollTrigger";
 import {SceneLoadingProvider} from "@/utils/three/SceneLoadingContext";
 import {WorldModel} from "@/resources/model/progist/WorldMode";
 import NavBar from "@/utils/ui/NavBar";
+import InfoPanel from "@/utils/ui/InfoPanel";
+import infoPanelStyles from "@/utils/ui/InfoPanel.module.css";
+import BdtecSceneHeroCopy from "@/components/bdtec/BdtecSceneHeroCopy";
+import {
+    AirIcon,
+    AnalysisIcon,
+    CarbonIcon,
+    InstitutionIcon,
+    PavilionIcon,
+    WaterIcon,
+} from "@/components/progist/ProgistNavIcons";
 import styles from "./page.module.css";
 
 
@@ -134,17 +145,51 @@ function CameraController({activePanelId, deviceType}: { activePanelId: number; 
                 smoothTime={CAMERA_TRANSITION_SMOOTH_TIME}
                 draggingSmoothTime={0.12}
             />
-            <CameraHelper
-                controlsRef={cameraControlsRef}
-                activePanelId={activePanelId}
-                deviceType={deviceType}
-            />
+            {/*<CameraHelper*/}
+            {/*    controlsRef={cameraControlsRef}*/}
+            {/*    activePanelId={activePanelId}*/}
+            {/*    deviceType={deviceType}*/}
+            {/*/>*/}
         </>
     );
 }
 
 
 const PANEL_COUNT = 6;
+
+/** 임시 샘플 카피 — 확정 문구로 교체 예정 */
+const panelContents: Record<number, { title: string; desc: string; extra?: string }> = {
+    1: {
+        title: '수질 Zone',
+        desc: '샘플: 하천·정수장·정화 장비 데모가 모여 있는 구역입니다. 터치하면 수질 지표 UI가 뜹니다.',
+        extra: 'pH · DO · 탁도 등 가상 센서 값이 3초마다 갱신되는 연출(샘플)입니다.',
+    },
+    2: {
+        title: '대기 Zone',
+        desc: '샘플: 미세먼지·VOC·배출 시설 모니터링을 소개하는 공간입니다.',
+        extra: '집진기·탈황 설비와 연동된 대시보드 목업이 배치되어 있습니다.',
+    },
+    3: {
+        title: '측정·분석 Zone',
+        desc: '샘플: 현장 계측기부터 분석 리포트까지 한 줄로 보여 주는 구역입니다.',
+        extra: '랩 장비·휴대용 측정기·데이터 시각화 화면이 나란히 전시됩니다.',
+    },
+    4: {
+        title: '탈탄소 Zone',
+        desc: '샘플: RE100 · ESS · 탄소배출권 관련 스토리보드가 들어갈 자리입니다.',
+        extra: '신재생·저탄소 공정 사례 카드 6장 분량(가안)으로 구성 예정.',
+    },
+    5: {
+        title: '외국관 Pavilion',
+        desc: '샘플: 해외 기업·기관 부스가 배치되는 글로벌 존입니다.',
+        extra: '국가별 플래그·파트너 로고 월 — 실제 목록은 추후 반영.',
+    },
+    6: {
+        title: '기관 및 단체',
+        desc: '샘플: 정부·공공·협회 부스 안내 데스크 구역입니다.',
+        extra: '지원 사업·인증·규제 Q&A 링크 모음(플레이스홀더).',
+    },
+};
 
 export default function Home() {
     const [activePanelId, setActivePanelId] = useState<number>(0);
@@ -155,15 +200,28 @@ export default function Home() {
 
     const navMenus = useMemo(
         () => [
-            { title: '수질', onClick: () => setActivePanelId(1) },
-            { title: '대기', onClick: () => setActivePanelId(2) },
-            { title: '측정분석', onClick: () => setActivePanelId(3) },
-            { title: '탈탄소', onClick: () => setActivePanelId(4) },
-            { title: '외국관', onClick: () => setActivePanelId(5) },
-            { title: '기관 및 단체', onClick: () => setActivePanelId(6) },
+            { title: '수질', icon: <WaterIcon />, onClick: () => setActivePanelId(1) },
+            { title: '대기', icon: <AirIcon />, onClick: () => setActivePanelId(2) },
+            { title: '측정분석', icon: <AnalysisIcon />, onClick: () => setActivePanelId(3) },
+            { title: '탈탄소', icon: <CarbonIcon />, onClick: () => setActivePanelId(4) },
+            { title: '외국관', icon: <PavilionIcon />, onClick: () => setActivePanelId(5) },
+            { title: '기관 및 단체', icon: <InstitutionIcon />, onClick: () => setActivePanelId(6) },
         ],
         [],
     );
+
+    const handleVariableChange = (newValue: number) => {
+        setActivePanelId(newValue);
+    };
+
+    const handleNextPanel = () => {
+        setActivePanelId((prev) => {
+            if (prev < 1 || prev >= PANEL_COUNT) return 1;
+            return prev + 1;
+        });
+    };
+
+    const currentPanelData = panelContents[activePanelId] ?? { title: '', desc: '', extra: '' };
 
     const handleAutoTourToggle = () => {
         setAutoTour((prev) => {
@@ -213,6 +271,17 @@ export default function Home() {
         <SceneLoadingProvider>
             <main className={styles.homeMain}>
                 <div className={styles.stickyViewport}>
+                    <BdtecSceneHeroCopy
+                        visible={activePanelId === 0}
+                        title="ENVEX World"
+                        subtitle="3D 브로슈어 샘플"
+                        body={[
+                            '전시장 6개 구역을 3D 맵에서 둘러볼 수 있는 데모 화면입니다.',
+                            '하단 아이콘을 누르면 해당 존으로 카메라가 이동하고 설명 패널이 열립니다.',
+                            'AUTO를 켜면 구역이 5초 간격으로 순환합니다.',
+                        ]}
+                    />
+
                     <div className={styles.canvasLayer}>
                         <ManciniCanvas quality="default">
                             <CameraController activePanelId={activePanelId} deviceType={deviceType} />
@@ -229,6 +298,8 @@ export default function Home() {
                     <NavBar
                         logoSrc="/model/bdtec/logo.svg"
                         menus={navMenus}
+                        iconMode
+                        compact
                         contactLink="/brochure/bdtec/contactus"
                         activeIndex={
                             activePanelId >= 1 && activePanelId <= PANEL_COUNT
@@ -237,6 +308,26 @@ export default function Home() {
                         }
                         autoTour={autoTour}
                         onAutoTourToggle={handleAutoTourToggle}
+                    />
+
+                    {activePanelId >= 1 && activePanelId <= PANEL_COUNT && (
+                        <button
+                            type="button"
+                            className={styles.panelNextBtn}
+                            onClick={handleNextPanel}
+                            aria-label="다음 구역으로 이동"
+                        >
+                            Next
+                        </button>
+                    )}
+
+                    <InfoPanel
+                        isOpen={activePanelId >= 1 && activePanelId <= PANEL_COUNT}
+                        title={currentPanelData.title}
+                        desc={currentPanelData.desc}
+                        extra={currentPanelData.extra}
+                        onClose={() => handleVariableChange(0)}
+                        teaserClassName={infoPanelStyles.teaserAboveBottomNav}
                     />
                 </div>
             </main>

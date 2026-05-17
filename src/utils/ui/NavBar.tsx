@@ -3,9 +3,10 @@ import gsap from 'gsap';
 import TransitionLink from "@/utils/ui/TransitionLink";
 import DynamicIsland from "@/utils/DynamicIsland";
 
-interface MenuItem {
+export interface MenuItem {
     title: string;
     onClick: () => void;
+    icon?: React.ReactNode;
 }
 
 interface NavBarProps {
@@ -16,6 +17,10 @@ interface NavBarProps {
     activeIndex?: number | null;
     autoTour?: boolean;
     onAutoTourToggle?: () => void;
+    /** true면 아이콘만 표시 (툴팁·aria-label은 title 유지) */
+    iconMode?: boolean;
+    /** 하단 바 높이·패딩 축소 */
+    compact?: boolean;
 }
 
 export default function NavBar({
@@ -25,6 +30,8 @@ export default function NavBar({
     activeIndex: activeIndexProp = null,
     autoTour = false,
     onAutoTourToggle,
+    iconMode = false,
+    compact = false,
 }: NavBarProps) {
     const [activeIndexLocal, setActiveIndexLocal] = useState<number | null>(null);
     const activeIndex = activeIndexProp ?? activeIndexLocal;
@@ -202,6 +209,24 @@ export default function NavBar({
                     }
                     .nav-item.active, .nav-item:hover { color: #1a4242; }
 
+                    .nav-item--icon {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 10px;
+                        width: 44px;
+                        height: 44px;
+                        min-width: 44px;
+                        box-sizing: border-box;
+                    }
+
+                    .nav-item__icon {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        line-height: 0;
+                    }
+
                     .contact-btn {
                         text-decoration: none;
                         color: #315152;
@@ -213,6 +238,44 @@ export default function NavBar({
                         white-space: nowrap;
                     }
                     .contact-btn:hover { background-color: #a8d4d1; transform: scale(1.02); }
+
+                    .navbar-wrapper--compact {
+                        bottom: 12px;
+                        padding: 4px 6px;
+                        border-radius: 20px;
+                        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+                    }
+
+                    .navbar-wrapper--compact .logo img { height: 16px; }
+                    .navbar-wrapper--compact .logo { padding: 0 4px 0 8px; }
+                    .navbar-wrapper--compact .logo-cluster { gap: 6px; padding-left: 4px; }
+
+                    .navbar-wrapper--compact .auto-tour-btn {
+                        padding: 3px 7px;
+                        font-size: 9px;
+                        gap: 4px;
+                    }
+                    .navbar-wrapper--compact .auto-tour-btn__dot {
+                        width: 5px;
+                        height: 5px;
+                    }
+
+                    .navbar-wrapper--compact .nav-item--icon {
+                        width: 32px;
+                        height: 32px;
+                        min-width: 32px;
+                        padding: 6px;
+                    }
+
+                    .navbar-wrapper--compact .nav-item__icon svg {
+                        width: 18px;
+                        height: 18px;
+                    }
+
+                    .navbar-wrapper--compact .contact-btn {
+                        padding: 8px 14px;
+                        font-size: 12px;
+                    }
 
                     .mobile-top-bar { display: none; }
 
@@ -271,15 +334,53 @@ export default function NavBar({
                             padding: 8px 14px;
                         }
 
+                        .nav-item--icon {
+                            width: 40px;
+                            height: 40px;
+                            min-width: 40px;
+                            padding: 8px;
+                        }
+
+                        .navbar-wrapper--compact {
+                            bottom: 10px;
+                        }
+
+                        .navbar-wrapper--compact .nav-links-box {
+                            padding: 5px 6px;
+                            border-radius: 18px;
+                            gap: 2px;
+                        }
+
+                        .navbar-wrapper--compact .nav-item--icon {
+                            width: 30px;
+                            height: 30px;
+                            min-width: 30px;
+                            padding: 5px;
+                        }
+
+                        .navbar-wrapper--compact .nav-item__icon svg {
+                            width: 17px;
+                            height: 17px;
+                        }
+
                         .nav-item.active, .nav-item:hover {
                             background-color: #00fce0;
                         }
                         .highlight-pill { display: none; }
                     }
+
+                    .mobile-top-bar--compact {
+                        padding: 5px 8px 5px 10px;
+                    }
+                    .mobile-top-bar--compact .logo img { height: 16px; }
+                    .mobile-top-bar--compact .contact-btn {
+                        padding: 7px 14px;
+                        font-size: 11px;
+                    }
                 `}
             </style>
 
-            <div className="mobile-top-bar">
+            <div className={`mobile-top-bar${compact ? ' mobile-top-bar--compact' : ''}`}>
                 {logoBlock}
 
 
@@ -290,7 +391,7 @@ export default function NavBar({
                 </TransitionLink>
             </div>
 
-            <div className="navbar-wrapper">
+            <div className={`navbar-wrapper${compact ? ' navbar-wrapper--compact' : ''}`}>
                 {logoBlock}
 
                 <nav className="nav-links-box" onMouseLeave={() => moveHighlight(activeIndex)}>
@@ -307,9 +408,15 @@ export default function NavBar({
                                 handleMenuClick(index);
                             }}
                             onMouseEnter={() => moveHighlight(index)}
-                            className={`nav-item ${activeIndex === index ? 'active' : ''}`}
+                            title={menu.title}
+                            aria-label={menu.title}
+                            className={`nav-item ${iconMode && menu.icon ? 'nav-item--icon' : ''} ${activeIndex === index ? 'active' : ''}`}
                         >
-                            {menu.title}
+                            {iconMode && menu.icon ? (
+                                <span className="nav-item__icon">{menu.icon}</span>
+                            ) : (
+                                menu.title
+                            )}
                         </a>
                     ))}
                 </nav>
