@@ -37,7 +37,7 @@ export function ManciniCanvas({ quality, children }: { quality: string; children
             flat
             orthographic
             style={{ width: "100vw", height: "100vh", display: "block", touchAction: "none" }}
-            dpr={dpr}
+            dpr={window.devicePixelRatio}
             camera={{
                 position: [0, 200, 800],
                 zoom: 1,
