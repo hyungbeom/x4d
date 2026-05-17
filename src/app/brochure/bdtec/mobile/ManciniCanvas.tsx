@@ -4,7 +4,6 @@ import * as THREE from "three/webgpu";
 import { Canvas } from "@react-three/fiber";
 import { Bloom, EffectComposer, ToneMapping } from "@react-three/postprocessing";
 import { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
 import { ResizeHandler } from "@/utils/three/ResizeHandler";
 import { BdtecSceneLoadingReporter } from "@/app/brochure/bdtec/mobile/BdtecSceneLoadingReporter";
 import { useBdtecSceneLoadingActions } from "@/app/brochure/bdtec/BdtecSceneLoadingContext";
@@ -68,7 +67,7 @@ export function ManciniCanvas({ quality, children }: { quality: string; children
                 gl.toneMappingExposure = 1.1;
                 gl.setClearColor(0x1a2030, 1);
                 rendererRef.current = gl;
-                // setWebgpuReady(true);
+                setWebgpuReady(true);
             }}
         >
             <BdtecSceneLoadingReporter />
