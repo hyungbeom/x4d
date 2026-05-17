@@ -75,6 +75,13 @@ export default function Home() {
         setActivePanelId(newValue);
     };
 
+    const handleNextPanel = () => {
+        setActivePanelId((prev) => {
+            if (prev < 1 || prev >= 5) return 1;
+            return prev + 1;
+        });
+    };
+
     const handleAutoTourToggle = () => {
         setAutoTour((prev) => {
             const next = !prev;
@@ -152,6 +159,14 @@ export default function Home() {
                             autoTour={autoTour}
                             onAutoTourToggle={handleAutoTourToggle}
                         />
+                        <button
+                            type="button"
+                            className={styles.panelNextBtn}
+                            onClick={handleNextPanel}
+                            aria-label="다음 구역으로 이동"
+                        >
+                            Next
+                        </button>
                         </>
                     )}
                     {/*{process.env.NODE_ENV === 'development' && <DomStats />}*/}

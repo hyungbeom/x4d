@@ -180,8 +180,13 @@ export default function BdtecScene({quality, activePanelId, deviceType}: BdtecSc
                 <BdtecBrochureGrid
                     cellSize={32}
                     sectionSize={160}
-                    cellColor="#5a6d8f"
-                    sectionColor="#b3c4f5"
+                    cellColor="#d0c8cc"
+                    sectionColor="#6b8fa8"
+                    animateColors
+                    pulseSpeed={2}
+                    cellColorTo="#ffffff"
+                    sectionColorTo="#b8e4ff"
+                    hdrPulse
                 />
 
                 <FloatingTankLine/>

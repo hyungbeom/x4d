@@ -169,9 +169,9 @@ export function Modem(props:any) {
                                 rotation={[0, 0, Math.PI / 4]}
                             >
                                 <meshStandardMaterial
-                                    color="#157837"
-                                    metalness={0.9}
-                                    roughness={0.2}
+                                    color="#ff0000"  // 아주 쨍한 순수 레드
+                                    metalness={0.1}  // 금속성을 빼서 색을 맑게
+                                    roughness={0.1}  // 표면을 매끄럽게 해서 빛을 쨍하게 반사 (광택)
                                 />
 
                             </mesh>
@@ -184,9 +184,9 @@ export function Modem(props:any) {
                                 rotation={[0, 0, Math.PI / 4]}
                             >
                                 <meshStandardMaterial
-                                    color="#157837"
-                                    metalness={0.9}
-                                    roughness={0.2}
+                                    color="#ff0000"  // 아주 쨍한 순수 레드
+                                    metalness={0.1}  // 금속성을 빼서 색을 맑게
+                                    roughness={0.1}  // 표면을 매끄럽게 해서 빛을 쨍하게 반사 (광택)
                                 />
                             </mesh>
                             <mesh
@@ -198,9 +198,9 @@ export function Modem(props:any) {
                                 rotation={[0, 0, Math.PI / 4]}
                             >
                                 <meshStandardMaterial
-                                    color="#157837"
-                                    metalness={0.9}
-                                    roughness={0.2}
+                                    color="#ff0000"  // 아주 쨍한 순수 레드
+                                    metalness={0.1}  // 금속성을 빼서 색을 맑게
+                                    roughness={0.1}  // 표면을 매끄럽게 해서 빛을 쨍하게 반사 (광택)
                                 />
                             </mesh>
                         </group>

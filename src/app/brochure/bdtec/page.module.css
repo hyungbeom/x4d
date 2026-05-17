@@ -98,7 +98,50 @@
   justify-content: center;
 }
 
+/* 하단 NavBar 바로 위 · 우측 — InfoPanel .detailBtn(자세히 보기) 톤 */
+.panelNextBtn {
+  position: absolute;
+  right: clamp(16px, 3vw, 28px);
+  bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+  z-index: 55;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.panelNextBtn:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.panelNextBtn:active {
+  transform: scale(0.97);
+}
+
+@media (min-width: 1025px) {
+  .panelNextBtn {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 @media (max-width: 768px) {
+  .panelNextBtn {
+    bottom: calc(118px + env(safe-area-inset-bottom, 0px));
+    right: 14px;
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
   .startBtnContainer {
     bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     left: 50%;
