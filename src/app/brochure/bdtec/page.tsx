@@ -10,7 +10,7 @@ import PageWrapper from "@/utils/ui/PageWrapper";
 import styles from "./page.module.css";
 import BdtecBrochureLoader from "@/components/bdtec/BdtecBrochureLoader";
 import BdtecSceneHeroCopy from "@/components/bdtec/BdtecSceneHeroCopy";
-import { BdtecSceneLoadingProvider } from "@/app/brochure/bdtec/BdtecSceneLoadingContext";
+import { SceneLoadingProvider } from "@/utils/three/SceneLoadingContext";
 import BdtecScene from "@/app/brochure/bdtec/mobile/Mobile";
 import dynamic from "next/dynamic";
 
@@ -126,7 +126,7 @@ export default function Home() {
     const currentPanelData = panelContents[activePanelId] || { title: "", desc: "", extra: "" };
 
     return (
-        <BdtecSceneLoadingProvider>
+        <SceneLoadingProvider>
             <BdtecBrochureLoader onGone={() => setSceneRevealed(true)} />
             <PageWrapper>
             <main ref={mainContainerRef} className={styles.scrollMain}>
@@ -197,6 +197,6 @@ export default function Home() {
                 </div>
             </main>
         </PageWrapper>
-        </BdtecSceneLoadingProvider>
+        </SceneLoadingProvider>
     );
 }

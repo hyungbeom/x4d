@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
     isBdtecSceneFullyReady,
     useBdtecSceneLoadingState,
-} from "@/app/brochure/bdtec/BdtecSceneLoadingContext";
+} from "@/utils/three/SceneLoadingContext";
 import { gsap, ScrollTrigger } from "@/lib/brochureGsap";
 
 const AFTER_READY_MS = 600;

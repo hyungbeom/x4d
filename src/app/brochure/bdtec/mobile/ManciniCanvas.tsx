@@ -4,8 +4,8 @@ import { Canvas, extend } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three/webgpu";
 import { ResizeHandler } from "@/utils/three/ResizeHandler";
-import { BdtecSceneLoadingReporter } from "@/app/brochure/bdtec/mobile/BdtecSceneLoadingReporter";
-import { useBdtecSceneLoadingActions } from "@/app/brochure/bdtec/BdtecSceneLoadingContext";
+import { SceneLoadingReporter } from "@/utils/three/SceneLoadingReporter";
+import { useBdtecSceneLoadingActions } from "@/utils/three/SceneLoadingContext";
 
 // @ts-ignore
 extend(THREE);
@@ -68,7 +68,7 @@ export function ManciniCanvas({ quality, children }: { quality: string; children
             }}
         >
             <color attach="background" args={['#0a0a0a']} />
-            <BdtecSceneLoadingReporter />
+            <SceneLoadingReporter />
             {children}
             <ResizeHandler quality={quality} rendererRef={rendererRef} />
         </Canvas>
