@@ -1,10 +1,9 @@
 'use client';
 
-import {useEnvironment} from '@react-three/drei';
-import {useFrame, useThree} from '@react-three/fiber';
-import {useLayoutEffect, useMemo, useRef, useState} from 'react';
+import { useEnvironment } from '@react-three/drei';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-
 
 function skyboxScaleForCamera(camera: THREE.Camera) {
     if (camera instanceof THREE.OrthographicCamera) {
@@ -21,68 +20,59 @@ function skyboxScaleForCamera(camera: THREE.Camera) {
     return 5000;
 }
 
-/** PMREM + roughness로 HDRI 배경 블러 (직교 카메라 스카이박스) */
+/** PMREM 의존성 제거, 네이티브 envMap + roughness 활용 */
 function HdriSkyMesh({
                          texture,
                          blur,
                      }: {
-    texture: THREE.CubeTexture;
+    texture: THREE.Texture;
     blur: number;
 }) {
     const meshRef = useRef<THREE.Mesh>(null);
-    const gl = useThree((s) => s.gl);
-    const [envMap, setEnvMap] = useState<THREE.Texture | null>(null);
-    const pmremTargetRef = useRef<THREE.WebGLRenderTarget | null>(null);
-
-    useLayoutEffect(() => {
-        if (!texture?.image) return;
-
-        const pmremGenerator = new THREE.PMREMGenerator(gl);
-        pmremGenerator.compileCubemapShader();
-        const rt = pmremGenerator.fromCubemap(texture);
-        pmremGenerator.dispose();
-
-        pmremTargetRef.current?.dispose();
-        pmremTargetRef.current = rt;
-        setEnvMap(rt.texture);
-
-        return () => {
-            rt.dispose();
-            pmremTargetRef.current = null;
-            setEnvMap(null);
-        };
-    }, [texture, gl]);
 
     const material = useMemo(() => {
-        if (!envMap) return null;
+        if (!texture) return null;
         const roughness = THREE.MathUtils.clamp(blur, 0, 1);
+
         return new THREE.MeshPhysicalMaterial({
-            envMap,
+            envMap: texture, // PMREM 없이 텍스처를 직접 전달
             roughness,
-            metalness: 0,
+            metalness: 1, // 배경을 거울처럼 100% 반사하도록 1로 설정
+            color: 0x000000, // 디퓨즈(Diffuse) 색상의 간섭을 막기 위해 검은색으로 설정
             side: THREE.BackSide,
             depthWrite: false,
             depthTest: false,
             fog: false,
             toneMapped: true,
         });
-    }, [envMap, blur]);
+    }, [texture, blur]);
 
-    useLayoutEffect(() => () => material?.dispose(), [material]);
+    useLayoutEffect(() => {
+        return () => {
+            material?.dispose();
+        };
+    }, [material]);
 
     useFrame((state) => {
         const mesh = meshRef.current;
         if (!mesh) return;
+
+        // 1. 카메라 위치 따라가기
         mesh.position.copy(state.camera.position);
-        mesh.scale.setScalar(skyboxScaleForCamera(state.camera));
+
+        // 2. 스케일 계산
+        const scale = skyboxScaleForCamera(state.camera);
+
+        // 3. X축 스케일을 반전시켜서 좌우가 뒤집힌 이미지를 원래대로 복구
+        mesh.scale.set(-scale, scale, scale);
     });
 
     if (!material) return null;
 
     return (
         <mesh ref={meshRef} frustumCulled={false} renderOrder={-10}>
-            <sphereGeometry args={[1, 64, 32]}/>
-            <primitive object={material} attach="material"/>
+            <sphereGeometry args={[1, 64, 32]} />
+            <primitive object={material} attach="material" />
         </mesh>
     );
 }
@@ -96,11 +86,10 @@ export function BdtecSceneEnvironment({
                                           environmentIntensity = 1.15,
                                       }: {
     preset?: any;
-    /** 0–1, 클수록 배경 HDRI가 더 흐림 */
     blur?: number;
     environmentIntensity?: number;
 }) {
-    const texture = useEnvironment({preset});
+    const texture = useEnvironment({ preset });
     const scene = useThree((s) => s.scene);
 
     useLayoutEffect(() => {
@@ -119,12 +108,12 @@ export function BdtecSceneEnvironment({
         };
     }, [texture, scene, environmentIntensity]);
 
-    if (!texture?.image) return null;
+    // useEnvironment는 기본적으로 Suspense를 타므로 텍스처가 존재함을 보장합니다.
+    if (!texture) return null;
 
-    // @ts-ignore
-    return <HdriSkyMesh texture={texture} blur={blur}/>;
+    return <HdriSkyMesh texture={texture as THREE.Texture} blur={blur} />;
 }
 
 BdtecSceneEnvironment.preload = (options?: { preset?: any }) => {
-    useEnvironment.preload({preset: options?.preset ?? 'sunset'});
+    useEnvironment.preload({ preset: options?.preset ?? 'sunset' });
 };

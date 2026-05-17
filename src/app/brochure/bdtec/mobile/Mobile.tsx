@@ -23,6 +23,7 @@ import {SystemModel} from "@/resources/model/bdtect/SystemModel";
 import {Modem} from "@/resources/model/bdtect/Modem";
 import {DataModel} from "@/resources/model/bdtect/Data";
 import {SplineSmokeParticles} from "@/utils/three/SplineParticles";
+import {Light_Environment} from "@/utils/three/Light_Environment";
 
 // ... (FloatingTankLine 컴포넌트 유지) ...
 function FloatingTankLine() {
@@ -79,7 +80,7 @@ function CameraController({activePanelId, deviceType}: { activePanelId: number; 
         0: {
             desktop: {c: [0, 200, 800], t: [0, 0, 0], z: 1},
             tablet: {c: [0, 250, 1000], t: [0, 0, 0], z: 1},
-            mobile: {c: [965.4, 849.3, -544.1], t: [-101.6, 147.4, 88.3], z: 0.54}
+            mobile: { c: [875.0, 923.0, 819.3], t: [37.6, 221.1, -95.6], z: 0.36 }
         },
         1: {
             desktop: {c: [-40, 260, 280], t: BDI_100_TARGET, z: 1.3},
@@ -138,11 +139,11 @@ function CameraController({activePanelId, deviceType}: { activePanelId: number; 
                 smoothTime={CAMERA_TRANSITION_SMOOTH_TIME}
                 draggingSmoothTime={0.12}
             />
-            {/*<CameraHelper*/}
-            {/*    controlsRef={cameraControlsRef}*/}
-            {/*    activePanelId={activePanelId}*/}
-            {/*    deviceType={deviceType}*/}
-            {/*/>*/}
+            <CameraHelper
+                controlsRef={cameraControlsRef}
+                activePanelId={activePanelId}
+                deviceType={deviceType}
+            />
         </>
     );
 }
@@ -173,14 +174,14 @@ export default function BdtecScene({quality, activePanelId, deviceType}: BdtecSc
             <CameraController activePanelId={activePanelId} deviceType={deviceType}/>
 
             <Suspense fallback={null}>
-                <BdtecSceneEnvironment preset="sunset" blur={0.35} environmentIntensity={1.15}/>
+                <BdtecSceneEnvironment preset="sunset" blur={0} environmentIntensity={1.15}/>
                 {/*<Light_Environment />*/}
-                <BdtecBrochureGrid
-                    cellSize={32}
-                    sectionSize={160}
-                    cellColor="#5a6d8f"
-                    sectionColor="#b3c4f5"
-                />
+                {/*<BdtecBrochureGrid*/}
+                {/*    cellSize={32}*/}
+                {/*    sectionSize={160}*/}
+                {/*    cellColor="#5a6d8f"*/}
+                {/*    sectionColor="#b3c4f5"*/}
+                {/*/>*/}
 
                 <FloatingTankLine/>
 

@@ -6,7 +6,7 @@ export function Light_Environment() {
       <hemisphereLight
         color="#e8eeff"
         groundColor="#3a3a48"
-        intensity={0.65}
+        intensity={0.25}
         position={[0, 400, 0]}
       />
       <directionalLight
