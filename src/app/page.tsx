@@ -28,6 +28,7 @@ import {
     PavilionIcon,
     WaterIcon,
 } from "@/components/progist/ProgistNavIcons";
+import PageWrapper from "@/utils/ui/PageWrapper";
 import styles from "./page.module.css";
 
 
@@ -261,6 +262,7 @@ export default function Home() {
 
     return (
         <SceneLoadingProvider>
+            <PageWrapper type="blindsReverse">
             <main className={styles.homeMain}>
                 <div className={styles.stickyViewport}>
                     <BdtecSceneHeroCopy
@@ -332,6 +334,7 @@ export default function Home() {
                     />
                 </div>
             </main>
+            </PageWrapper>
         </SceneLoadingProvider>
     );
 }

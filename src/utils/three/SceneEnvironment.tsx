@@ -36,23 +36,16 @@ function GradientBackgroundMesh({
 }) {
     const meshRef = useRef<THREE.Mesh>(null);
 
-    const material = useMemo(() => {
-        const tex = createGradientTexture(colorTop, colorBottom);
-        if (!tex) return null;
-
-        return new THREE.MeshBasicMaterial({
-            map: tex,
-            depthWrite: false, // 💡 다른 모든 3D 모델들 뒤에 배경으로 깔리게 함
-            depthTest: false,
-            toneMapped: false, // 💡 조명에 의해 배경색이 변질되지 않고 지정한 색 그대로 나오게 함
-        });
-    }, [colorTop, colorBottom]);
+    const texture = useMemo(
+        () => createGradientTexture(colorTop, colorBottom),
+        [colorTop, colorBottom],
+    );
 
     useLayoutEffect(() => {
         return () => {
-            material?.dispose();
+            texture?.dispose();
         };
-    }, [material]);
+    }, [texture]);
 
     useFrame((state) => {
         const mesh = meshRef.current;
@@ -74,13 +67,17 @@ function GradientBackgroundMesh({
         mesh.scale.set(w, h, 1);
     });
 
-    if (!material) return null;
+    if (!texture) return null;
 
     return (
         <mesh ref={meshRef} renderOrder={-10} frustumCulled={false}>
-            {/* 구슬(Sphere) 대신 평면(Plane)을 사용합니다! */}
             <planeGeometry args={[1, 1]} />
-            <primitive object={material} attach="material" />
+            <meshBasicMaterial
+                map={texture}
+                depthWrite={false}
+                depthTest={false}
+                toneMapped={false}
+            />
         </mesh>
     );
 }
