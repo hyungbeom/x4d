@@ -24,6 +24,8 @@ import gsap from "gsap";
 import {ScrollTrigger} from "gsap/ScrollTrigger";
 import {SceneLoadingProvider} from "@/utils/three/SceneLoadingContext";
 import {WorldModel} from "@/resources/model/progist/WorldMode";
+import NavBar from "@/utils/ui/NavBar";
+import styles from "./page.module.css";
 
 
 type CameraSnapshot = { c: [number, number, number]; t: [number, number, number]; z: number };
@@ -70,26 +72,34 @@ function CameraController({activePanelId, deviceType}: { activePanelId: number; 
         1: {
             desktop: {c: [-40, 260, 280], t: BDI_100_TARGET, z: 1.3},
             tablet: {c: [-40, 300, 340], t: BDI_100_TARGET, z: 1.2},
-            mobile: {c: [-160.8, 438.0, 328.8], t: [3.8, 250.9, 46.8], z: 2.05},
+            mobile: { c: [-255.9, 738.5, 1265.3], t: [-121.8, 55.2, 21.9], z: 4.14 },
         },
         2: {
             desktop: {c: [-420, 50, 200], t: [-420, 0, -20], z: 1.2},
             tablet: {c: [-420, 80, 250], t: [-420, 0, -20], z: 1.1},
-            mobile: {c: [-455.2, 212.6, 78.5], t: [-359.0, 124.5, -45.3], z: 0.94}
+
+            mobile: { c: [-260.4, 967.5, 1098.5], t: [-62.2, 108.4, -21.2], z: 4.56 }
         },
         3: {
             desktop: {c: [0, 50, 650], t: [0, 0, 370], z: 1},
             tablet: {c: [0, 80, 750], t: [0, 0, 370], z: 1},
-            mobile: {c: [-204.4, 283.8, 783.5], t: [15.3, 152.0, 360.3], z: 1.30}
+            mobile: { c: [-437.9, 793.5, 1140.7], t: [108.3, 60.3, 47.4], z: 4.59 }
         },
         4: {
             desktop: {c: [300, 50, 350], t: [300, 0, 88], z: 1},
             tablet: {c: [300, 80, 450], t: [300, 0, 88], z: 1},
-            mobile: {c: [525.1, 279.1, 448.5], t: [277.6, 170.6, 55.0], z: 1.09}
+
+            mobile: { c: [665.8, 786.9, 969.8], t: [-65.1, -7.7, 39.5], z: 4.11 },
         },
         5: {
-            desktop: {c: [0, 150, 300], t: [0, 100, 0], z: 1}, tablet: {c: [0, 200, 400], t: [0, 100, 0], z: 1},
-            mobile: {c: [744.1, 285.8, 61.6], t: [588.6, 168.6, -117.6], z: 1.00}
+            desktop: {c: [0, 150, 300], t: [0, 100, 0], z: 1},
+            tablet: {c: [0, 200, 400], t: [0, 100, 0], z: 1},
+            mobile: { c: [-120.4, 964.2, 1066.1], t: [91.5, 89.8, -39.2], z: 4.15 }
+        },
+        6: {
+            desktop: {c: [0, 150, 300], t: [0, 100, 0], z: 1},
+            tablet: {c: [0, 200, 400], t: [0, 100, 0], z: 1},
+            mobile: { c: [470.6, 1053.6, 804.7], t: [20.9, 67.8, -121.0], z: 4.82 }
         },
     } satisfies Record<number, Record<DeviceType, CameraSnapshot>>), []);
 
@@ -134,12 +144,50 @@ function CameraController({activePanelId, deviceType}: { activePanelId: number; 
 }
 
 
-export default function Home() {
+const PANEL_COUNT = 6;
 
+export default function Home() {
     const [activePanelId, setActivePanelId] = useState<number>(0);
     const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+    const [autoTour, setAutoTour] = useState(false);
 
+    const AUTO_TOUR_INTERVAL_MS = 5000;
 
+    const navMenus = useMemo(
+        () => [
+            { title: '수질', onClick: () => setActivePanelId(1) },
+            { title: '대기', onClick: () => setActivePanelId(2) },
+            { title: '측정분석', onClick: () => setActivePanelId(3) },
+            { title: '탈탄소', onClick: () => setActivePanelId(4) },
+            { title: '외국관', onClick: () => setActivePanelId(5) },
+            { title: '기관 및 단체', onClick: () => setActivePanelId(6) },
+        ],
+        [],
+    );
+
+    const handleAutoTourToggle = () => {
+        setAutoTour((prev) => {
+            const next = !prev;
+            if (next) {
+                setActivePanelId((id) => (id < 1 ? 1 : id));
+            }
+            return next;
+        });
+    };
+
+    useEffect(() => {
+        if (!autoTour) return;
+
+        const tick = () => {
+            setActivePanelId((prev) => {
+                if (prev < 1 || prev >= PANEL_COUNT) return 1;
+                return prev + 1;
+            });
+        };
+
+        const intervalId = window.setInterval(tick, AUTO_TOUR_INTERVAL_MS);
+        return () => window.clearInterval(intervalId);
+    }, [autoTour]);
 
     useEffect(() => {
         gsap.registerPlugin(ScrollTrigger);
@@ -163,21 +211,35 @@ export default function Home() {
 
     return (
         <SceneLoadingProvider>
-        <ManciniCanvas quality={'default'}>
-            <CameraController activePanelId={activePanelId} deviceType={deviceType}/>
-            
-            <Suspense fallback={null}>
-                {/*<SceneEnvironment preset="forest" blur={1} environmentIntensity={0.8}/>*/}
-                <SceneEnvironment/>
-                <Light_Environment/>
+            <main className={styles.homeMain}>
+                <div className={styles.stickyViewport}>
+                    <div className={styles.canvasLayer}>
+                        <ManciniCanvas quality="default">
+                            <CameraController activePanelId={activePanelId} deviceType={deviceType} />
 
+                            <Suspense fallback={null}>
+                                <SceneEnvironment />
+                                <Light_Environment />
+                                <WorldModel />
+                                <SceneReadyGate />
+                            </Suspense>
+                        </ManciniCanvas>
+                    </div>
 
-
-                <WorldModel/>
-
-                <SceneReadyGate/>
-            </Suspense>
-        </ManciniCanvas>
+                    <NavBar
+                        logoSrc="/model/bdtec/logo.svg"
+                        menus={navMenus}
+                        contactLink="/brochure/bdtec/contactus"
+                        activeIndex={
+                            activePanelId >= 1 && activePanelId <= PANEL_COUNT
+                                ? activePanelId - 1
+                                : null
+                        }
+                        autoTour={autoTour}
+                        onAutoTourToggle={handleAutoTourToggle}
+                    />
+                </div>
+            </main>
         </SceneLoadingProvider>
     );
 }
