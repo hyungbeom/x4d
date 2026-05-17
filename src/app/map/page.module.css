@@ -1,0 +1,71 @@
+.mapMain {
+  position: relative;
+  width: 100dvw;
+  height: 100dvh;
+  overflow: hidden;
+  background: linear-gradient(180deg, #8ecfef 0%, #b3e0f7 38%, #d4effa 72%, #f0f9ff 100%);
+}
+
+.mapMainHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.mapMainVisible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.55s ease;
+}
+
+.canvasLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.canvasLayer canvas {
+  touch-action: none;
+}
+
+.topBar {
+  position: absolute;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  left: 16px;
+  right: 16px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.topBar > * {
+  pointer-events: auto;
+}
+
+.backBtn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: inherit;
+}
+
+.boothTag {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ff9a4d 0%, #f97316 100%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.35);
+}

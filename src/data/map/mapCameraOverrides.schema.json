@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MapCameraOverrides",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["pointId", "booth", "label"],
+    "additionalProperties": false,
+    "properties": {
+      "pointId": {
+        "type": "string",
+        "description": "point-001 ~ point-070",
+        "pattern": "^point-\\d{3}$"
+      },
+      "booth": {
+        "type": "string",
+        "description": "URL ?booth= 값 (예: A11, A14-1)"
+      },
+      "label": {
+        "type": "string",
+        "description": "기업명 / 표시 라벨"
+      },
+      "markPosition": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": { "type": "number" },
+        "description": "mark.gltf 월드 좌표 [x, y, z]"
+      },
+      "cameras": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "desktop": { "$ref": "#/$defs/snapshot" },
+          "tablet": { "$ref": "#/$defs/snapshot" },
+          "mobile": { "$ref": "#/$defs/snapshot" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "snapshot": {
+      "type": "object",
+      "required": ["c", "t", "z"],
+      "additionalProperties": false,
+      "properties": {
+        "c": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" },
+          "description": "카메라 위치"
+        },
+        "t": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" },
+          "description": "타겟"
+        },
+        "z": {
+          "type": "number",
+          "description": "orthographic zoom"
+        }
+      }
+    }
+  }
+}

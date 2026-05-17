@@ -1,0 +1,225 @@
+'use client';
+
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+    isBdtecSceneFullyReady,
+    useBdtecSceneLoadingState,
+} from '@/utils/three/SceneLoadingContext';
+import { gsap } from '@/lib/brochureGsap';
+
+const AFTER_READY_MS = 500;
+const FORCE_DONE_MS = 18_000;
+
+function resourceLabel(item: string) {
+    if (!item) return '초기화';
+    const l = item.toLowerCase();
+    if (l.includes('map.gltf') || l.includes('mark.gltf')) return '전시장 맵';
+    if (l.endsWith('.glb') || l.endsWith('.gltf')) return '3D 오브젝트';
+    if (l.includes('.jpg') || l.includes('.jpeg') || l.includes('.png') || l.includes('texture'))
+        return '텍스처';
+    return '리소스';
+}
+
+type Phase = 'loading' | 'exit' | 'gone';
+
+type MapSceneLoaderProps = {
+    booth?: string;
+    onGone?: () => void;
+};
+
+export default function MapSceneLoader({ booth, onGone }: MapSceneLoaderProps) {
+    const loading = useBdtecSceneLoadingState();
+    const { moduleReady, canvasMounted, webgpuReady, suspenseReady, active, progress, item } = loading;
+
+    const shellRef = useRef<HTMLDivElement>(null);
+    const barFillRef = useRef<HTMLDivElement>(null);
+    const [phase, setPhase] = useState<Phase>('loading');
+    const doneRef = useRef(false);
+
+    const fullyReady = isBdtecSceneFullyReady(loading);
+
+    const assetPct = useMemo(() => {
+        const p = Number.isFinite(progress) ? progress : 0;
+        return Math.min(100, Math.max(0, Math.round(p)));
+    }, [progress]);
+
+    const pct = useMemo(() => {
+        let floor = 0;
+        if (moduleReady) floor = 12;
+        if (canvasMounted) floor = Math.max(floor, 22);
+        if (webgpuReady) floor = Math.max(floor, 35);
+        if (suspenseReady) floor = Math.max(floor, 72);
+        if (fullyReady) return 100;
+        const blended = active ? Math.max(floor, assetPct * 0.85) : Math.max(floor, assetPct);
+        return Math.min(99, Math.round(blended));
+    }, [moduleReady, canvasMounted, webgpuReady, suspenseReady, fullyReady, active, assetPct]);
+
+    const label = useMemo(() => resourceLabel(item), [item]);
+
+    const statusLine = useMemo(() => {
+        if (!moduleReady) return '3D 모듈을 불러오는 중…';
+        if (!canvasMounted) return '렌더러를 연결하는 중…';
+        if (!webgpuReady) return '3D 렌더러 초기화 중…';
+        if (active) {
+            return (
+                <>
+                    <span style={{ color: '#1e5a7a' }}>{label}</span>
+                    <span style={{ opacity: 0.65 }}> · 로딩 중</span>
+                </>
+            );
+        }
+        if (!suspenseReady) return '맵 오브젝트를 배치하는 중…';
+        if (pct < 100) return '리소스 마무리 중…';
+        return <span style={{ color: '#2d6a8a' }}>준비 완료 — 맵을 표시합니다</span>;
+    }, [moduleReady, canvasMounted, webgpuReady, suspenseReady, active, label, pct]);
+
+    const runExit = useCallback(() => {
+        if (doneRef.current) return;
+        doneRef.current = true;
+        const shell = shellRef.current;
+        if (!shell) {
+            setPhase('gone');
+            onGone?.();
+            return;
+        }
+        setPhase('exit');
+        gsap.to(shell, {
+            opacity: 0,
+            y: -20,
+            filter: 'blur(10px)',
+            duration: 0.65,
+            ease: 'power3.inOut',
+            onComplete: () => {
+                shell.style.pointerEvents = 'none';
+                shell.style.visibility = 'hidden';
+                setPhase('gone');
+                onGone?.();
+            },
+        });
+    }, [onGone]);
+
+    useEffect(() => {
+        const bar = barFillRef.current;
+        if (!bar) return;
+        gsap.to(bar, { width: `${pct}%`, duration: 0.22, ease: 'power2.out' });
+        return () => {
+            gsap.killTweensOf(bar);
+        };
+    }, [pct]);
+
+    useEffect(() => {
+        if (phase !== 'loading' || doneRef.current) return;
+        if (!fullyReady) return;
+        const t = window.setTimeout(() => runExit(), AFTER_READY_MS);
+        return () => window.clearTimeout(t);
+    }, [fullyReady, phase, runExit]);
+
+    useEffect(() => {
+        if (phase !== 'loading' || doneRef.current) return;
+        const t = window.setTimeout(() => {
+            if (!doneRef.current) runExit();
+        }, FORCE_DONE_MS);
+        return () => window.clearTimeout(t);
+    }, [phase, runExit]);
+
+    useEffect(() => {
+        if (phase === 'gone') {
+            document.body.style.overflow = '';
+            return;
+        }
+        document.body.style.overflow = 'hidden';
+    }, [phase]);
+
+    if (phase === 'gone') return null;
+
+    return (
+        <div
+            ref={shellRef}
+            style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 99999,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'linear-gradient(180deg, #8ecfef 0%, #b3e0f7 42%, #d4effa 78%, #f0f9ff 100%)',
+                color: '#0f2d3d',
+                fontFamily: 'Inter, system-ui, sans-serif',
+            }}
+        >
+            <p
+                style={{
+                    fontSize: 'clamp(11px, 1.1vw, 13px)',
+                    letterSpacing: '0.28em',
+                    textTransform: 'uppercase',
+                    color: '#0d7ea8',
+                    fontWeight: 700,
+                    marginBottom: '10px',
+                }}
+            >
+                ENVEX MAP
+            </p>
+            <h1
+                style={{
+                    fontSize: 'clamp(22px, 3.2vw, 32px)',
+                    fontWeight: 800,
+                    margin: '0 0 8px',
+                    letterSpacing: '-0.02em',
+                    color: '#123d52',
+                }}
+            >
+                3D 맵을 준비하고 있습니다
+            </h1>
+            {booth ? (
+                <p
+                    style={{
+                        margin: '0 0 8px',
+                        fontSize: 'clamp(13px, 1.4vw, 15px)',
+                        fontWeight: 600,
+                        color: '#c2410c',
+                    }}
+                >
+                    부스 {booth}
+                </p>
+            ) : null}
+            <p style={{ margin: '0 0 28px', color: '#3d6b82', fontSize: 'clamp(13px, 1.4vw, 15px)' }}>
+                {statusLine}
+            </p>
+
+            <div
+                style={{
+                    width: 'min(420px, 86vw)',
+                    height: '5px',
+                    borderRadius: '999px',
+                    background: 'rgba(255,255,255,0.55)',
+                    overflow: 'hidden',
+                    boxShadow: 'inset 0 1px 2px rgba(15, 45, 61, 0.12)',
+                }}
+            >
+                <div
+                    ref={barFillRef}
+                    style={{
+                        height: '100%',
+                        width: '0%',
+                        borderRadius: '999px',
+                        background: 'linear-gradient(90deg, #0ea5e9, #38bdf8)',
+                        boxShadow: '0 0 16px rgba(14, 165, 233, 0.45)',
+                    }}
+                />
+            </div>
+
+            <p
+                style={{
+                    marginTop: '14px',
+                    fontVariantNumeric: 'tabular-nums',
+                    color: '#4a7a94',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                }}
+            >
+                {pct}%
+            </p>
+        </div>
+    );
+}
