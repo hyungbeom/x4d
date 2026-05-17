@@ -2,16 +2,16 @@
 export function Light_Environment() {
   return (
     <>
-      <ambientLight intensity={0.85} />
+      <ambientLight intensity={0.72} />
       <hemisphereLight
         color="#e8eeff"
-        groundColor="#3a3a48"
-        intensity={0.25}
+        groundColor="#444450"
+        intensity={0.28}
         position={[0, 400, 0]}
       />
       <directionalLight
         position={[320, 520, 280]}
-        intensity={4.8}
+        intensity={3.6}
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-camera-near={10}
@@ -21,6 +21,11 @@ export function Light_Environment() {
         shadow-camera-bottom={-800}
         shadow-camera-left={-800}
         shadow-bias={-0.0005}
+      />
+      <directionalLight
+        position={[-280, 180, -220]}
+        intensity={0.7}
+        color="#c8d0e8"
       />
     </>
   );

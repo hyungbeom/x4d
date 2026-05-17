@@ -9,6 +9,7 @@ import InfoPanel from "@/utils/ui/InfoPanel";
 import PageWrapper from "@/utils/ui/PageWrapper";
 import styles from "./page.module.css";
 import BdtecBrochureLoader from "@/components/bdtec/BdtecBrochureLoader";
+import BdtecSceneHeroCopy from "@/components/bdtec/BdtecSceneHeroCopy";
 import { BdtecSceneLoadingProvider } from "@/app/brochure/bdtec/BdtecSceneLoadingContext";
 import BdtecScene from "@/app/brochure/bdtec/mobile/Mobile";
 import dynamic from "next/dynamic";
@@ -27,7 +28,7 @@ const panelContents: Record<number, { title: string; desc: string; extra?: strin
 };
 
 export default function Home() {
-    const [intro, setIntro] = useState(true);
+    const [intro, setIntro] = useState(false);
     const [activePanelId, setActivePanelId] = useState<number>(0);
     const [quality, setQuality] = useState("default");
 
@@ -154,6 +155,10 @@ export default function Home() {
                         </>
                     )}
                     {/*{process.env.NODE_ENV === 'development' && <DomStats />}*/}
+
+                    <BdtecSceneHeroCopy
+                        visible={intro && activePanelId === 0}
+                    />
 
                     <InfoPanel
                         isOpen={activePanelId >= 1 && activePanelId <= 5}

@@ -37,7 +37,6 @@ export function ManciniCanvas({ quality, children }: { quality: string; children
 
     return (
         <Canvas
-            flat
             orthographic
             style={{ width: "100vw", height: "100vh", display: "block", touchAction: "none" }}
             dpr={dpr}
@@ -45,7 +44,7 @@ export function ManciniCanvas({ quality, children }: { quality: string; children
                 position: [0, 200, 800],
                 zoom: 1,
                 near: -1000,
-                far: 3000,
+                far: 500000,
                 fov: 25
             }}
             shadows={"variance"}
@@ -62,7 +61,9 @@ export function ManciniCanvas({ quality, children }: { quality: string; children
                 rendererRef.current = renderer as never;
                 return renderer;
             }}
-            onCreated={() => {
+            onCreated={({ gl }) => {
+                gl.toneMapping = THREE.ACESFilmicToneMapping;
+                gl.toneMappingExposure = 1.1;
                 setWebgpuReady(true);
             }}
         >

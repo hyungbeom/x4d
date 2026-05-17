@@ -159,7 +159,7 @@ export default function BdtecScene({quality, activePanelId, deviceType}: BdtecSc
 
     useEffect(() => {
         setModuleReady(true);
-        BdtecSceneEnvironment.preload({preset: 'sunset'});
+
         return () => setModuleReady(false);
     }, [setModuleReady]);
 
@@ -175,6 +175,7 @@ export default function BdtecScene({quality, activePanelId, deviceType}: BdtecSc
 
             <Suspense fallback={null}>
                 {/*<BdtecSceneEnvironment preset="forest" blur={1} environmentIntensity={0.8}/>*/}
+                <BdtecSceneEnvironment/>
                 <Light_Environment />
                 <BdtecBrochureGrid
                     cellSize={32}
