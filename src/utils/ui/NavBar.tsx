@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import gsap from 'gsap';
 import TransitionLink from "@/utils/ui/TransitionLink";
+import DynamicIsland from "@/utils/DynamicIsland";
 
 interface MenuItem {
     title: string;
@@ -280,6 +281,10 @@ export default function NavBar({
 
             <div className="mobile-top-bar">
                 {logoBlock}
+
+
+                {/*<DynamicIsland/>*/}
+
                 <TransitionLink href={contactLink} className="contact-btn" type="blinds">
                     Contact Us
                 </TransitionLink>

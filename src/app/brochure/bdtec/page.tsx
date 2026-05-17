@@ -11,6 +11,12 @@ import styles from "./page.module.css";
 import BdtecBrochureLoader from "@/components/bdtec/BdtecBrochureLoader";
 import { BdtecSceneLoadingProvider } from "@/app/brochure/bdtec/BdtecSceneLoadingContext";
 import BdtecScene from "@/app/brochure/bdtec/mobile/Mobile";
+import dynamic from "next/dynamic";
+
+
+const DynamicIsland = dynamic(() => import('@/utils/DynamicIsland'), {
+    ssr: false // 서버 사이드 렌더링을 끄고 브라우저에서만 그리도록 강제합니다.
+});
 
 const panelContents: Record<number, { title: string; desc: string; extra?: string }> = {
     1: { title: "BDI-100", desc: "24시간 지속적인 모니터링으로 집진상태 판단과 측정 시스템을 제공합니다.", extra: "온도/차압/전류 등 환경 데이터를 안전하게 전송합니다." },
@@ -132,6 +138,9 @@ export default function Home() {
                     )}
 
                     {intro && (
+
+                        <>
+                            <DynamicIsland/>
                         <NavBar
                             logoSrc="/model/bdtec/logo.svg"
                             menus={navMenus}
@@ -142,6 +151,7 @@ export default function Home() {
                             autoTour={autoTour}
                             onAutoTourToggle={handleAutoTourToggle}
                         />
+                        </>
                     )}
                     {/*{process.env.NODE_ENV === 'development' && <DomStats />}*/}
 
