@@ -1,11 +1,10 @@
 'use client';
 
-import { useEnvironment } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {useEnvironment} from '@react-three/drei';
+import {useFrame, useThree} from '@react-three/fiber';
+import {useLayoutEffect, useMemo, useRef, useState} from 'react';
 import * as THREE from 'three';
 
-type Preset = Parameters<typeof useEnvironment>[0]['preset'];
 
 function skyboxScaleForCamera(camera: THREE.Camera) {
     if (camera instanceof THREE.OrthographicCamera) {
@@ -24,9 +23,9 @@ function skyboxScaleForCamera(camera: THREE.Camera) {
 
 /** PMREM + roughness로 HDRI 배경 블러 (직교 카메라 스카이박스) */
 function HdriSkyMesh({
-    texture,
-    blur,
-}: {
+                         texture,
+                         blur,
+                     }: {
     texture: THREE.CubeTexture;
     blur: number;
 }) {
@@ -82,8 +81,8 @@ function HdriSkyMesh({
 
     return (
         <mesh ref={meshRef} frustumCulled={false} renderOrder={-10}>
-            <sphereGeometry args={[1, 64, 32]} />
-            <primitive object={material} attach="material" />
+            <sphereGeometry args={[1, 64, 32]}/>
+            <primitive object={material} attach="material"/>
         </mesh>
     );
 }
@@ -92,16 +91,16 @@ function HdriSkyMesh({
  * HDRI — 모델 IBL(scene.environment) + 직교 카메라용 배경 스카이박스
  */
 export function BdtecSceneEnvironment({
-    preset = 'sunset',
-    blur = 0.35,
-    environmentIntensity = 1.15,
-}: {
-    preset?: Preset;
+                                          preset = 'sunset',
+                                          blur = 0.35,
+                                          environmentIntensity = 1.15,
+                                      }: {
+    preset?: any;
     /** 0–1, 클수록 배경 HDRI가 더 흐림 */
     blur?: number;
     environmentIntensity?: number;
 }) {
-    const texture = useEnvironment({ preset });
+    const texture = useEnvironment({preset});
     const scene = useThree((s) => s.scene);
 
     useLayoutEffect(() => {
@@ -122,9 +121,10 @@ export function BdtecSceneEnvironment({
 
     if (!texture?.image) return null;
 
-    return <HdriSkyMesh texture={texture} blur={blur} />;
+    // @ts-ignore
+    return <HdriSkyMesh texture={texture} blur={blur}/>;
 }
 
-BdtecSceneEnvironment.preload = (options?: { preset?: Preset }) => {
-    useEnvironment.preload({ preset: options?.preset ?? 'sunset' });
+BdtecSceneEnvironment.preload = (options?: { preset?: any }) => {
+    useEnvironment.preload({preset: options?.preset ?? 'sunset'});
 };

@@ -67,6 +67,7 @@ export default function Home() {
                 <OrbitControls autoRotate autoRotateSpeed={0.05} enableZoom={false} makeDefault
                                minPolarAngle={Math.PI / 2} maxPolarAngle={Math.PI / 2}/>
 
+                {/*@ts-ignored*/}
                 <EffectComposer disableNormalPass>
                     <Bloom luminanceThreshold={2} mipmapBlur/>
                     <ToneMapping/>

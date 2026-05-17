@@ -59,6 +59,7 @@ export function ManciniCanvas({ quality, children }: { quality: string; children
         >
             <BdtecSceneLoadingReporter />
             {children}
+            {/*@ts-ignored*/}
             <EffectComposer disableNormalPass>
                 <Bloom luminanceThreshold={2} mipmapBlur />
                 <ToneMapping />

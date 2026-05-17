@@ -1,29 +1,28 @@
 'use client';
 
-import React, { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useBdtecSceneLoadingActions } from '@/app/brochure/bdtec/BdtecSceneLoadingContext';
-import { BdtecSceneReadyGate } from '@/app/brochure/bdtec/mobile/BdtecSceneReadyGate';
+import React, {Suspense, useCallback, useEffect, useMemo, useRef} from 'react';
+import {useBdtecSceneLoadingActions} from '@/app/brochure/bdtec/BdtecSceneLoadingContext';
+import {BdtecSceneReadyGate} from '@/app/brochure/bdtec/mobile/BdtecSceneReadyGate';
 import * as THREE from 'three';
-import { useFrame } from "@react-three/fiber";
-import { CameraControls } from "@react-three/drei";
-import { BdtecBrochureGrid } from "@/utils/three/BdtecBrochureGrid";
-import { BdtecSceneEnvironment } from "@/utils/three/BdtecSceneEnvironment";
+import {useFrame} from "@react-three/fiber";
+import {CameraControls} from "@react-three/drei";
+import {BdtecBrochureGrid} from "@/utils/three/BdtecBrochureGrid";
+import {BdtecSceneEnvironment} from "@/utils/three/BdtecSceneEnvironment";
 import type CameraControlsImpl from 'camera-controls';
 
 // 3D 환경 및 커스텀 컴포넌트
-import { ManciniCanvas } from "@/app/brochure/bdtec/mobile/ManciniCanvas";
-import { Light_Environment } from "@/utils/three/Light_Environment";
+import {ManciniCanvas} from "@/app/brochure/bdtec/mobile/ManciniCanvas";
 import LineObj from "@/utils/three/LineObj";
 
 // 3D 모델
-import { Tank } from "@/resources/model/bdtect/Tank";
-import { AirProduct } from "@/resources/model/Air_Product";
-import { Factory } from "@/resources/model/bdtect/Factory";
-import { Wifi } from "@/resources/model/bdtect/Wifi";
-import { SystemModel } from "@/resources/model/bdtect/SystemModel";
-import { Modem } from "@/resources/model/bdtect/Modem";
+import {Tank} from "@/resources/model/bdtect/Tank";
+import {AirProduct} from "@/resources/model/Air_Product";
+import {Factory} from "@/resources/model/bdtect/Factory";
+import {Wifi} from "@/resources/model/bdtect/Wifi";
+import {SystemModel} from "@/resources/model/bdtect/SystemModel";
+import {Modem} from "@/resources/model/bdtect/Modem";
 import {DataModel} from "@/resources/model/bdtect/Data";
-import {SplineParticles, SplineSmokeParticles} from "@/utils/three/SplineParticles";
+import {SplineSmokeParticles} from "@/utils/three/SplineParticles";
 
 // ... (FloatingTankLine 컴포넌트 유지) ...
 function FloatingTankLine() {
@@ -37,7 +36,8 @@ function FloatingTankLine() {
             groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 3) * 10;
         }
     });
-    return <group ref={groupRef}><LineObj type="type1" points={tankSurroundPoints} tubeRadius={3} lightRadius={1} /></group>;
+    return <group ref={groupRef}><LineObj type="type1" points={tankSurroundPoints} tubeRadius={3} lightRadius={1}/>
+    </group>;
 }
 
 type CameraSnapshot = { c: [number, number, number]; t: [number, number, number]; z: number };
@@ -49,7 +49,7 @@ const BDI_100_TARGET: [number, number, number] = [-40, 215, 45];
 const CAMERA_TRANSITION_SMOOTH_TIME = 0.55;
 
 /** 즉시 스냅 (초기 마운트·리사이즈 deviceType 전환 등) */
-function applyCameraSnapshot(controls: CameraControlsImpl, { c, t, z }: CameraSnapshot) {
+function applyCameraSnapshot(controls: CameraControlsImpl, {c, t, z}: CameraSnapshot) {
     controls.setLookAt(c[0], c[1], c[2], t[0], t[1], t[2], false);
     controls.zoomTo(z, false);
     const cam = controls.camera;
@@ -61,7 +61,7 @@ function applyCameraSnapshot(controls: CameraControlsImpl, { c, t, z }: CameraSn
 }
 
 /** 패널 전환 시 부드럽게 이동 */
-function transitionCameraSnapshot(controls: CameraControlsImpl, { c, t, z }: CameraSnapshot) {
+function transitionCameraSnapshot(controls: CameraControlsImpl, {c, t, z}: CameraSnapshot) {
     void Promise.all([
         controls.setLookAt(c[0], c[1], c[2], t[0], t[1], t[2], true),
         controls.zoomTo(z, true),
@@ -69,33 +69,41 @@ function transitionCameraSnapshot(controls: CameraControlsImpl, { c, t, z }: Cam
 }
 
 // 🚀 1. 카메라를 통제하는 핵심 컴포넌트
-function CameraController({ activePanelId, deviceType }: { activePanelId: number; deviceType: DeviceType }) {
+function CameraController({activePanelId, deviceType}: { activePanelId: number; deviceType: DeviceType }) {
     const cameraControlsRef = useRef<CameraControlsImpl | null>(null);
     const hasInitializedRef = useRef(false);
     const prevDeviceTypeRef = useRef<DeviceType>(deviceType);
 
     // 🎯 설정 객체: c(카메라 위치), t(타겟 위치), z(줌) — 헬퍼는 deviceType·panelId에 맞는 슬롯에 붙여넣기
     const cameraConfig = useMemo(() => ({
-        0: { desktop: { c: [0, 200, 800], t: [0, 0, 0], z: 1 },
-            tablet: { c: [0, 250, 1000], t: [0, 0, 0], z: 1 },
-            mobile: { c: [965.4, 849.3, -544.1], t: [-101.6, 147.4, 88.3], z: 0.54 }
+        0: {
+            desktop: {c: [0, 200, 800], t: [0, 0, 0], z: 1},
+            tablet: {c: [0, 250, 1000], t: [0, 0, 0], z: 1},
+            mobile: {c: [965.4, 849.3, -544.1], t: [-101.6, 147.4, 88.3], z: 0.54}
         },
         1: {
-            desktop: { c: [-40, 260, 280], t: BDI_100_TARGET, z: 1.3 },
-            tablet: { c: [-40, 300, 340], t: BDI_100_TARGET, z: 1.2 },
-            mobile:{ c: [-160.8, 438.0, 328.8], t: [3.8, 250.9, 46.8], z: 2.05 },
+            desktop: {c: [-40, 260, 280], t: BDI_100_TARGET, z: 1.3},
+            tablet: {c: [-40, 300, 340], t: BDI_100_TARGET, z: 1.2},
+            mobile: {c: [-160.8, 438.0, 328.8], t: [3.8, 250.9, 46.8], z: 2.05},
         },
-        2: { desktop: { c: [-420, 50, 200], t: [-420, 0, -20], z: 1.2 }, tablet: { c: [-420, 80, 250], t: [-420, 0, -20], z: 1.1 }, mobile: { c: [-455.2, 212.6, 78.5], t: [-359.0, 124.5, -45.3], z: 0.94 } },
-        3: { desktop: { c: [0, 50, 650], t: [0, 0, 370], z: 1 },
-            tablet: { c: [0, 80, 750], t: [0, 0, 370], z: 1 },
-            mobile:{ c: [-204.4, 283.8, 783.5], t: [15.3, 152.0, 360.3], z: 1.30 }
+        2: {
+            desktop: {c: [-420, 50, 200], t: [-420, 0, -20], z: 1.2},
+            tablet: {c: [-420, 80, 250], t: [-420, 0, -20], z: 1.1},
+            mobile: {c: [-455.2, 212.6, 78.5], t: [-359.0, 124.5, -45.3], z: 0.94}
         },
-        4: { desktop: { c: [300, 50, 350], t: [300, 0, 88], z: 1 },
-            tablet: { c: [300, 80, 450], t: [300, 0, 88], z: 1 },
-            mobile: { c: [525.1, 279.1, 448.5], t: [277.6, 170.6, 55.0], z: 1.09 }
+        3: {
+            desktop: {c: [0, 50, 650], t: [0, 0, 370], z: 1},
+            tablet: {c: [0, 80, 750], t: [0, 0, 370], z: 1},
+            mobile: {c: [-204.4, 283.8, 783.5], t: [15.3, 152.0, 360.3], z: 1.30}
         },
-        5: { desktop: { c: [0, 150, 300], t: [0, 100, 0], z: 1 }, tablet: { c: [0, 200, 400], t: [0, 100, 0], z: 1 },
-            mobile: { c: [744.1, 285.8, 61.6], t: [588.6, 168.6, -117.6], z: 1.00 }
+        4: {
+            desktop: {c: [300, 50, 350], t: [300, 0, 88], z: 1},
+            tablet: {c: [300, 80, 450], t: [300, 0, 88], z: 1},
+            mobile: {c: [525.1, 279.1, 448.5], t: [277.6, 170.6, 55.0], z: 1.09}
+        },
+        5: {
+            desktop: {c: [0, 150, 300], t: [0, 100, 0], z: 1}, tablet: {c: [0, 200, 400], t: [0, 100, 0], z: 1},
+            mobile: {c: [744.1, 285.8, 61.6], t: [588.6, 168.6, -117.6], z: 1.00}
         },
     } satisfies Record<number, Record<DeviceType, CameraSnapshot>>), []);
 
@@ -145,12 +153,12 @@ interface BdtecSceneProps {
     deviceType: 'desktop' | 'tablet' | 'mobile';
 }
 
-export default function BdtecScene({ quality, activePanelId, deviceType }: BdtecSceneProps) {
-    const { setModuleReady } = useBdtecSceneLoadingActions();
+export default function BdtecScene({quality, activePanelId, deviceType}: BdtecSceneProps) {
+    const {setModuleReady} = useBdtecSceneLoadingActions();
 
     useEffect(() => {
         setModuleReady(true);
-        BdtecSceneEnvironment.preload({ preset: 'sunset' });
+        BdtecSceneEnvironment.preload({preset: 'sunset'});
         return () => setModuleReady(false);
     }, [setModuleReady]);
 
@@ -162,10 +170,10 @@ export default function BdtecScene({ quality, activePanelId, deviceType }: Bdtec
 
     return (
         <ManciniCanvas quality={quality}>
-            <CameraController activePanelId={activePanelId} deviceType={deviceType} />
+            <CameraController activePanelId={activePanelId} deviceType={deviceType}/>
 
             <Suspense fallback={null}>
-                <BdtecSceneEnvironment preset="sunset" blur={0.35} environmentIntensity={1.15} />
+                <BdtecSceneEnvironment preset="sunset" blur={0.35} environmentIntensity={1.15}/>
                 {/*<Light_Environment />*/}
                 <BdtecBrochureGrid
                     cellSize={32}
@@ -174,11 +182,11 @@ export default function BdtecScene({ quality, activePanelId, deviceType }: Bdtec
                     sectionColor="#b3c4f5"
                 />
 
-                <FloatingTankLine />
+                <FloatingTankLine/>
 
-                <AirProduct scale={[20, 20, 20]} position={[-40, 215, 45]} />
-                <Tank scale={[70, 70, 70]} position={[0, 0, 370]} rotation={[0, -Math.PI / 2, 0]} />
-                <Modem scale={[100, 100, 100]} position={[0, 0, 450]} />
+                <AirProduct scale={[20, 20, 20]} position={[-40, 215, 45]}/>
+                <Tank scale={[70, 70, 70]} position={[0, 0, 370]} rotation={[0, -Math.PI / 2, 0]}/>
+                <Modem scale={[100, 100, 100]} position={[0, 0, 450]}/>
                 <SplineSmokeParticles
                     spawnPosition={[-350, 200, -5]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정
                     count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)
@@ -209,19 +217,19 @@ export default function BdtecScene({ quality, activePanelId, deviceType }: Bdtec
                     spawnPosition={[-545, 110, -60]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정
                     count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)
                 />
-                <Factory scale={[40, 40, 40]} rotation={[0, -Math.PI / 2, 0]} position={[-420, 0, -20]} />
-                <Modem scale={[100, 100, 100]} position={[-450, 0, 80]} />
-                <Wifi scale={[150, 150, 150]} position={[300, 0, 88]} />
-                <SystemModel scale={[100, 100, 100]} position={[0, 130, 0]} rotation={[0, 0, 0]} />
-                <DataModel scale={[50, 50, 50]} position={[590, 0, -30]} rotation={[0,  Math.PI / 2, 0]} />
+                <Factory scale={[40, 40, 40]} rotation={[0, -Math.PI / 2, 0]} position={[-420, 0, -20]}/>
+                <Modem scale={[100, 100, 100]} position={[-450, 0, 80]}/>
+                <Wifi scale={[150, 150, 150]} position={[300, 0, 88]}/>
+                <SystemModel scale={[100, 100, 100]} position={[0, 130, 0]} rotation={[0, 0, 0]}/>
+                <DataModel scale={[50, 50, 50]} position={[590, 0, -30]} rotation={[0, Math.PI / 2, 0]}/>
 
-                <LineObj type="type1" points={PipeLine1} tubeRadius={5} lightRadius={3} speed={1} />
-                <LineObj type="type1" points={PipeLine2} tubeRadius={5} lightRadius={3} speed={1} />
-                <LineObj type="type1" points={PipeLine3} tubeRadius={5} lightRadius={3} speed={1} />
-                <LineObj type="type2" points={PipeLine4} tubeRadius={5} lightRadius={3} speed={1} lineWidth={7} />
-                <LineObj type="type1" points={PipeLine5} tubeRadius={18} lightRadius={15} speed={1} />
+                <LineObj type="type1" points={PipeLine1} tubeRadius={5} lightRadius={3} speed={1}/>
+                <LineObj type="type1" points={PipeLine2} tubeRadius={5} lightRadius={3} speed={1}/>
+                <LineObj type="type1" points={PipeLine3} tubeRadius={5} lightRadius={3} speed={1}/>
+                <LineObj type="type2" points={PipeLine4} tubeRadius={5} lightRadius={3} speed={1} lineWidth={7}/>
+                <LineObj type="type1" points={PipeLine5} tubeRadius={18} lightRadius={15} speed={1}/>
 
-                <BdtecSceneReadyGate />
+                <BdtecSceneReadyGate/>
             </Suspense>
         </ManciniCanvas>
     );
@@ -229,10 +237,10 @@ export default function BdtecScene({ quality, activePanelId, deviceType }: Bdtec
 
 // 🚀 3. 클릭 한 번으로 코드가 복사되는 마법의 헬퍼!
 function CameraHelper({
-    controlsRef,
-    activePanelId,
-    deviceType,
-}: {
+                          controlsRef,
+                          activePanelId,
+                          deviceType,
+                      }: {
     controlsRef: React.RefObject<CameraControlsImpl | null>;
     activePanelId: number;
     deviceType: DeviceType;
@@ -293,7 +301,9 @@ function CameraHelper({
         container.appendChild(copyBtn);
         document.body.appendChild(container);
 
-        return () => { document.body.removeChild(container); };
+        return () => {
+            document.body.removeChild(container);
+        };
     }, []);
 
     useFrame((state) => {
