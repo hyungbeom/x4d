@@ -34,13 +34,13 @@
   font-size: clamp(1.5rem, 3.2vw, 2.25rem);
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #1a3234;
+  color: #e8f2f5;
 }
 
 .titleSub {
   font-size: clamp(1.25rem, 2.6vw, 1.75rem);
   font-weight: 600;
-  color: #3d5c5e;
+  color: #9eb8c4;
 }
 
 .body {
@@ -54,7 +54,7 @@
   font-size: clamp(0.75rem, 1.45vw, 0.8125rem);
   line-height: 1.38;
   font-weight: 450;
-  color: rgba(26, 50, 52, 0.82);
+  color: rgba(200, 220, 228, 0.78);
   max-width: 36rem;
 }
 

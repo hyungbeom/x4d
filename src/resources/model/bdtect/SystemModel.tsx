@@ -1,7 +1,9 @@
 import * as THREE from 'three';
-import React, { useRef } from 'react'
-import { useGLTF } from '@react-three/drei'
-import {useFrame} from "@react-three/fiber";
+import React, { useRef } from 'react';
+import { useGLTF } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { BDTEC_GLASS_CASE } from '@/resources/model/bdtect/bdtecGlassMaterial';
+import { GlassCaseEdges } from '@/resources/model/bdtect/GlassCaseEdges';
 
 export function SystemModel(props:any) {
     const { nodes, materials }:any = useGLTF('/model/bdtec/system.glb')
@@ -88,19 +90,14 @@ export function SystemModel(props:any) {
                     rotation={[Math.PI / 2, 0, 0]}
                     scale={[-1.203, -1.203, -0.704]}
                 >
-                    <meshPhysicalMaterial
-                        color="#ffffff"
-                        transmission={1}
-                        transparent={true}
-                        opacity={1}
-                        roughness={0}
-                        metalness={0}
-                        ior={1.5}
-                        thickness={0.1}
-                        clearcoat={0}
-                        side={THREE.DoubleSide}
-                    />
+                    <meshPhysicalMaterial {...BDTEC_GLASS_CASE} />
                 </mesh>
+                <GlassCaseEdges
+                    geometry={nodes.Cube002.geometry}
+                    position={[-47.266, 0.937, 47.255]}
+                    rotation={[Math.PI / 2, 0, 0]}
+                    scale={[-1.203, -1.203, -0.704]}
+                />
 
                 <mesh
                     castShadow
@@ -110,19 +107,14 @@ export function SystemModel(props:any) {
                     rotation={[Math.PI / 2, 0, 0]}
                     scale={[-1.203, -1.203, -1.342]}
                 >
-                    <meshPhysicalMaterial
-                        color="#ffffff"
-                        transmission={1}
-                        transparent={true}
-                        opacity={1}
-                        roughness={0}
-                        metalness={0}
-                        ior={1.5}
-                        thickness={0.1}
-                        clearcoat={0}
-                        side={THREE.DoubleSide}
-                    />
+                    <meshPhysicalMaterial {...BDTEC_GLASS_CASE} />
                 </mesh>
+                <GlassCaseEdges
+                    geometry={nodes.Cube003.geometry}
+                    position={[-47.266, -47.497, 47.255]}
+                    rotation={[Math.PI / 2, 0, 0]}
+                    scale={[-1.203, -1.203, -1.342]}
+                />
                 <mesh
                     castShadow
                     receiveShadow

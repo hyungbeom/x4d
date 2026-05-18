@@ -73,6 +73,7 @@ export function ManciniCanvas({
                 scene.background = new THREE.Color(backgroundColorRef.current);
                 gl.toneMapping = THREE.ACESFilmicToneMapping;
                 gl.toneMappingExposure = 1.1;
+                gl.localClippingEnabled = true;
                 setWebgpuReady(true);
             }}
         >

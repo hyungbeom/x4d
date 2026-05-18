@@ -11,10 +11,10 @@
   width: 100dvw;
   background: linear-gradient(
     180deg,
-    #b3daf5 0%,
-    #d4ebfa 45%,
-    #f5fbff 78%,
-    #ffffff 100%
+    #1e3a52 0%,
+    #162a3c 45%,
+    #101c2a 78%,
+    #0c141c 100%
   );
   overflow-x: hidden;
   overflow-y: clip;
@@ -36,10 +36,10 @@
   overflow: hidden;
   background: linear-gradient(
     180deg,
-    #b3daf5 0%,
-    #c5e3f8 32%,
-    #e8f4fc 68%,
-    #ffffff 100%
+    #1e3a52 0%,
+    #182f42 32%,
+    #121f2e 68%,
+    #0c141c 100%
   );
 }
 
@@ -92,11 +92,11 @@
   height: 100%;
   background: linear-gradient(
     180deg,
-    #a8d4f0 0%,
-    #b8dff5 28%,
-    #d8eef9 58%,
-    #f0f9ff 82%,
-    #ffffff 100%
+    #1e3a52 0%,
+    #182f42 28%,
+    #121f2e 58%,
+    #0e1822 82%,
+    #0c141c 100%
   );
 }
 
