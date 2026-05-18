@@ -310,8 +310,7 @@ export default function NavBar({
                         top: calc(10px + env(safe-area-inset-top, 0px));
                         left: 50%;
                         transform: translateX(-50%);
-                        width: fit-content;
-                        max-width: min(92vw, 520px);
+                        width: min(92vw, 520px);
                         background-color: #f7fdfc;
                         padding: 6px 14px;
                         border-radius: 999px;
@@ -376,6 +375,7 @@ export default function NavBar({
                     @media (min-width: 1025px) {
                         .mobile-top-bar--desktopVisible {
                             display: grid;
+                            width: min(92vw, 520px);
                         }
                     }
 
@@ -390,6 +390,8 @@ export default function NavBar({
 
                         .mobile-top-bar {
                             display: grid;
+                            width: 92vw;
+                            max-width: none;
                         }
 
                         .navbar-wrapper > .logo-cluster,
@@ -445,6 +447,28 @@ export default function NavBar({
                             background-color: #00fce0;
                         }
                         .highlight-pill { display: none; }
+                    }
+
+                    @media (max-width: 768px) {
+                        .mobile-top-bar {
+                            width: min(92vw, 400px);
+                            column-gap: 8px;
+                            padding: 6px 12px;
+                        }
+
+                        .mobile-top-bar__logo img {
+                            height: 18px;
+                        }
+
+                        .mobile-top-bar .contact-btn {
+                            padding: 8px 14px;
+                            font-size: 12px;
+                        }
+
+                        .mobile-top-bar .header-ai-slot {
+                            width: 104px;
+                            height: 30px;
+                        }
                     }
 
                     .mobile-top-bar--compact {
