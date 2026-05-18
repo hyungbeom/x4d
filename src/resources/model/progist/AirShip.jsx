@@ -32,7 +32,7 @@ export function AirShip(props) {
                     geometry={nodes.Airship_Screen.geometry}
                     position={[1.736, 9.672, 0.231]}
                 >
-                    <AirshipScreenMaterial videoUrl="https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" />
+                    <AirshipScreenMaterial videoUrl="/movie.mp4" />
                 </mesh>
             </mesh>
         </group>
