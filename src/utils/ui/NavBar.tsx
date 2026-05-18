@@ -1,11 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import TransitionLink from "@/utils/ui/TransitionLink";
-
-const DynamicIsland = dynamic(() => import('@/utils/DynamicIsland'), { ssr: false });
 
 export interface MenuItem {
     title: string;
@@ -25,9 +22,6 @@ interface NavBarProps {
     iconMode?: boolean;
     /** 하단 바 높이·패딩 축소 */
     compact?: boolean;
-    /** 모바일 상단 바에 AI ASK(DynamicIsland) 표시 */
-    showAiAsk?: boolean;
-    aiCompanyId?: string;
     /** 로고 클릭 시 (예: 전체 보기 패널 0) */
     onLogoClick?: () => void;
 }
@@ -41,12 +35,9 @@ export default function NavBar({
     onAutoTourToggle,
     iconMode = false,
     compact = false,
-    showAiAsk = false,
-    aiCompanyId = 'bdtec',
     onLogoClick,
 }: NavBarProps) {
     const [activeIndexLocal, setActiveIndexLocal] = useState<number | null>(null);
-    const [isDesktopHeader, setIsDesktopHeader] = useState(false);
     const activeIndex = activeIndexProp ?? activeIndexLocal;
     const pillRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
@@ -79,14 +70,6 @@ export default function NavBar({
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, [activeIndex, moveHighlight]);
-
-    useEffect(() => {
-        const mq = window.matchMedia('(min-width: 1025px)');
-        const sync = () => setIsDesktopHeader(mq.matches);
-        sync();
-        mq.addEventListener('change', sync);
-        return () => mq.removeEventListener('change', sync);
-    }, []);
 
     const handleMenuClick = (index: number) => {
         setActiveIndexLocal(index);
@@ -415,44 +398,9 @@ export default function NavBar({
                         margin-left: 0;
                     }
 
-                    .header-ai-slot {
-                        position: absolute;
-                        right: 10px;
-                        bottom: 6px;
-                        width: 112px;
-                        height: 32px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        z-index: 2;
-                    }
-
                     .mobile-top-bar .logo-cluster {
                         flex: 0 1 auto;
                         min-width: 0;
-                    }
-
-                    .desktop-header-ai {
-                        display: none;
-                    }
-
-                    @media (min-width: 1025px) {
-                        .desktop-header-ai {
-                            display: flex;
-                            position: fixed;
-                            top: 10px;
-                            right: clamp(20px, 3vw, 32px);
-                            width: 200px;
-                            height: 50px;
-                            align-items: center;
-                            justify-content: center;
-                            z-index: 100;
-                            pointer-events: auto;
-                        }
-
-                        .header-ai-slot--mobile {
-                            display: none;
-                        }
                     }
                 `}
             </style>
@@ -468,18 +416,7 @@ export default function NavBar({
                     Contact Us
                 </TransitionLink>
 
-                {showAiAsk && !isDesktopHeader && (
-                    <div className="header-ai-slot header-ai-slot--mobile">
-                        <DynamicIsland placement="inline" companyId={aiCompanyId} />
-                    </div>
-                )}
             </div>
-
-            {showAiAsk && isDesktopHeader && (
-                <div className="desktop-header-ai">
-                    <DynamicIsland placement="inline" companyId={aiCompanyId} />
-                </div>
-            )}
 
             <div className={`navbar-wrapper${compact ? ' navbar-wrapper--compact' : ''}`}>
                 {logoBlock}

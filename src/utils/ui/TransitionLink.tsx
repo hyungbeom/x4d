@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import gsap from 'gsap';
+import { getPageBlindsColumns, showPageBlindsContainer } from '@/utils/ui/pageBlinds';
 import { TransitionType } from './PageWrapper';
 
 interface TransitionLinkProps {
@@ -28,19 +29,23 @@ export default function TransitionLink({ href, children, className, type = 'slid
         const ease = "power3.inOut";
 
         if (type === 'blinds') {
-            // 🎯 Blinds 타입: 15개의 하얀색 기둥이 아래에서 위로 차르륵 올라오며 화면을 덮음
-            gsap.set('#blinds-container', { visibility: 'visible' });
-            gsap.fromTo('.blind-column',
-                { scaleY: 0, transformOrigin: 'bottom' }, // 바닥에서부터
+            const columns = getPageBlindsColumns();
+            if (!columns || !showPageBlindsContainer()) {
+                router.push(href);
+                return;
+            }
+            gsap.fromTo(
+                columns,
+                { scaleY: 0, transformOrigin: 'bottom' },
                 {
-                    scaleY: 1, // 화면 끝까지 채움
+                    scaleY: 1,
                     duration: 0.6,
-                    stagger: 0.05, // 0.05초 간격으로 순차적 실행 (웨이브 효과)
-                    ease: "power3.inOut",
-                    onComplete: () => router.push(href) // 화면이 다 덮이면 다음 페이지로 이동!
-                }
+                    stagger: 0.05,
+                    ease: 'power3.inOut',
+                    onComplete: () => router.push(href),
+                },
             );
-            return; // 👈 아래의 기존 애니메이션은 실행하지 않고 여기서 함수 종료
+            return;
         }
 
         // 🎯 기존 애니메이션 속성 세팅

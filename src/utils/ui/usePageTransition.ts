@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import gsap from 'gsap';
+import { getPageBlindsColumns, showPageBlindsContainer } from '@/utils/ui/pageBlinds';
 import type { TransitionType } from './PageWrapper';
 
 export function usePageTransition() {
@@ -21,9 +22,13 @@ export function usePageTransition() {
             const ease = 'power3.inOut';
 
             if (type === 'blinds') {
-                gsap.set('#blinds-container', { visibility: 'visible', display: 'flex' });
+                const columns = getPageBlindsColumns();
+                if (!columns || !showPageBlindsContainer()) {
+                    router.push(href);
+                    return;
+                }
                 gsap.fromTo(
-                    '.blind-column',
+                    columns,
                     { scaleY: 0, transformOrigin: 'bottom' },
                     {
                         scaleY: 1,

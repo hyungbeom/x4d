@@ -105,7 +105,7 @@ export default function Home() {
 
     return (
         <SceneLoadingProvider>
-            <PageWrapper type="fade">
+
             <main ref={mainContainerRef} className={styles.scrollMain}>
                 <div className={styles.stickyViewport}>
 
@@ -120,8 +120,6 @@ export default function Home() {
                             autoTour={autoTour}
                             onAutoTourToggle={handleAutoTourToggle}
                             onLogoClick={handleLogoClick}
-                            showAiAsk
-                            aiCompanyId="bdtec"
                         />
                         <BdtecSpecModal visible={intro} />
                     </div>
@@ -163,7 +161,6 @@ export default function Home() {
                     </div>
                 </div>
             </main>
-        </PageWrapper>
         </SceneLoadingProvider>
     );
 }

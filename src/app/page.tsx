@@ -13,7 +13,8 @@ import type CameraControlsImpl from "camera-controls";
 import CameraHelper from "@/utils/three/CamHelper";
 import gsap from "gsap";
 import {ScrollTrigger} from "gsap/ScrollTrigger";
-import {SceneLoadingProvider} from "@/utils/three/SceneLoadingContext";
+import {SceneLoadingProvider, useBdtecSceneLoadingActions} from "@/utils/three/SceneLoadingContext";
+import EnvexEntryOverlay from "@/components/envex/EnvexEntryOverlay";
 import {WorldModel} from "@/resources/model/progist/WorldModel";
 import NavBar from "@/utils/ui/NavBar";
 import InfoPanel from "@/utils/ui/InfoPanel";
@@ -28,7 +29,6 @@ import {
     PavilionIcon,
     WaterIcon,
 } from "@/components/progist/ProgistNavIcons";
-import PageWrapper from "@/utils/ui/PageWrapper";
 import styles from "./page.module.css";
 import {CHAirModel} from "@/resources/model/progist/CHAirModel";
 import {CHEarthModel} from "@/resources/model/progist/CHEarthModel";
@@ -191,10 +191,13 @@ const panelContents: Record<number, { title: string; desc: string; extra?: strin
     },
 };
 
-export default function Home() {
+function HomeContent() {
+    const [intro, setIntro] = useState(false);
     const [activePanelId, setActivePanelId] = useState<number>(0);
     const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
     const [autoTour, setAutoTour] = useState(false);
+    const viewportRef = useRef<HTMLDivElement>(null);
+    const { setModuleReady } = useBdtecSceneLoadingActions();
 
     const AUTO_TOUR_INTERVAL_MS = 5000;
 
@@ -234,7 +237,7 @@ export default function Home() {
     };
 
     useEffect(() => {
-        if (!autoTour) return;
+        if (!autoTour || !intro) return;
 
         const tick = () => {
             setActivePanelId((prev) => {
@@ -245,7 +248,12 @@ export default function Home() {
 
         const intervalId = window.setInterval(tick, AUTO_TOUR_INTERVAL_MS);
         return () => window.clearInterval(intervalId);
-    }, [autoTour]);
+    }, [autoTour, intro]);
+
+    useEffect(() => {
+        setModuleReady(true);
+        return () => setModuleReady(false);
+    }, [setModuleReady]);
 
     useEffect(() => {
         gsap.registerPlugin(ScrollTrigger);
@@ -268,12 +276,10 @@ export default function Home() {
     }, []);
 
     return (
-        <SceneLoadingProvider>
-            <PageWrapper type="blindsReverse">
             <main className={styles.homeMain}>
-                <div className={styles.stickyViewport}>
+                <div ref={viewportRef} className={styles.stickyViewport}>
                     <BdtecSceneHeroCopy
-                        visible={activePanelId === 0}
+                        visible={intro && activePanelId === 0}
                         title="ENVEX World"
                         subtitle="3D 브로슈어 샘플"
                         body={[
@@ -307,8 +313,9 @@ export default function Home() {
                         </ManciniCanvas>
                     </div>
 
+                    <div className={styles.homeUi} aria-hidden={!intro}>
                     <NavBar
-                        logoSrc="/model/bdtec/logo.svg"
+                        logoSrc="/logo.svg"
                         menus={navMenus}
                         iconMode
                         compact
@@ -320,12 +327,11 @@ export default function Home() {
                         }
                         autoTour={autoTour}
                         onAutoTourToggle={handleAutoTourToggle}
-                        showAiAsk
-                        aiCompanyId="envex"
                         onLogoClick={() => handleVariableChange(0)}
                     />
+                    </div>
 
-                    {activePanelId >= 1 && activePanelId <= PANEL_COUNT && (
+                    {intro && activePanelId >= 1 && activePanelId <= PANEL_COUNT && (
                         <button
                             type="button"
                             className={styles.panelNextBtn}
@@ -337,7 +343,7 @@ export default function Home() {
                     )}
 
                     <InfoPanel
-                        isOpen={activePanelId >= 1 && activePanelId <= PANEL_COUNT}
+                        isOpen={intro && activePanelId >= 1 && activePanelId <= PANEL_COUNT}
                         title={currentPanelData.title}
                         desc={currentPanelData.desc}
                         extra={currentPanelData.extra}
@@ -346,9 +352,20 @@ export default function Home() {
                         detailButtonLabel="기업리스트 보기"
                         companies={SAMPLE_COMPANIES}
                     />
+
                 </div>
+                    <EnvexEntryOverlay
+                        viewportRef={viewportRef}
+                        onReveal={() => setIntro(true)}
+                    />
             </main>
-            </PageWrapper>
+    );
+}
+
+export default function Home() {
+    return (
+        <SceneLoadingProvider>
+            <HomeContent />
         </SceneLoadingProvider>
     );
 }

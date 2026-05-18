@@ -19,14 +19,21 @@
   overflow: hidden;
 }
 
+.homeUi {
+  position: relative;
+  z-index: 50;
+}
+
 .canvasLayer {
   position: absolute;
   inset: 0;
   z-index: 0;
+  pointer-events: none;
 }
 
 .canvasLayer canvas {
   touch-action: none;
+  pointer-events: auto;
 }
 
 .panelNextBtn {
