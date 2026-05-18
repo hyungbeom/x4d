@@ -5,7 +5,7 @@ import * as THREE from 'three'
 
 const SCREEN_VIDEO_SRC = '/movie.mp4'
 
-export function AirShip(props) {
+export function AirShip({ onScreenClick, ...props }) {
     const { nodes, materials } = useGLTF('/model/progist/Airship.glb')
     const shipRef = useRef()
 
@@ -31,8 +31,20 @@ export function AirShip(props) {
                     receiveShadow
                     geometry={nodes.Airship_Screen.geometry}
                     position={[1.736, 9.672, 0.231]}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        onScreenClick?.()
+                    }}
+                    onPointerOver={(e) => {
+                        if (!onScreenClick) return
+                        e.stopPropagation()
+                        document.body.style.cursor = 'pointer'
+                    }}
+                    onPointerOut={() => {
+                        document.body.style.cursor = ''
+                    }}
                 >
-                    <AirshipScreenMaterial videoUrl="/movie.mp4" />
+                    <AirshipScreenMaterial videoUrl={SCREEN_VIDEO_SRC} />
                 </mesh>
             </mesh>
         </group>

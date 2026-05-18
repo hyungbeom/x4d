@@ -30,6 +30,7 @@ import {CHMicroscopeModel} from "@/resources/model/progist/CHMicroscopeModel";
 import {CHWaterModel} from "@/resources/model/progist/CHWaterModel";
 import {AirShip} from "@/resources/model/progist/AirShip";
 import {Cloud} from "@/resources/model/progist/Cloud";
+import AirshipVideoOverlay, { type AirshipVideoUi } from '@/components/envex/AirshipVideoOverlay';
 
 
 type CameraSnapshot = { c: [number, number, number]; t: [number, number, number]; z: number };
@@ -186,6 +187,7 @@ const panelContents: Record<number, { title: string; desc: string; extra?: strin
 
 function HomeContent() {
     const [intro, setIntro] = useState(false);
+    const [airshipVideoUi, setAirshipVideoUi] = useState<AirshipVideoUi>('none');
     const [activePanelId, setActivePanelId] = useState<number>(0);
     const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
     const [autoTour, setAutoTour] = useState(false);
@@ -302,7 +304,14 @@ function HomeContent() {
                                 <CHEarthModel position={[98,12,-70]}/>
                                 <CHLeafModel position={[-46,8,112]}/>
                                 <CHMicroscopeModel position={[122,8,40]}/>
-                                <AirShip position={[122,270,40]} scale={[1.5,1.5,1.5]}  rotation={[0,Math.PI/5,0]}/>
+                                <AirShip
+                                    position={[122, 270, 40]}
+                                    scale={[1.5, 1.5, 1.5]}
+                                    rotation={[0, Math.PI / 5, 0]}
+                                    onScreenClick={
+                                        intro ? () => setAirshipVideoUi('confirm') : undefined
+                                    }
+                                />
                                 <CHWaterModel position={[-132,15,35]} rotation={[0,Math.PI/4,0]}/>
                                 <Cloud scale={[7,7,7]} position={[0,120,0]} rotation={[0,Math.PI/4,0]} />
                                 {/*<SplineSmokeParticles*/}
@@ -367,6 +376,11 @@ function HomeContent() {
                     />
 
                 </div>
+                    <AirshipVideoOverlay
+                        ui={airshipVideoUi}
+                        onUiChange={setAirshipVideoUi}
+                    />
+
                     <EnvexEntryOverlay
                         viewportRef={viewportRef}
                         onReveal={() => setIntro(true)}
