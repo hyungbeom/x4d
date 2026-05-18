@@ -46,6 +46,7 @@ export default function NavBar({
     onLogoClick,
 }: NavBarProps) {
     const [activeIndexLocal, setActiveIndexLocal] = useState<number | null>(null);
+    const [isDesktopHeader, setIsDesktopHeader] = useState(false);
     const activeIndex = activeIndexProp ?? activeIndexLocal;
     const pillRef = useRef<HTMLDivElement>(null);
     const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
@@ -78,6 +79,14 @@ export default function NavBar({
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, [activeIndex, moveHighlight]);
+
+    useEffect(() => {
+        const mq = window.matchMedia('(min-width: 1025px)');
+        const sync = () => setIsDesktopHeader(mq.matches);
+        sync();
+        mq.addEventListener('change', sync);
+        return () => mq.removeEventListener('change', sync);
+    }, []);
 
     const handleMenuClick = (index: number) => {
         setActiveIndexLocal(index);
@@ -320,11 +329,16 @@ export default function NavBar({
                         align-items: center;
                         gap: 8px;
                             background-color: #f7fdfc;
-                            padding: 8px 10px 8px 12px;
+                            padding: 8px 10px 38px 12px;
                             border-radius: 999px;
                             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
                             box-sizing: border-box;
                             z-index: 100;
+                        }
+
+                        .mobile-top-bar__contact {
+                            margin-left: auto;
+                            flex-shrink: 0;
                         }
 
                         .mobile-top-bar .logo-cluster { padding-left: 4px; gap: 8px; }
@@ -334,8 +348,6 @@ export default function NavBar({
                         .mobile-top-bar .contact-btn {
                             padding: 10px 20px;
                             font-size: 13px;
-                            margin-left: auto;
-                            flex-shrink: 0;
                         }
 
                         .navbar-wrapper > .logo-cluster,
@@ -394,7 +406,7 @@ export default function NavBar({
                     }
 
                     .mobile-top-bar--compact {
-                        padding: 5px 8px 5px 10px;
+                        padding: 5px 8px 34px 10px;
                     }
                     .mobile-top-bar--compact .logo img { height: 16px; }
                     .mobile-top-bar--compact .contact-btn {
@@ -403,21 +415,44 @@ export default function NavBar({
                         margin-left: 0;
                     }
 
-                    .mobile-top-bar__ai {
-                        flex-shrink: 0;
+                    .header-ai-slot {
+                        position: absolute;
+                        right: 10px;
+                        bottom: 6px;
                         width: 112px;
                         height: 32px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        position: relative;
-                        margin-left: auto;
-                        margin-right: 8px;
+                        z-index: 2;
                     }
 
                     .mobile-top-bar .logo-cluster {
                         flex: 0 1 auto;
                         min-width: 0;
+                    }
+
+                    .desktop-header-ai {
+                        display: none;
+                    }
+
+                    @media (min-width: 1025px) {
+                        .desktop-header-ai {
+                            display: flex;
+                            position: fixed;
+                            top: 10px;
+                            right: clamp(20px, 3vw, 32px);
+                            width: 200px;
+                            height: 50px;
+                            align-items: center;
+                            justify-content: center;
+                            z-index: 100;
+                            pointer-events: auto;
+                        }
+
+                        .header-ai-slot--mobile {
+                            display: none;
+                        }
                     }
                 `}
             </style>
@@ -425,16 +460,26 @@ export default function NavBar({
             <div className={`mobile-top-bar${compact ? ' mobile-top-bar--compact' : ''}`}>
                 {logoBlock}
 
-                {showAiAsk && (
-                    <div className="mobile-top-bar__ai">
+                <TransitionLink
+                    href={contactLink}
+                    className="contact-btn mobile-top-bar__contact"
+                    type="blinds"
+                >
+                    Contact Us
+                </TransitionLink>
+
+                {showAiAsk && !isDesktopHeader && (
+                    <div className="header-ai-slot header-ai-slot--mobile">
                         <DynamicIsland placement="inline" companyId={aiCompanyId} />
                     </div>
                 )}
-
-                <TransitionLink href={contactLink} className="contact-btn" type="blinds">
-                    Contact Us
-                </TransitionLink>
             </div>
+
+            {showAiAsk && isDesktopHeader && (
+                <div className="desktop-header-ai">
+                    <DynamicIsland placement="inline" companyId={aiCompanyId} />
+                </div>
+            )}
 
             <div className={`navbar-wrapper${compact ? ' navbar-wrapper--compact' : ''}`}>
                 {logoBlock}

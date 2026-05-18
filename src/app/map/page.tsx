@@ -25,7 +25,15 @@ import styles from './page.module.css';
 
 type DeviceType = 'desktop' | 'tablet' | 'mobile';
 
-function MapScene({ deviceType, booth }: { deviceType: DeviceType; booth: string }) {
+function MapScene({
+    deviceType,
+    booth,
+    copyCoordsOnClick,
+}: {
+    deviceType: DeviceType;
+    booth: string;
+    copyCoordsOnClick: boolean;
+}) {
     const cameraControlsRef = useRef<CameraControlsImpl | null>(null);
     const hasBoothCamera = booth.length > 0;
 
@@ -45,12 +53,18 @@ function MapScene({ deviceType, booth }: { deviceType: DeviceType; booth: string
                 smoothTime={0.45}
                 draggingSmoothTime={0.12}
             />
-            {/*<CameraHelper*/}
-            {/*    controlsRef={cameraControlsRef}*/}
-            {/*    activePanelId={0}*/}
-            {/*    deviceType={deviceType}*/}
-            {/*/>*/}
-            <MapModel skipAutoFit={hasBoothCamera} />
+            {copyCoordsOnClick ? (
+                <CameraHelper
+                    controlsRef={cameraControlsRef}
+                    activePanelId={0}
+                    deviceType={deviceType}
+                />
+            ) : null}
+            <MapModel
+                skipAutoFit={hasBoothCamera}
+                copyCoordsOnClick={copyCoordsOnClick}
+                booth={booth}
+            />
             <MapBoothMarks booth={booth} />
         </>
     );
@@ -62,6 +76,11 @@ function MapPageContent() {
     const navigate = usePageTransition();
     const { setModuleReady, reset } = useBdtecSceneLoadingActions();
     const booth = useMemo(() => searchParams.get('booth') ?? '', [searchParams]);
+    const copyCoordsOnClick = useMemo(
+        () =>
+            process.env.NODE_ENV === 'development' || searchParams.get('copy') === '1',
+        [searchParams],
+    );
     const [deviceType, setDeviceType] = useState<DeviceType>('desktop');
     const [sceneRevealed, setSceneRevealed] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
@@ -122,6 +141,9 @@ function MapPageContent() {
                             <span className={styles.topBarSpacer} aria-hidden />
                         )}
                         {booth ? <span className={styles.boothTag}>부스 {booth}</span> : null}
+                        {copyCoordsOnClick ? (
+                            <span className={styles.copyHint}>맵 클릭 → 좌표 복사</span>
+                        ) : null}
                     </div>
 
                     <MapCompanySearchModal
@@ -135,7 +157,11 @@ function MapPageContent() {
                             <Suspense fallback={null}>
                                 <SceneEnvironment colorTop="#7ec8ef" colorBottom="#e8f6ff" />
                                 <Light_Environment />
-                                <MapScene deviceType={deviceType} booth={booth} />
+                                <MapScene
+                                    deviceType={deviceType}
+                                    booth={booth}
+                                    copyCoordsOnClick={copyCoordsOnClick}
+                                />
 
                                 <SceneReadyGate />
                             </Suspense>

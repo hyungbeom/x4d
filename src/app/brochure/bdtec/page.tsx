@@ -17,10 +17,6 @@ const BdtecScene = dynamic(() => import('@/app/brochure/bdtec/mobile/Mobile'), {
     ssr: false,
 });
 
-const DynamicIsland = dynamic(() => import('@/utils/DynamicIsland'), {
-    ssr: false,
-});
-
 const panelContents: Record<number, { title: string; desc: string; extra?: string }> = {
     1: { title: "BDI-100", desc: "24시간 지속적인 모니터링으로 집진상태 판단과 측정 시스템을 제공합니다.", extra: "온도/차압/전류 등 환경 데이터를 안전하게 전송합니다." },
     2: { title: "배출시설", desc: "산업 현장에서 발생하는 오염물질 배출 현황을 실시간으로 감시합니다.", extra: "배출량 초과 여부를 즉각적으로 알림 처리합니다." },
@@ -114,7 +110,6 @@ export default function Home() {
                 <div className={styles.stickyViewport}>
 
                     <div ref={brochureUiRef} className={styles.brochureUi} aria-hidden={!intro}>
-                        <DynamicIsland />
                         <NavBar
                             logoSrc="/model/bdtec/logo.svg"
                             menus={navMenus}
@@ -125,6 +120,8 @@ export default function Home() {
                             autoTour={autoTour}
                             onAutoTourToggle={handleAutoTourToggle}
                             onLogoClick={handleLogoClick}
+                            showAiAsk
+                            aiCompanyId="bdtec"
                         />
                         <BdtecSpecModal visible={intro} />
                     </div>

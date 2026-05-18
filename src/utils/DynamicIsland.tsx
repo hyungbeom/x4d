@@ -262,8 +262,9 @@ export default function DynamicIsland({
                 style={{
                     position: isInline && inlineDocked ? 'relative' : 'fixed',
                     top: isInline && inlineDocked ? undefined : '10px',
-                    left: isInline && inlineDocked ? undefined : '50%',
-                    transform: isInline && inlineDocked ? undefined : 'translateX(-50%)',
+                    left: isInline && inlineDocked ? undefined : isInline ? 'auto' : '50%',
+                    right: isInline && inlineDocked ? undefined : isInline ? 'clamp(16px, 3vw, 28px)' : undefined,
+                    transform: isInline && inlineDocked ? undefined : isInline ? 'none' : 'translateX(-50%)',
                     flexShrink: isInline && inlineDocked ? 0 : undefined,
                     zIndex: 9999,
                     cursor: isExpanded ? 'default' : 'pointer',
