@@ -1,0 +1,96 @@
+.footer {
+  position: fixed;
+  left: 50%;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(245, 251, 250, 0.94);
+  border: 1px solid rgba(129, 169, 171, 0.18);
+  box-shadow:
+    0 6px 24px rgba(18, 61, 82, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.separator {
+  width: 4px;
+  height: 4px;
+  margin: 0 8px;
+  border-radius: 50%;
+  background: #b5ced0;
+  flex-shrink: 0;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.12s ease;
+}
+
+.item:hover:not(.itemActive) {
+  background: rgba(129, 169, 171, 0.12);
+}
+
+.item:active {
+  transform: scale(0.94);
+}
+
+.itemActive {
+  background: #3f4f53;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.itemActive .icon {
+  filter: brightness(0) invert(1);
+}
+
+@media (max-width: 768px) {
+  .footer {
+    width: min(92vw, 400px);
+    padding: 8px 12px;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .item {
+    width: 40px;
+    height: 40px;
+  }
+
+  .icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .separator {
+    margin: 0 6px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .footer {
+    bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+    padding: 11px 20px;
+  }
+}

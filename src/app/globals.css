@@ -1,4 +1,4 @@
-@import url('https://rsms.me/inter/inter.css');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 
 @font-face {
   font-family: 'Meslo';
@@ -21,8 +21,32 @@ body,
   margin: 0;
   padding: 0;
 }
-/* globals.css */
-body, html {
+
+html,
+body,
+button,
+input,
+textarea,
+select {
+  font-family:
+    'Pretendard Variable',
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    Roboto,
+    'Helvetica Neue',
+    'Segoe UI',
+    'Apple SD Gothic Neo',
+    'Noto Sans KR',
+    'Malgun Gothic',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body,
+html {
   margin: 0;
   padding: 0;
   /* overflow: hidden; 👈 범인 검거! 과감하게 삭제하거나 주석 처리! */

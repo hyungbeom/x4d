@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import TransitionLink from "@/utils/ui/TransitionLink";
+
+const DynamicIsland = dynamic(() => import('@/utils/DynamicIsland'), { ssr: false });
 
 export interface MenuItem {
     title: string;
@@ -24,6 +27,11 @@ interface NavBarProps {
     compact?: boolean;
     /** 로고 클릭 시 (예: 전체 보기 패널 0) */
     onLogoClick?: () => void;
+    /** true면 하단 navbar-wrapper 숨김 (ENVEX 푸터 등 별도 UI 사용 시) */
+    hideBottomNav?: boolean;
+    /** 모바일 상단 바 중앙 AI ASK */
+    showAiAsk?: boolean;
+    aiCompanyId?: string;
 }
 
 export default function NavBar({
@@ -36,6 +44,9 @@ export default function NavBar({
     iconMode = false,
     compact = false,
     onLogoClick,
+    hideBottomNav = false,
+    showAiAsk = false,
+    aiCompanyId = 'envex',
 }: NavBarProps) {
     const [activeIndexLocal, setActiveIndexLocal] = useState<number | null>(null);
     const activeIndex = activeIndexProp ?? activeIndexLocal;
@@ -302,36 +313,61 @@ export default function NavBar({
                         }
 
                     .mobile-top-bar {
-                        display: flex;
+                        display: grid;
+                        grid-template-columns: 1fr auto 1fr;
+                        align-items: center;
+                        gap: 8px;
                         position: fixed;
                         top: 10px;
                         left: 50%;
                         transform: translateX(-50%);
                         width: 92vw;
-                        justify-content: flex-start;
+                        background-color: #f7fdfc;
+                        padding: 6px 12px;
+                        border-radius: 999px;
+                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                        box-sizing: border-box;
+                        z-index: 100;
+                    }
+
+                    .mobile-top-bar__left {
+                        display: flex;
                         align-items: center;
-                        gap: 8px;
-                            background-color: #f7fdfc;
-                            padding: 8px 10px 38px 12px;
-                            border-radius: 999px;
-                            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-                            box-sizing: border-box;
-                            z-index: 100;
-                        }
+                        justify-self: start;
+                        min-width: 0;
+                    }
 
-                        .mobile-top-bar__contact {
-                            margin-left: auto;
-                            flex-shrink: 0;
-                        }
+                    .mobile-top-bar__center {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        justify-self: center;
+                    }
 
-                        .mobile-top-bar .logo-cluster { padding-left: 4px; gap: 8px; }
-                        .mobile-top-bar .logo { padding: 0; }
-                        .mobile-top-bar .logo img { height: 20px; }
+                    .mobile-top-bar__right {
+                        display: flex;
+                        align-items: center;
+                        justify-self: end;
+                    }
 
-                        .mobile-top-bar .contact-btn {
-                            padding: 10px 20px;
-                            font-size: 13px;
-                        }
+                    .mobile-top-bar__contact {
+                        flex-shrink: 0;
+                    }
+
+                    .mobile-top-bar .contact-btn {
+                        padding: 10px 20px;
+                        font-size: 13px;
+                    }
+
+                    .mobile-top-bar .header-ai-slot {
+                        position: relative;
+                        width: 112px;
+                        height: 32px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        overflow: visible;
+                    }
 
                         .navbar-wrapper > .logo-cluster,
                         .navbar-wrapper > .contact-wrapper { display: none; }
@@ -389,35 +425,39 @@ export default function NavBar({
                     }
 
                     .mobile-top-bar--compact {
-                        padding: 5px 8px 34px 10px;
+                        padding: 5px 10px;
                     }
-                    .mobile-top-bar--compact .logo img { height: 16px; }
+
                     .mobile-top-bar--compact .contact-btn {
                         padding: 7px 14px;
                         font-size: 11px;
-                        margin-left: 0;
-                    }
-
-                    .mobile-top-bar .logo-cluster {
-                        flex: 0 1 auto;
-                        min-width: 0;
                     }
                 `}
             </style>
 
             <div className={`mobile-top-bar${compact ? ' mobile-top-bar--compact' : ''}`}>
-                {logoBlock}
+                <div className="mobile-top-bar__left">{autoToggleButton}</div>
 
-                <TransitionLink
-                    href={contactLink}
-                    className="contact-btn mobile-top-bar__contact"
-                    type="blinds"
-                >
-                    Contact Us
-                </TransitionLink>
+                <div className="mobile-top-bar__center">
+                    {showAiAsk && (
+                        <div className="header-ai-slot">
+                            <DynamicIsland placement="inline" companyId={aiCompanyId} />
+                        </div>
+                    )}
+                </div>
 
+                <div className="mobile-top-bar__right">
+                    <TransitionLink
+                        href={contactLink}
+                        className="contact-btn mobile-top-bar__contact"
+                        type="blinds"
+                    >
+                        Contact Us
+                    </TransitionLink>
+                </div>
             </div>
 
+            {!hideBottomNav && (
             <div className={`navbar-wrapper${compact ? ' navbar-wrapper--compact' : ''}`}>
                 {logoBlock}
 
@@ -454,6 +494,7 @@ export default function NavBar({
                     </TransitionLink>
                 </div>
             </div>
+            )}
         </>
     );
 }

@@ -15,20 +15,13 @@ import gsap from "gsap";
 import {ScrollTrigger} from "gsap/ScrollTrigger";
 import {SceneLoadingProvider, useBdtecSceneLoadingActions} from "@/utils/three/SceneLoadingContext";
 import EnvexEntryOverlay from "@/components/envex/EnvexEntryOverlay";
+import EnvexFooterNav from "@/components/envex/EnvexFooterNav";
 import {WorldModel} from "@/resources/model/progist/WorldModel";
 import NavBar from "@/utils/ui/NavBar";
 import InfoPanel from "@/utils/ui/InfoPanel";
-import { SAMPLE_COMPANIES } from "@/data/progist/sampleCompanies";
+import { getCompaniesByPanelId } from "@/data/map/envexCompanies";
 import infoPanelStyles from "@/utils/ui/InfoPanel.module.css";
 import BdtecSceneHeroCopy from "@/components/bdtec/BdtecSceneHeroCopy";
-import {
-    AirIcon,
-    AnalysisIcon,
-    CarbonIcon,
-    InstitutionIcon,
-    PavilionIcon,
-    WaterIcon,
-} from "@/components/progist/ProgistNavIcons";
 import styles from "./page.module.css";
 import {CHAirModel} from "@/resources/model/progist/CHAirModel";
 import {CHEarthModel} from "@/resources/model/progist/CHEarthModel";
@@ -203,12 +196,12 @@ function HomeContent() {
 
     const navMenus = useMemo(
         () => [
-            { title: '수질', icon: <WaterIcon />, onClick: () => setActivePanelId(1) },
-            { title: '대기', icon: <AirIcon />, onClick: () => setActivePanelId(2) },
-            { title: '측정분석', icon: <AnalysisIcon />, onClick: () => setActivePanelId(3) },
-            { title: '탈탄소', icon: <CarbonIcon />, onClick: () => setActivePanelId(4) },
-            { title: '외국관', icon: <PavilionIcon />, onClick: () => setActivePanelId(5) },
-            { title: '기관 및 단체', icon: <InstitutionIcon />, onClick: () => setActivePanelId(6) },
+            { title: '수질', onClick: () => setActivePanelId(1) },
+            { title: '대기', onClick: () => setActivePanelId(2) },
+            { title: '측정분석', onClick: () => setActivePanelId(3) },
+            { title: '탈탄소', onClick: () => setActivePanelId(4) },
+            { title: '외국관', onClick: () => setActivePanelId(5) },
+            { title: '기관 및 단체', onClick: () => setActivePanelId(6) },
         ],
         [],
     );
@@ -225,6 +218,14 @@ function HomeContent() {
     };
 
     const currentPanelData = panelContents[activePanelId] ?? { title: '', desc: '', extra: '' };
+
+    const zoneCompanies = useMemo(
+        () =>
+            activePanelId >= 1 && activePanelId <= PANEL_COUNT
+                ? getCompaniesByPanelId(activePanelId)
+                : [],
+        [activePanelId],
+    );
 
     const handleAutoTourToggle = () => {
         setAutoTour((prev) => {
@@ -301,7 +302,7 @@ function HomeContent() {
                                 <CHEarthModel position={[98,12,-70]}/>
                                 <CHLeafModel position={[-46,8,112]}/>
                                 <CHMicroscopeModel position={[122,8,40]}/>
-                                <AirShip position={[122,230,40]} scale={[1.5,1.5,1.5]}  rotation={[0,Math.PI/5,0]}/>
+                                <AirShip position={[122,270,40]} scale={[1.5,1.5,1.5]}  rotation={[0,Math.PI/5,0]}/>
                                 <CHWaterModel position={[-132,15,35]} rotation={[0,Math.PI/4,0]}/>
                                 <Cloud scale={[7,7,7]} position={[0,120,0]} rotation={[0,Math.PI/4,0]} />
                                 {/*<SplineSmokeParticles*/}
@@ -313,23 +314,35 @@ function HomeContent() {
                         </ManciniCanvas>
                     </div>
 
-                    <div className={styles.homeUi} aria-hidden={!intro}>
-                    <NavBar
-                        logoSrc="/logo.svg"
-                        menus={navMenus}
-                        iconMode
-                        compact
-                        contactLink="/brochure/bdtec/contactus"
-                        activeIndex={
-                            activePanelId >= 1 && activePanelId <= PANEL_COUNT
-                                ? activePanelId - 1
-                                : null
-                        }
-                        autoTour={autoTour}
-                        onAutoTourToggle={handleAutoTourToggle}
-                        onLogoClick={() => handleVariableChange(0)}
-                    />
-                    </div>
+                    {intro && (
+                        <div className={styles.homeUi}>
+                            <NavBar
+                                logoSrc="/logo.svg"
+                                menus={navMenus}
+                                compact
+                                hideBottomNav
+                                contactLink="/brochure/bdtec/contactus"
+                                activeIndex={
+                                    activePanelId >= 1 && activePanelId <= PANEL_COUNT
+                                        ? activePanelId - 1
+                                        : null
+                                }
+                                autoTour={autoTour}
+                                onAutoTourToggle={handleAutoTourToggle}
+                                onLogoClick={() => handleVariableChange(0)}
+                                showAiAsk
+                                aiCompanyId="envex"
+                            />
+                            <EnvexFooterNav
+                                activeIndex={
+                                    activePanelId >= 1 && activePanelId <= PANEL_COUNT
+                                        ? activePanelId - 1
+                                        : null
+                                }
+                                onSelect={handleVariableChange}
+                            />
+                        </div>
+                    )}
 
                     {intro && activePanelId >= 1 && activePanelId <= PANEL_COUNT && (
                         <button
@@ -350,7 +363,7 @@ function HomeContent() {
                         onClose={() => handleVariableChange(0)}
                         teaserClassName={infoPanelStyles.teaserAboveBottomNav}
                         detailButtonLabel="기업리스트 보기"
-                        companies={SAMPLE_COMPANIES}
+                        companies={zoneCompanies}
                     />
 
                 </div>

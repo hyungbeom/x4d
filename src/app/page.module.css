@@ -13,6 +13,7 @@
 }
 
 .stickyViewport {
+
   position: relative;
   width: 100%;
   height: 100dvh;
@@ -20,8 +21,16 @@
 }
 
 .homeUi {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 50;
+  pointer-events: none;
+}
+
+/* NavBar·푸터만 클릭 가능 (캔버스는 통과) */
+.homeUi > *,
+.homeUi nav {
+  pointer-events: auto;
 }
 
 .canvasLayer {

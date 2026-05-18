@@ -1,6 +1,6 @@
 'use client';
 
-import type { CompanyListItem } from '@/data/progist/sampleCompanies';
+import { openCompanyHomepage, type CompanyListItem } from '@/data/map/envexCompanies';
 import { usePageTransition } from '@/utils/ui/usePageTransition';
 import styles from './CompanyList.module.css';
 
@@ -13,14 +13,44 @@ export default function CompanyList({ companies }: CompanyListProps) {
 
     return (
         <ul className={styles.list}>
-            {companies.map((company) => (
-                <li key={company.id} className={styles.card}>
+            {companies.map((company) => {
+                const hasHomepage = Boolean(company.homepage);
+                return (
+                <li
+                    key={company.id}
+                    className={[styles.card, hasHomepage ? styles.cardClickable : ''].filter(Boolean).join(' ')}
+                    onClick={hasHomepage ? () => openCompanyHomepage(company.homepage) : undefined}
+                    onKeyDown={
+                        hasHomepage
+                            ? (e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault();
+                                      openCompanyHomepage(company.homepage);
+                                  }
+                              }
+                            : undefined
+                    }
+                    role={hasHomepage ? 'button' : undefined}
+                    tabIndex={hasHomepage ? 0 : undefined}
+                >
                     <div
                         className={styles.logo}
-                        style={{ backgroundColor: company.logoColor }}
-                        aria-hidden
+                        style={company.logoUrl ? undefined : { backgroundColor: company.logoColor }}
                     >
-                        {company.logoInitials}
+                        {company.logoUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={company.logoUrl}
+                                alt=""
+                                className={styles.logoImg}
+                                loading="lazy"
+                                decoding="async"
+                            />
+                        ) : (
+                            <span className={styles.logoFallback} aria-hidden>
+                                {company.logoInitials}
+                            </span>
+                        )}
                     </div>
                     <div className={styles.body}>
                         <p className={styles.nameEn}>{company.nameEn}</p>
@@ -30,15 +60,17 @@ export default function CompanyList({ companies }: CompanyListProps) {
                         <button
                             type="button"
                             className={styles.booth}
-                            onClick={() =>
-                                navigate(`/map?booth=${encodeURIComponent(company.booth)}`, 'blinds')
-                            }
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/map?booth=${encodeURIComponent(company.booth)}`, 'blinds');
+                            }}
                         >
                             {company.booth}
                         </button>
                     </div>
                 </li>
-            ))}
+                );
+            })}
         </ul>
     );
 }

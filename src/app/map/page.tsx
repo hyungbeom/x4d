@@ -33,12 +33,27 @@ import styles from './page.module.css';
 
 type DeviceType = 'desktop' | 'tablet' | 'mobile';
 
+function flyMapCameraToBooth(
+    controls: CameraControlsImpl,
+    boothCode: string,
+    viewMode: MapViewMode,
+    deviceType: DeviceType,
+) {
+    const snapshot =
+        viewMode === '2d'
+            ? getMap2DTopViewSnapshot(boothCode || null, deviceType)
+            : getMap3DViewSnapshot(boothCode || null, deviceType);
+    applyMapCameraSnapshot(controls, snapshot, true);
+}
+
 function MapScene({
                       deviceType,
                       booth,
                       viewMode,
                       mapNav,
                       mapEditTools,
+                      cameraFlyBooth,
+                      cameraFlyKey,
                       onCoordCopied,
                       onMapNotReady,
                   }: {
@@ -47,6 +62,8 @@ function MapScene({
     viewMode: MapViewMode;
     mapNav: ReturnType<typeof resolveMapNav>;
     mapEditTools: boolean;
+    cameraFlyBooth: string | null;
+    cameraFlyKey: number;
     onCoordCopied?: (text: string) => void;
     onMapNotReady?: () => void;
 }) {
@@ -58,14 +75,15 @@ function MapScene({
         if (!controls) return;
 
         applyMapViewModeControls(controls, viewMode);
-
-        const snapshot =
-            viewMode === '2d'
-                ? getMap2DTopViewSnapshot(booth || null, deviceType)
-                : getMap3DViewSnapshot(booth || null, deviceType);
-
-        applyMapCameraSnapshot(controls, snapshot, true);
+        flyMapCameraToBooth(controls, booth, viewMode, deviceType);
     }, [booth, deviceType, viewMode]);
+
+    useEffect(() => {
+        if (!cameraFlyKey || !cameraFlyBooth?.trim()) return;
+        const controls = cameraControlsRef.current;
+        if (!controls) return;
+        flyMapCameraToBooth(controls, cameraFlyBooth, viewMode, deviceType);
+    }, [cameraFlyBooth, cameraFlyKey, deviceType, viewMode]);
 
     return (
         <>
@@ -121,6 +139,13 @@ function MapPageContent() {
     const [navOpen, setNavOpen] = useState(false);
     const [copyToast, setCopyToast] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<MapViewMode>('2d');
+    const [cameraFly, setCameraFly] = useState<{ booth: string; key: number } | null>(null);
+
+    const requestCameraFly = useCallback((boothCode: string) => {
+        const code = boothCode.trim();
+        if (!code) return;
+        setCameraFly((prev) => ({ booth: code, key: (prev?.key ?? 0) + 1 }));
+    }, []);
 
     useEffect(() => {
         if (!copyToast) return;
@@ -179,11 +204,29 @@ function MapPageContent() {
                         ← 브로슈어로
                     </button>
                     <span className={styles.topBarSpacer} aria-hidden/>
-                    {fromBooth ? (
-                        <span className={styles.fromBoothTag}>출발 {fromBooth}</span>
-                    ) : null}
-                    {booth ? (
-                        <span className={styles.boothTag}>목적지 {booth}</span>
+                    {fromBooth || booth ? (
+                        <div className={styles.topBarTags}>
+                            {fromBooth ? (
+                                <button
+                                    type="button"
+                                    className={styles.fromBoothTag}
+                                    onClick={() => requestCameraFly(fromBooth)}
+                                    aria-label={`출발지 ${fromBooth}로 이동`}
+                                >
+                                    출발지 {fromBooth}
+                                </button>
+                            ) : null}
+                            {booth ? (
+                                <button
+                                    type="button"
+                                    className={styles.boothTag}
+                                    onClick={() => requestCameraFly(booth)}
+                                    aria-label={`도착지 ${booth}로 이동`}
+                                >
+                                    도착지 {booth}
+                                </button>
+                            ) : null}
+                        </div>
                     ) : null}
                     {mapEditTools ? (
                         <span className={styles.copyHint}>
@@ -246,6 +289,8 @@ function MapPageContent() {
                                 viewMode={viewMode}
                                 mapNav={mapNav}
                                 mapEditTools={mapEditTools && sceneRevealed}
+                                cameraFlyBooth={cameraFly?.booth ?? null}
+                                cameraFlyKey={cameraFly?.key ?? 0}
                                 onCoordCopied={setCopyToast}
                                 onMapNotReady={() =>
                                     setCopyToast('맵 로딩 중… 잠시 후 다시 클릭하세요')

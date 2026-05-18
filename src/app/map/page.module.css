@@ -105,26 +105,46 @@
   font-family: inherit;
 }
 
-.fromBoothTag {
+.topBarTags {
+  grid-column: 3;
   justify-self: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.fromBoothTag,
+.boothTag {
   padding: 6px 12px;
+  border: none;
   border-radius: 8px;
-  background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
   color: #fff;
   font-size: 12px;
   font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: filter 0.15s ease, transform 0.12s ease;
+}
+
+.fromBoothTag {
+  background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
   box-shadow: 0 2px 8px rgba(34, 197, 94, 0.35);
 }
 
 .boothTag {
-  justify-self: end;
-  padding: 6px 12px;
-  border-radius: 8px;
   background: linear-gradient(180deg, #ff9a4d 0%, #f97316 100%);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
   box-shadow: 0 2px 8px rgba(249, 115, 22, 0.35);
+}
+
+.fromBoothTag:hover,
+.boothTag:hover {
+  filter: brightness(1.06);
+}
+
+.fromBoothTag:active,
+.boothTag:active {
+  transform: scale(0.97);
 }
 
 .copyHint {

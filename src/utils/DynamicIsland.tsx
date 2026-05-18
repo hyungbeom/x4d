@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 
 // 🌟 커스텀 훅: 화면 너비 감지
@@ -79,6 +79,7 @@ export default function DynamicIsland({
     // 3. 충돌 방지를 위한 최적화 Refs
     const isFirstRender = useRef(true);
     const prevExpanded = useRef(isExpanded);
+    const prevExpandedForAnim = useRef(isExpanded);
     const resetCallRef = useRef<gsap.core.Tween | null>(null);
 
     // 컴포넌트 언마운트 시 클린업
@@ -108,24 +109,55 @@ export default function DynamicIsland({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isExpanded, isModalOpen]);
 
-    // 💡 [Effect 2] 아일랜드 확장/축소 애니메이션
-    useEffect(() => {
+    // 💡 [Effect 2] 아일랜드 확장/축소 애니메이션 (isExpanded 변경 시에만)
+    useLayoutEffect(() => {
         if (!islandRef.current || !initialContentRef.current || !chatPanelRef.current) return;
         if (isFirstRender.current) { isFirstRender.current = false; return; }
+        if (prevExpandedForAnim.current === isExpanded) return;
+        prevExpandedForAnim.current = isExpanded;
 
-        gsap.killTweensOf([islandRef.current, initialContentRef.current, chatPanelRef.current]);
+        const island = islandRef.current;
+        const initialContent = initialContentRef.current;
+        const chatPanel = chatPanelRef.current;
+        const slot = isInline ? island.parentElement : null;
+        const slotRect = slot?.getBoundingClientRect();
+
+        gsap.killTweensOf([island, initialContent, chatPanel]);
         if (resetCallRef.current) resetCallRef.current.kill();
 
+        const targetHeight =
+            mode === 'input' ? openInputHeight : mode === 'thinking' ? openThinkingHeight : openResultHeight;
+
         if (isExpanded) {
-            if (isInline) setInlineDocked(false);
+            if (isInline && slotRect) {
+                setInlineDocked(false);
+                gsap.set(island, {
+                    position: 'fixed',
+                    left: slotRect.left + slotRect.width / 2,
+                    top: slotRect.top,
+                    xPercent: -50,
+                    width: slotRect.width,
+                    height: slotRect.height,
+                    maxWidth: slotRect.width,
+                    right: 'auto',
+                    transform: 'none',
+                });
+            }
 
-            const targetHeight = mode === 'input' ? openInputHeight
-                : mode === 'thinking' ? openThinkingHeight
-                    : openResultHeight;
-
-            gsap.to(initialContentRef.current, { opacity: 0, duration: 0.2 });
-            gsap.to(islandRef.current, { width: '90vw', maxWidth: '350px', height: targetHeight, borderRadius: isMobile ? '16px' : '24px', duration: 0.6, ease: "back.out(1.5)", delay: 0.1 });
-            gsap.to(chatPanelRef.current, { opacity: 1, duration: 0.3, delay: 0.4 });
+            gsap.to(initialContent, { opacity: 0, duration: 0.2 });
+            gsap.to(island, {
+                width: Math.min(window.innerWidth * 0.9, 350),
+                maxWidth: 350,
+                height: targetHeight,
+                borderRadius: isMobile ? '16px' : '24px',
+                ...(isInline && slotRect
+                    ? { left: slotRect.left + slotRect.width / 2, top: slotRect.top, xPercent: -50 }
+                    : {}),
+                duration: 0.55,
+                ease: 'power3.out',
+                delay: 0.08,
+            });
+            gsap.to(chatPanel, { opacity: 1, duration: 0.3, delay: 0.35 });
         } else {
             // 🌟 아일랜드가 닫힐 때 통신 진행 중이라면 끊어주기
             if (eventSourceRef.current) {
@@ -133,27 +165,41 @@ export default function DynamicIsland({
                 eventSourceRef.current = null;
             }
 
-            gsap.to(chatPanelRef.current, { opacity: 0, duration: 0.2 });
-            gsap.to(islandRef.current, {
-                width: closedWidth,
-                maxWidth: closedWidth,
-                height: closedHeight,
-                borderRadius: '25px',
-                duration: 0.5,
-                ease: 'power3.inOut',
-                delay: 0.1,
-                onComplete: () => {
-                    if (!isInline || !islandRef.current) return;
-                    gsap.set(islandRef.current, {
-                        width: closedWidth,
-                        maxWidth: closedWidth,
-                        height: closedHeight,
-                        borderRadius: '25px',
-                    });
-                    setInlineDocked(true);
-                },
-            });
-            gsap.to(initialContentRef.current, { opacity: 1, duration: 0.3, delay: 0.4 });
+            gsap.to(chatPanel, { opacity: 0, duration: 0.2 });
+
+            if (isInline && slotRect) {
+                gsap.to(island, {
+                    width: slotRect.width,
+                    maxWidth: slotRect.width,
+                    height: slotRect.height,
+                    left: slotRect.left + slotRect.width / 2,
+                    top: slotRect.top,
+                    xPercent: -50,
+                    borderRadius: '25px',
+                    duration: 0.42,
+                    ease: 'power3.inOut',
+                    delay: 0.08,
+                    onComplete: () => {
+                        gsap.set(island, {
+                            clearProps:
+                                'position,left,top,right,width,height,maxWidth,minWidth,transform,xPercent,yPercent',
+                        });
+                        setInlineDocked(true);
+                    },
+                });
+            } else {
+                gsap.to(island, {
+                    width: closedWidth,
+                    maxWidth: closedWidth,
+                    height: closedHeight,
+                    borderRadius: '25px',
+                    duration: 0.5,
+                    ease: 'power3.inOut',
+                    delay: 0.1,
+                });
+            }
+
+            gsap.to(initialContent, { opacity: 1, duration: 0.3, delay: 0.35 });
 
             resetCallRef.current = gsap.delayedCall(0.6, () => {
                 setMode('input');
@@ -163,7 +209,7 @@ export default function DynamicIsland({
                 gsap.set([thinkingSectionRef.current, resultSectionRef.current], { opacity: 0, y: 10 });
             });
         }
-    }, [isExpanded, mode, isMobile, isInline, closedWidth, closedHeight]);
+    }, [isExpanded, isMobile, isInline, closedWidth, closedHeight, mode, openInputHeight, openThinkingHeight, openResultHeight]);
 
     // 💡 [Effect 3] Mode 전환 애니메이션
     useEffect(() => {
@@ -260,11 +306,11 @@ export default function DynamicIsland({
             <div
                 ref={islandRef}
                 style={{
-                    position: isInline && inlineDocked ? 'relative' : 'fixed',
-                    top: isInline && inlineDocked ? undefined : '10px',
-                    left: isInline && inlineDocked ? undefined : isInline ? 'auto' : '50%',
-                    right: isInline && inlineDocked ? undefined : isInline ? 'clamp(16px, 3vw, 28px)' : undefined,
-                    transform: isInline && inlineDocked ? undefined : isInline ? 'none' : 'translateX(-50%)',
+                    position: isInline && inlineDocked ? 'relative' : isInline ? undefined : 'fixed',
+                    top: isInline && inlineDocked ? undefined : isInline ? undefined : '10px',
+                    left: isInline && inlineDocked ? undefined : isInline ? undefined : '50%',
+                    right: 'auto',
+                    transform: isInline && inlineDocked ? undefined : isInline ? undefined : 'translateX(-50%)',
                     flexShrink: isInline && inlineDocked ? 0 : undefined,
                     zIndex: 9999,
                     cursor: isExpanded ? 'default' : 'pointer',

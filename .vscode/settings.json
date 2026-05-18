@@ -1,0 +1,8 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": ["**/src/data/map/mapCameraOverrides.json"],
+      "url": "./src/data/map/mapCameraOverrides.schema.json"
+    }
+  ]
+}

@@ -1,0 +1,318 @@
+.shell {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  background: transparent;
+  overflow: hidden;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.loadingLayer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  pointer-events: auto;
+  background: #ffffff;
+}
+
+.logo {
+  width: min(280px, 72vw);
+  height: auto;
+  /* logo.svg fill=white → ENVEX 다크 블루 */
+  filter: brightness(0) saturate(100%) invert(17%) sepia(42%) saturate(1200%) hue-rotate(168deg)
+    brightness(0.85);
+}
+
+.loadingLabel {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #a8b4bc;
+}
+
+.progressBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.barTrack {
+  width: min(240px, 72vw);
+  height: 3px;
+  border-radius: 2px;
+  background: #e5e9ec;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  width: 100%;
+  border-radius: 2px;
+  background: #1a6fd4;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.pct {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: #1a1a1a;
+}
+
+.introLayer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+/* 인트로 동안 3D 배경만 아주 살짝 블러 */
+.introLayer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.introScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #9fdcf2 0%,
+    #b8e8f6 22%,
+    #d2f0fa 42%,
+    rgba(232, 247, 253, 0.72) 58%,
+    rgba(240, 249, 255, 0.2) 72%,
+    transparent 88%
+  );
+}
+
+.introContent {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 20px 0;
+  pointer-events: auto;
+}
+
+.introTopBar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: clamp(20px, 5vh, 36px);
+}
+
+.introBrand {
+  flex: 1;
+  min-width: 0;
+}
+
+.introLogo {
+  width: min(200px, 58vw);
+  height: auto;
+}
+
+.soundBtn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(36, 44, 48, 0.58);
+  color: #ffffff;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background-color 0.2s ease;
+}
+
+.soundBtn:hover {
+  background: rgba(36, 44, 48, 0.72);
+}
+
+.soundIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.introCopy {
+  max-width: 22rem;
+}
+
+.introHeading {
+  margin: 0 0 14px;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.22;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #2f454e;
+}
+
+.introDesc {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #4d646d;
+
+  max-width: 20rem;
+}
+
+.startBtnContainer {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.startBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /*gap: 0.55em;*/
+  min-height: 48px;
+  padding: 18px 48px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(18, 18, 22, 0.58);
+  color: #ffffff;
+  font-size: 18px;
+  /*font-weight: 700;*/
+  /*letter-spacing: 0.14em;*/
+  text-transform: uppercase;
+  /*line-height: 1;*/
+  white-space: nowrap;
+  cursor: pointer;
+  /*backdrop-filter: blur(18px);*/
+  /*-webkit-backdrop-filter: blur(18px);*/
+  box-shadow:
+    0 6px 28px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+  transform-origin: center center;
+}
+
+.startBtnLabel {
+  letter-spacing: inherit;
+}
+
+.startBtnChevron {
+  flex-shrink: 0;
+  font-size: 0.95em;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  opacity: 1;
+  transform: translateY(0.02em);
+}
+
+.startBtn:hover {
+  background: rgba(12, 12, 14, 0.68);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 10px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.startBtn:active {
+  transform: scale(0.97);
+}
+
+@media (min-width: 769px) {
+  .introContent {
+    padding-left: clamp(28px, 5vw, 48px);
+    padding-right: clamp(28px, 5vw, 48px);
+  }
+
+  .introLogo {
+    width: 220px;
+  }
+
+  .introCopy {
+    max-width: 26rem;
+  }
+
+  .introHeading {
+    font-size: 1.85rem;
+    max-width: 24rem;
+  }
+
+  .introDesc {
+    font-size: 0.9375rem;
+    max-width: 22rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .loadingLayer {
+    gap: 40px;
+  }
+
+  .introContent {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .startBtnContainer {
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+
+  .startBtn {
+    width: auto;
+    max-width: min(92vw, 380px);
+    min-height: 44px;
+    padding: 12px 32px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    gap: 0.45em;
+  }
+}
+
+@media (min-width: 769px) {
+  .startBtn {
+    min-height: 50px;
+    padding: 15px 56px;
+    font-size: 14px;
+    letter-spacing: 0.16em;
+    gap: 0.55em;
+  }
+}

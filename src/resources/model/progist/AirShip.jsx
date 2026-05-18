@@ -1,26 +1,15 @@
-import React, { useRef } from 'react'
-import { useGLTF } from '@react-three/drei'
+import React, { useEffect, useRef, useState } from 'react'
+import {useGLTF, useVideoTexture} from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-/** 비행선 스크린 — public/video/screen_video.mp4 추가 시 VideoMaterial 로 교체 가능 */
-function ScreenMaterial() {
-    return (
-        <meshBasicMaterial
-            color="#1a2a38"
-            emissive="#0d7ea8"
-            emissiveIntensity={0.35}
-            toneMapped={false}
-            side={THREE.DoubleSide}
-        />
-    )
-}
+const SCREEN_VIDEO_SRC = '/movie.mp4'
 
 export function AirShip(props) {
     const { nodes, materials } = useGLTF('/model/progist/Airship.glb')
     const shipRef = useRef()
 
-    const initialY = props.position ? props.position[1] : 250
+    const initialY = props.position ? props.position[1] : 300
 
     useFrame((state) => {
         const time = state.clock.getElapsedTime()
@@ -43,11 +32,24 @@ export function AirShip(props) {
                     geometry={nodes.Airship_Screen.geometry}
                     position={[1.736, 9.672, 0.231]}
                 >
-                    <ScreenMaterial />
+                    <AirshipScreenMaterial videoUrl="https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" />
                 </mesh>
             </mesh>
         </group>
     )
 }
+
+// 1. 비디오 텍스처를 처리할 Material 컴포넌트 생성
+function AirshipScreenMaterial({ videoUrl }) {
+    // 비디오 텍스처 로드 (기본적으로 자동 재생, 반복 재생, 음소거가 적용됩니다)
+    const videoTexture = useVideoTexture(videoUrl);
+
+    return (
+        // meshBasicMaterial을 사용하면 빛의 영향을 받지 않아 화면이 밝게 보입니다.
+        // 빛의 영향을 받게 하려면 meshStandardMaterial로 변경하세요.
+        <meshBasicMaterial map={videoTexture} toneMapped={true} />
+    );
+}
+
 
 useGLTF.preload('/model/progist/Airship.glb')

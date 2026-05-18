@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import CompanyList from '@/components/progist/CompanyList';
-import type { CompanyListItem } from '@/data/progist/sampleCompanies';
+import CompanyListModal from '@/components/progist/CompanyListModal';
+import type { CompanyListItem } from '@/data/map/envexCompanies';
 import styles from './InfoPanel.module.css';
 
 const COMPACT_BREAKPOINT = '(max-width: 1024px)';
@@ -20,13 +21,6 @@ interface InfoPanelProps {
     detailButtonLabel?: string;
     /** 있으면 확장 시 기업 리스트 표시 */
     companies?: CompanyListItem[];
-}
-
-function getTeaserPreview(desc: string, extra?: string, maxSentences = 3): string[] {
-    const combined = [desc, extra].filter(Boolean).join(' ');
-    const sentences =
-        combined.match(/[^.!?。]+[.!?。]+|[^.!?。]+$/g)?.map((s) => s.trim()).filter(Boolean) ?? [desc];
-    return sentences.slice(0, maxSentences);
 }
 
 function useMediaQuery(query: string) {
@@ -58,17 +52,21 @@ export default function InfoPanel({
     const isCompact = useMediaQuery(COMPACT_BREAKPOINT);
     const isMobile = useMediaQuery(MOBILE_BREAKPOINT);
     const [isExpanded, setIsExpanded] = useState(false);
+    const [companyListOpen, setCompanyListOpen] = useState(false);
 
-    const showTeaser = isCompact && isOpen && !isExpanded;
+    const showTeaser = isCompact && isOpen && !isExpanded && !companyListOpen;
+    const hasCompanyList = Boolean(companies && companies.length > 0);
     const showPanel = isOpen && (!isCompact || isExpanded);
-    const teaserLines = getTeaserPreview(desc, extra);
-
     useEffect(() => {
-        if (!isOpen) setIsExpanded(false);
+        if (!isOpen) {
+            setIsExpanded(false);
+            setCompanyListOpen(false);
+        }
     }, [isOpen]);
 
     useEffect(() => {
         setIsExpanded(false);
+        setCompanyListOpen(false);
     }, [title]);
 
     useEffect(() => {
@@ -132,19 +130,32 @@ export default function InfoPanel({
                     className={[styles.teaser, teaserClassName].filter(Boolean).join(' ')}
                     style={{ opacity: 0 }}
                 >
-                    <h3 className={styles.teaserTitle}>{title}</h3>
-                    <p className={styles.teaserDesc}>
-                        {teaserLines.map((line, i) => (
-                            <React.Fragment key={i}>
-                                {i > 0 && ' '}
-                                {line}
-                            </React.Fragment>
-                        ))}
-                    </p>
+                    <div className={styles.teaserHeader}>
+                        <h3 className={styles.teaserTitle}>{title}</h3>
+                        <button
+                            type="button"
+                            className={styles.teaserCloseBtn}
+                            onClick={onClose}
+                            disabled={!showTeaser}
+                            aria-label="설명 카드 닫기"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                    <div className={styles.teaserBody}>
+                        <p className={styles.teaserDesc}>{desc}</p>
+                        {extra ? <p className={styles.teaserDesc}>{extra}</p> : null}
+                    </div>
                     <button
                         type="button"
                         className={styles.detailBtn}
-                        onClick={() => setIsExpanded(true)}
+                        onClick={() => {
+                            if (hasCompanyList) {
+                                setCompanyListOpen(true);
+                            } else {
+                                setIsExpanded(true);
+                            }
+                        }}
                         disabled={!showTeaser}
                     >
                         {detailButtonLabel}
@@ -184,6 +195,15 @@ export default function InfoPanel({
                     </>
                 )}
             </div>
+
+            {hasCompanyList && (
+                <CompanyListModal
+                    open={companyListOpen}
+                    title={title}
+                    companies={companies!}
+                    onClose={() => setCompanyListOpen(false)}
+                />
+            )}
         </>
     );
 }

@@ -16,23 +16,24 @@ type BdtecSceneHeroCopyProps = {
 };
 
 export default function BdtecSceneHeroCopy({
-    visible,
-    title = 'IoT Gateway',
-    subtitle = '구성도 입니다',
-    body = DEFAULT_BODY,
-}: BdtecSceneHeroCopyProps) {
+                                               visible,
+                                               title = 'IoT Gateway',
+                                               subtitle = '구성도 입니다',
+                                               body = DEFAULT_BODY,
+                                           }: BdtecSceneHeroCopyProps) {
     return (
         <div
+
             className={`${styles.hero} ${visible ? styles.heroVisible : styles.heroHidden}`}
             aria-hidden={!visible}
         >
-            <h1 className={styles.title}>
-                <span className={styles.titleMain}>{title}</span>
-                <span className={styles.titleSub}>{subtitle}</span>
+            <h1 className={styles.title} >
+                <span className={styles.titleMain}  style={{color: 'black'}}>{title}</span>
+                <span className={styles.titleSub}  style={{color: 'black'}}>{subtitle}</span>
             </h1>
-            <div className={styles.body}>
+            <div className={styles.body} style={{paddingTop : 15, color : 'white'}}   >
                 {body.map((line) => (
-                    <p key={line} className={styles.paragraph}>
+                    <p key={line} style={{color : 'white', fontSize : 13}}   className={styles.paragraph}>
                         {line}
                     </p>
                 ))}
