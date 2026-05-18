@@ -303,9 +303,6 @@ export default function NavBar({
 
                     .mobile-top-bar {
                         display: none;
-                        grid-template-columns: 1fr auto 1fr;
-                        align-items: center;
-                        column-gap: 10px;
                         position: fixed;
                         top: calc(10px + env(safe-area-inset-top, 0px));
                         left: 50%;
@@ -317,27 +314,44 @@ export default function NavBar({
                         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
                         box-sizing: border-box;
                         z-index: 100;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: 8px;
                     }
 
                     .mobile-top-bar__left {
                         display: flex;
                         align-items: center;
                         gap: 8px;
-                        justify-self: start;
+                        flex: 0 1 auto;
                         min-width: 0;
+                        position: relative;
+                        z-index: 1;
                     }
 
                     .mobile-top-bar__center {
+                        position: absolute;
+                        left: 50%;
+                        top: 50%;
+                        transform: translate(-50%, -50%);
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        justify-self: center;
+                        z-index: 2;
+                        pointer-events: none;
+                    }
+
+                    .mobile-top-bar__center > * {
+                        pointer-events: auto;
                     }
 
                     .mobile-top-bar__right {
                         display: flex;
                         align-items: center;
-                        justify-self: end;
+                        flex: 0 0 auto;
+                        margin-left: auto;
+                        position: relative;
+                        z-index: 1;
                     }
 
                     .mobile-top-bar__contact {
@@ -370,11 +384,16 @@ export default function NavBar({
                         justify-content: center;
                         overflow: visible;
                         flex-shrink: 0;
+                        isolation: isolate;
+                    }
+
+                    .mobile-top-bar .header-ai-slot > div {
+                        z-index: 1 !important;
                     }
 
                     @media (min-width: 1025px) {
                         .mobile-top-bar--desktopVisible {
-                            display: grid;
+                            display: flex;
                             width: min(92vw, 520px);
                         }
                     }
@@ -389,9 +408,13 @@ export default function NavBar({
                         }
 
                         .mobile-top-bar {
-                            display: grid;
+                            display: flex;
                             width: 92vw;
                             max-width: none;
+                        }
+
+                        .mobile-top-bar__logo {
+                            display: none;
                         }
 
                         .navbar-wrapper > .logo-cluster,
