@@ -24,6 +24,7 @@
 }
 
 .title {
+  color : black;
   margin: 0 0 0.75rem;
   display: flex;
   flex-direction: column;
