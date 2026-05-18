@@ -322,19 +322,20 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
                             산업을 선도할 최신 트렌드와 미래를 한눈에 <br/>확인해 보세요.
                         </p>
                     </div>
-                </div>
-                <div className={styles.startBtnContainer}>
-                    <button
-                        ref={startBtnRef}
-                        type="button"
-                        className={styles.startBtn}
-                        onClick={handleStart}
-                    >
-                        <span className={styles.startBtnLabel}>Explore the 2026 Envex</span>
-                        <span className={styles.startBtnChevron} aria-hidden="true">
-                            &gt;
-                        </span>
-                    </button>
+
+                    <div className={styles.startBtnContainer}>
+                        <button
+                            ref={startBtnRef}
+                            type="button"
+                            className={styles.startBtn}
+                            onClick={handleStart}
+                        >
+                            <span className={styles.startBtnLabel}>Explore the 2026 Envex</span>
+                            <span className={styles.startBtnChevron} aria-hidden="true">
+                                &gt;
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>,

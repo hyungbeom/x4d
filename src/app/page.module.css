@@ -99,6 +99,22 @@
 @media (min-width: 1025px) {
   .panelActionStack {
     bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    right: clamp(28px, 4vw, 48px);
+    gap: 12px;
+  }
+
+  .panelNextBtn {
+    min-width: 168px;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-width: 1.5px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  }
+
+  .panelSeminarBtn {
+    box-shadow: 0 6px 20px rgba(14, 116, 144, 0.28);
   }
 }
 

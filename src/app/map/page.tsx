@@ -257,31 +257,27 @@ function MapPageContent() {
                     </div>
                 ) : null}
 
-                {deviceType !== 'desktop' ? (
-                    <div className={styles.bottomActions}>
-                        <button
-                            type="button"
-                            className={styles.findCompanyBtn}
-                            onClick={() => setSearchOpen(true)}
-                        >
-                            기업찾기
-                        </button>
-                        <button
-                            type="button"
-                            className={styles.findNavBtn}
-                            onClick={() => setNavOpen(true)}
-                        >
-                            길찾기
-                        </button>
-                        <MapViewModeToggle
-                            mode={viewMode}
-                            onChange={setViewMode}
-                            placement="inline"
-                        />
-                    </div>
-                ) : (
-                    <MapViewModeToggle mode={viewMode} onChange={setViewMode} />
-                )}
+                <div className={styles.bottomActions}>
+                    <button
+                        type="button"
+                        className={styles.findCompanyBtn}
+                        onClick={() => setSearchOpen(true)}
+                    >
+                        기업찾기
+                    </button>
+                    <button
+                        type="button"
+                        className={styles.findNavBtn}
+                        onClick={() => setNavOpen(true)}
+                    >
+                        길찾기
+                    </button>
+                    <MapViewModeToggle
+                        mode={viewMode}
+                        onChange={setViewMode}
+                        placement="inline"
+                    />
+                </div>
 
                 <div className={styles.canvasLayer}>
                     <ManciniCanvas quality="default" backgroundColor="#b8dff5">

@@ -54,9 +54,12 @@ export default function InfoPanel({
     const [isExpanded, setIsExpanded] = useState(false);
     const [companyListOpen, setCompanyListOpen] = useState(false);
 
-    const showTeaser = isCompact && isOpen && !isExpanded && !companyListOpen;
     const hasCompanyList = Boolean(companies && companies.length > 0);
-    const showPanel = isOpen && (!isCompact || isExpanded);
+    const showTeaser = isOpen && !isExpanded && !companyListOpen;
+    /** 데스크톱+기업목록: 티저만 · 모바일/태블릿: 확장 시 · 데스크톱(목록없음): 바로 패널 */
+    const showPanel =
+        isOpen &&
+        (isCompact ? isExpanded : !hasCompanyList);
     useEffect(() => {
         if (!isOpen) {
             setIsExpanded(false);
@@ -71,7 +74,7 @@ export default function InfoPanel({
 
     useEffect(() => {
         const teaser = teaserRef.current;
-        if (!teaser) return;
+        if (!teaser || !isCompact) return;
 
         gsap.to(teaser, {
             opacity: showTeaser ? 1 : 0,
@@ -79,7 +82,7 @@ export default function InfoPanel({
             duration: showTeaser ? 0.4 : 0.3,
             ease: showTeaser ? 'power2.out' : 'power2.in',
         });
-    }, [showTeaser]);
+    }, [showTeaser, isCompact]);
 
     useEffect(() => {
         const panel = panelRef.current;
@@ -88,10 +91,10 @@ export default function InfoPanel({
         const mm = gsap.matchMedia();
 
         mm.add('(min-width: 1025px)', () => {
-            if (isOpen) {
+            if (showPanel) {
                 gsap.to(panel, { x: 0, y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' });
             } else {
-                gsap.to(panel, { x: '100%', y: 0, opacity: 0, duration: 0.5, ease: 'power3.in' });
+                gsap.to(panel, { x: '-100%', y: 0, opacity: 0, duration: 0.5, ease: 'power3.in' });
             }
         });
 
@@ -112,10 +115,27 @@ export default function InfoPanel({
         });
 
         return () => mm.revert();
-    }, [isOpen, isExpanded]);
+    }, [isOpen, isExpanded, showPanel]);
+
+    useEffect(() => {
+        const teaser = teaserRef.current;
+        if (!teaser || isCompact) return;
+
+        gsap.to(teaser, {
+            x: showTeaser ? 0 : -28,
+            opacity: showTeaser ? 1 : 0,
+            pointerEvents: showTeaser ? 'auto' : 'none',
+            duration: showTeaser ? 0.5 : 0.35,
+            ease: showTeaser ? 'power3.out' : 'power2.in',
+        });
+    }, [showTeaser, isCompact]);
 
     const handleClose = () => {
-        if (isCompact && isExpanded) {
+        if (companyListOpen) {
+            setCompanyListOpen(false);
+            return;
+        }
+        if (isExpanded) {
             setIsExpanded(false);
             return;
         }
@@ -124,18 +144,23 @@ export default function InfoPanel({
 
     return (
         <>
-            {isCompact && isOpen && (
+            {isOpen && (
                 <div
                     ref={teaserRef}
-                    className={[styles.teaser, teaserClassName].filter(Boolean).join(' ')}
-                    style={{ opacity: 0 }}
+                    className={[
+                        styles.teaser,
+                        isCompact ? teaserClassName : styles.teaserDesktop,
+                    ]
+                        .filter(Boolean)
+                        .join(' ')}
+                    style={{ opacity: isCompact ? 0 : undefined }}
                 >
                     <div className={styles.teaserHeader}>
                         <h3 className={styles.teaserTitle}>{title}</h3>
                         <button
                             type="button"
                             className={styles.teaserCloseBtn}
-                            onClick={onClose}
+                            onClick={handleClose}
                             disabled={!showTeaser}
                             aria-label="설명 카드 닫기"
                         >

@@ -72,40 +72,41 @@ function CameraController({activePanelId, deviceType}: { activePanelId: number; 
     // 🎯 설정 객체: c(카메라 위치), t(타겟 위치), z(줌) — 헬퍼는 deviceType·panelId에 맞는 슬롯에 붙여넣기
     const cameraConfig = useMemo(() => ({
         0: {
-            desktop: {c: [0, 200, 800], t: [0, 0, 0], z: 1},
-            tablet: {c: [0, 250, 1000], t: [0, 0, 0], z: 1},
+            desktop: { c: [268.9, 557.8, 524.3], t: [-78.2, 15.1, 9.5], z: 3.85 },
+            tablet: { c: [173.4, 651.7, 788.4], t: [-4.0, 49.2, -29.0], z: 2.82 },
             mobile: { c: [806.1, 881.4, 901.9], t: [15.2, 95.0, 14.7], z: 1.97 }
         },
+        //수질
         1: {
-            desktop: {c: [-40, 260, 280], t: BDI_100_TARGET, z: 1.3},
-            tablet: {c: [-40, 300, 340], t: BDI_100_TARGET, z: 1.2},
+            desktop: { c: [457.9, 448.0, 436.5], t: [-139.6, 39.5, 41.3], z: 8.59 },
+            tablet: { c: [184.9, 272.7, 202.1], t: [-41.8, 117.9, 64.6], z: 5.34 },
             mobile: { c: [-255.9, 738.5, 1265.3], t: [-121.8, 55.2, 21.9], z: 4.14 },
         },
         2: {
-            desktop: {c: [-420, 50, 200], t: [-420, 0, -20], z: 1.2},
-            tablet: {c: [-420, 80, 250], t: [-420, 0, -20], z: 1.1},
+            desktop: { c: [60.0, 616.4, 572.5], t: [-96.6, 73.8, -28.3], z: 9.09 },
+            tablet: { c: [-81.4, 224.1, 267.8], t: [-58.1, 87.9, -6.4], z: 8.27 },
 
             mobile: { c: [-260.4, 967.5, 1098.5], t: [-62.2, 108.4, -21.2], z: 4.56 }
         },
         3: {
-            desktop: {c: [0, 50, 650], t: [0, 0, 370], z: 1},
-            tablet: {c: [0, 80, 750], t: [0, 0, 370], z: 1},
+            desktop: { c: [256.3, 522.7, 566.5], t: [78.4, -32.8, -16.5], z: 12.90 },
+            tablet: { c: [-19.3, 382.4, 482.6], t: [73.0, 156.3, 180.7], z: 8.08 },
             mobile: { c: [-437.9, 793.5, 1140.7], t: [108.3, 60.3, 47.4], z: 4.59 }
         },
         4: {
-            desktop: {c: [300, 50, 350], t: [300, 0, 88], z: 1},
-            tablet: {c: [300, 80, 450], t: [300, 0, 88], z: 1},
+            desktop: { c: [234.0, 510.8, 593.0], t: [-91.5, -31.9, 64.3], z: 7.77 },
+            tablet: { c: [210.3, 325.4, 480.1], t: [50.3, 117.0, 194.2], z: 6.60 },
 
             mobile: { c: [665.8, 786.9, 969.8], t: [-65.1, -7.7, 39.5], z: 4.11 },
         },
         5: {
-            desktop: {c: [0, 150, 300], t: [0, 100, 0], z: 1},
-            tablet: {c: [0, 200, 400], t: [0, 100, 0], z: 1},
+            desktop: { c: [-447.8, 355.2, 535.1], t: [46.1, 43.8, -47.2], z: 11.84 },
+            tablet: { c: [-226.2, 258.3, 281.4], t: [25.6, 90.8, 1.1], z: 8.13 },
             mobile: { c: [-120.4, 964.2, 1066.1], t: [91.5, 89.8, -39.2], z: 4.15 }
         },
         6: {
-            desktop: {c: [0, 150, 300], t: [0, 100, 0], z: 1},
-            tablet: {c: [0, 200, 400], t: [0, 100, 0], z: 1},
+            desktop: { c: [-203.5, 556.6, 588.8], t: [-36.5, 83.6, -65.7], z: 12.01 },
+            tablet: { c: [210.2, 273.8, 302.1], t: [51.5, 92.4, -32.4], z: 9.62 },
             mobile: { c: [470.6, 1053.6, 804.7], t: [20.9, 67.8, -121.0], z: 4.82 }
         },
     } satisfies Record<number, Record<DeviceType, CameraSnapshot>>), []);
@@ -379,18 +380,16 @@ function HomeContent() {
                             >
                                 부스 찾기
                             </button>
-                            {deviceType === 'mobile' ? (
-                                <button
-                                    ref={seminarBtnRef}
-                                    type="button"
-                                    className={`${styles.panelNextBtn} ${styles.panelSeminarBtn} ${seminarOpen ? styles.panelBtnHidden : ''}`}
-                                    onClick={() => setSeminarOpen(true)}
-                                    aria-label="세미나 일정 보기"
-                                    aria-expanded={seminarOpen}
-                                >
-                                    세미나 일정
-                                </button>
-                            ) : null}
+                            <button
+                                ref={seminarBtnRef}
+                                type="button"
+                                className={`${styles.panelNextBtn} ${styles.panelSeminarBtn} ${seminarOpen ? styles.panelBtnHidden : ''}`}
+                                onClick={() => setSeminarOpen(true)}
+                                aria-label="세미나 일정 보기"
+                                aria-expanded={seminarOpen}
+                            >
+                                세미나 일정
+                            </button>
                         </div>
                     )}
 

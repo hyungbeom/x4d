@@ -301,29 +301,19 @@ export default function NavBar({
                         font-size: 12px;
                     }
 
-                    .mobile-top-bar { display: none; }
-
-                    @media (max-width: 1024px) {
-                        .navbar-wrapper {
-                            bottom: 20px;
-                            background-color: transparent;
-                            box-shadow: none;
-                            padding: 0;
-                            width: 92vw;
-                        }
-
                     .mobile-top-bar {
-                        display: grid;
+                        display: none;
                         grid-template-columns: 1fr auto 1fr;
                         align-items: center;
-                        gap: 8px;
+                        column-gap: 10px;
                         position: fixed;
-                        top: 10px;
+                        top: calc(10px + env(safe-area-inset-top, 0px));
                         left: 50%;
                         transform: translateX(-50%);
-                        width: 92vw;
+                        width: fit-content;
+                        max-width: min(92vw, 520px);
                         background-color: #f7fdfc;
-                        padding: 6px 12px;
+                        padding: 6px 14px;
                         border-radius: 999px;
                         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
                         box-sizing: border-box;
@@ -333,6 +323,7 @@ export default function NavBar({
                     .mobile-top-bar__left {
                         display: flex;
                         align-items: center;
+                        gap: 8px;
                         justify-self: start;
                         min-width: 0;
                     }
@@ -354,6 +345,18 @@ export default function NavBar({
                         flex-shrink: 0;
                     }
 
+                    .mobile-top-bar__logo {
+                        display: inline-flex;
+                        align-items: center;
+                        flex-shrink: 0;
+                        text-decoration: none;
+                    }
+                    .mobile-top-bar__logo img {
+                        height: 22px;
+                        width: auto;
+                        object-fit: contain;
+                    }
+
                     .mobile-top-bar .contact-btn {
                         padding: 10px 20px;
                         font-size: 13px;
@@ -367,7 +370,27 @@ export default function NavBar({
                         align-items: center;
                         justify-content: center;
                         overflow: visible;
+                        flex-shrink: 0;
                     }
+
+                    @media (min-width: 1025px) {
+                        .mobile-top-bar--desktopVisible {
+                            display: grid;
+                        }
+                    }
+
+                    @media (max-width: 1024px) {
+                        .navbar-wrapper {
+                            bottom: 20px;
+                            background-color: transparent;
+                            box-shadow: none;
+                            padding: 0;
+                            width: 92vw;
+                        }
+
+                        .mobile-top-bar {
+                            display: grid;
+                        }
 
                         .navbar-wrapper > .logo-cluster,
                         .navbar-wrapper > .contact-wrapper { display: none; }
@@ -435,8 +458,24 @@ export default function NavBar({
                 `}
             </style>
 
-            <div className={`mobile-top-bar${compact ? ' mobile-top-bar--compact' : ''}`}>
-                <div className="mobile-top-bar__left">{autoToggleButton}</div>
+            <div className={`mobile-top-bar${compact ? ' mobile-top-bar--compact' : ''}${hideBottomNav ? ' mobile-top-bar--desktopVisible' : ''}`}>
+                <div className="mobile-top-bar__left">
+                    {hideBottomNav && logoSrc ? (
+                        <a
+                            href="#"
+                            className="mobile-top-bar__logo"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setActiveIndexLocal(null);
+                                onLogoClick?.();
+                            }}
+                            aria-label="전체 보기로 이동"
+                        >
+                            <img src={logoSrc} alt="ENVEX" />
+                        </a>
+                    ) : null}
+                    {autoToggleButton}
+                </div>
 
                 <div className="mobile-top-bar__center">
                     {showAiAsk && (

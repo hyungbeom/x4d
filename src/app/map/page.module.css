@@ -193,3 +193,21 @@
     transform: translateX(-50%) translateY(0);
   }
 }
+
+@media (min-width: 1025px) {
+  .bottomActions {
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    gap: 10px;
+    max-width: min(96vw, 520px);
+  }
+
+  .findCompanyBtn,
+  .findNavBtn {
+    padding: 10px 22px;
+    font-size: 13px;
+  }
+
+  .copyToast {
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+}

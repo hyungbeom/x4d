@@ -79,30 +79,19 @@
   background: transparent;
 }
 
-/* 인트로 동안 3D 배경만 아주 살짝 블러 */
-.introLayer::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-}
-
 .introScrim {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* 상단은 3D가 보이도록 투명, 하단·텍스트 영역만 살짝 딤 */
   background: linear-gradient(
     180deg,
-    #9fdcf2 0%,
-    #b8e8f6 22%,
-    #d2f0fa 42%,
-    rgba(232, 247, 253, 0.72) 58%,
-    rgba(240, 249, 255, 0.2) 72%,
-    transparent 88%
+    transparent 0%,
+    transparent 38%,
+    rgba(184, 232, 246, 0.18) 52%,
+    rgba(210, 240, 250, 0.32) 68%,
+    rgba(18, 28, 36, 0.14) 100%
   );
 }
 
@@ -131,8 +120,9 @@
 }
 
 .introLogo {
-  width: min(200px, 58vw);
+  width: min(240px, 62vw);
   height: auto;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.65));
 }
 
 .soundBtn {
@@ -168,29 +158,32 @@
 
 .introHeading {
   margin: 0 0 14px;
-  font-size: 32px;
+  font-size: clamp(1.75rem, 6.5vw, 2.25rem);
   font-weight: 400;
   line-height: 1.22;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: #2f454e;
+  text-shadow:
+    0 0 20px rgba(255, 255, 255, 0.85),
+    0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 .introDesc {
   margin: 0;
-  font-size: 15px;
+  font-size: clamp(0.95rem, 3.8vw, 1.125rem);
   font-weight: 700;
   color: #4d646d;
-
-  max-width: 20rem;
+  max-width: 22rem;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.75);
 }
 
 .startBtnContainer {
-  position: absolute;
-  bottom: 100px;
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
+  margin-top: auto;
+  padding-top: clamp(24px, 5vh, 40px);
+  display: flex;
+  justify-content: center;
+  width: 100%;
   z-index: 2;
   pointer-events: auto;
 }
@@ -252,7 +245,7 @@
   transform: scale(0.97);
 }
 
-@media (min-width: 769px) {
+@media (min-width: 769px) and (max-width: 1024px) {
   .introContent {
     padding-left: clamp(28px, 5vw, 48px);
     padding-right: clamp(28px, 5vw, 48px);
@@ -267,13 +260,110 @@
   }
 
   .introHeading {
-    font-size: 1.85rem;
+    font-size: clamp(2rem, 4.5vw, 2.5rem);
     max-width: 24rem;
   }
 
   .introDesc {
-    font-size: 0.9375rem;
-    max-width: 22rem;
+    font-size: clamp(1rem, 2.2vw, 1.125rem);
+    max-width: 24rem;
+  }
+}
+
+/* 데스크톱 — 참고 시안: 왼쪽 타이포 + CTA, 오른쪽 3D 노출 */
+@media (min-width: 1025px) {
+  .introScrim {
+    background: linear-gradient(
+      100deg,
+      rgba(110, 192, 232, 0.9) 0%,
+      rgba(150, 210, 240, 0.55) 36%,
+      rgba(190, 228, 245, 0.18) 54%,
+      transparent 68%
+    );
+  }
+
+  .introContent {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: min(680px, 52vw);
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: calc(32px + env(safe-area-inset-top, 0px)) clamp(56px, 6vw, 96px) 32px;
+    box-sizing: border-box;
+  }
+
+  .introTopBar {
+    position: relative;
+    justify-content: flex-start;
+    margin-bottom: clamp(36px, 6vh, 64px);
+  }
+
+  .introBrand {
+    flex: none;
+  }
+
+  .introLogo {
+    width: clamp(260px, 22vw, 360px);
+    filter: drop-shadow(0 2px 16px rgba(255, 255, 255, 0.35));
+  }
+
+  .soundBtn {
+    position: fixed;
+    top: calc(22px + env(safe-area-inset-top, 0px));
+    right: clamp(32px, 4vw, 56px);
+    z-index: 3;
+    margin-top: 0;
+  }
+
+  .introCopy {
+    max-width: none;
+    width: 100%;
+  }
+
+  .introHeading {
+    margin: 0 0 clamp(20px, 2.8vh, 28px);
+    font-size: clamp(2.35rem, 3.8vw, 3.75rem);
+    font-weight: 200;
+    line-height: 1.26;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(22, 68, 88, 0.95);
+    text-shadow: none;
+    max-width: 14em;
+  }
+
+  .introDesc {
+    font-size: clamp(1.125rem, 1.45vw, 1.375rem);
+    font-weight: 500;
+    line-height: 1.72;
+    color: rgba(28, 58, 72, 0.88);
+    max-width: 32rem;
+    text-shadow: none;
+  }
+
+  .startBtnContainer {
+    margin-top: clamp(28px, 4vh, 44px);
+    padding-top: 0;
+    justify-content: flex-start;
+  }
+
+  .startBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    min-height: 58px;
+    padding: 18px 52px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    background: rgba(20, 24, 28, 0.9);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .startBtn:active {
+    transform: scale(0.98);
   }
 }
 
@@ -288,11 +378,10 @@
   }
 
   .startBtnContainer {
-    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    padding: 0 16px;
+    padding-top: 20px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    padding-left: 16px;
+    padding-right: 16px;
     box-sizing: border-box;
   }
 
@@ -307,7 +396,7 @@
   }
 }
 
-@media (min-width: 769px) {
+@media (min-width: 769px) and (max-width: 1024px) {
   .startBtn {
     min-height: 50px;
     padding: 15px 56px;
