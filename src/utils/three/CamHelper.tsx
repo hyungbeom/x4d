@@ -9,10 +9,13 @@ export default function CameraHelper({
                           controlsRef,
                           activePanelId,
                           deviceType,
+                          contextLabel,
                       }: {
     controlsRef: React.RefObject<CameraControlsImpl | null>;
     activePanelId: number;
     deviceType: DeviceType;
+    /** 맵 부스 등 컨텍스트 라벨 */
+    contextLabel?: string;
 }) {
     useEffect(() => {
         // 전체 컨테이너
@@ -71,7 +74,7 @@ export default function CameraHelper({
         document.body.appendChild(container);
 
         return () => {
-            document.body.removeChild(container);
+            container.remove();
         };
     }, []);
 
@@ -84,8 +87,12 @@ export default function CameraHelper({
             const t = new THREE.Vector3();
             controlsRef.current.getTarget(t);
 
+            const header = contextLabel
+                ? `[ ${contextLabel} · ${deviceType} ]`
+                : `[ panel ${activePanelId} · ${deviceType} ]`;
+
             textDiv.innerText =
-                `[ panel ${activePanelId} · ${deviceType} ]\n` +
+                `${header}\n` +
                 `c: [${c.x.toFixed(1)}, ${c.y.toFixed(1)}, ${c.z.toFixed(1)}],\n` +
                 `t: [${t.x.toFixed(1)}, ${t.y.toFixed(1)}, ${t.z.toFixed(1)}],\n` +
                 `z: ${z.toFixed(2)}`;

@@ -12,6 +12,7 @@ import { Light_Environment } from '@/utils/three/Light_Environment';
 import { SceneReadyGate } from '@/utils/three/SceneReadyGate';
 import MapSceneLoader from '@/components/map/MapSceneLoader';
 import MapCompanySearchModal from '@/components/map/MapCompanySearchModal';
+import { MapClickCopyHandler } from '@/components/map/MapClickCopyHandler';
 import {
     SceneLoadingProvider,
     useBdtecSceneLoadingActions,
@@ -20,7 +21,8 @@ import PageWrapper from '@/utils/ui/PageWrapper';
 import { usePageTransition } from '@/utils/ui/usePageTransition';
 import CameraHelper from '@/utils/three/CamHelper';
 import { applyMapCameraSnapshot } from '@/utils/map/applyMapCameraSnapshot';
-import { getMapCameraSnapshot } from '@/utils/map/mapCameraPoints';
+import { getMapCameraSnapshot, resolveMapCameraPoint } from '@/utils/map/mapCameraPoints';
+import { useMapEditTools } from '@/utils/map/useMapEditTools';
 import styles from './page.module.css';
 
 type DeviceType = 'desktop' | 'tablet' | 'mobile';
@@ -28,11 +30,15 @@ type DeviceType = 'desktop' | 'tablet' | 'mobile';
 function MapScene({
     deviceType,
     booth,
-    copyCoordsOnClick,
+    mapEditTools,
+    onCoordCopied,
+    onMapNotReady,
 }: {
     deviceType: DeviceType;
     booth: string;
-    copyCoordsOnClick: boolean;
+    mapEditTools: boolean;
+    onCoordCopied?: (text: string) => void;
+    onMapNotReady?: () => void;
 }) {
     const cameraControlsRef = useRef<CameraControlsImpl | null>(null);
     const hasBoothCamera = booth.length > 0;
@@ -53,18 +59,23 @@ function MapScene({
                 smoothTime={0.45}
                 draggingSmoothTime={0.12}
             />
-            {copyCoordsOnClick ? (
+            {mapEditTools ? (
                 <CameraHelper
                     controlsRef={cameraControlsRef}
                     activePanelId={0}
                     deviceType={deviceType}
+                    contextLabel={booth ? `booth ${booth}` : 'map'}
                 />
             ) : null}
-            <MapModel
-                skipAutoFit={hasBoothCamera}
-                copyCoordsOnClick={copyCoordsOnClick}
-                booth={booth}
-            />
+            <MapModel skipAutoFit={hasBoothCamera} />
+            {mapEditTools ? (
+                <MapClickCopyHandler
+                    enabled
+                    booth={booth}
+                    onCopied={onCoordCopied}
+                    onMapNotReady={onMapNotReady}
+                />
+            ) : null}
             <MapBoothMarks booth={booth} />
         </>
     );
@@ -76,14 +87,22 @@ function MapPageContent() {
     const navigate = usePageTransition();
     const { setModuleReady, reset } = useBdtecSceneLoadingActions();
     const booth = useMemo(() => searchParams.get('booth') ?? '', [searchParams]);
-    const copyCoordsOnClick = useMemo(
-        () =>
-            process.env.NODE_ENV === 'development' || searchParams.get('copy') === '1',
-        [searchParams],
-    );
+    const mapEditTools = useMapEditTools(booth, searchParams);
+    const cameraPointLabel = useMemo(() => {
+        if (!booth) return '';
+        const point = resolveMapCameraPoint(booth);
+        return point ? `${point.id} · ${point.label ?? booth}` : booth;
+    }, [booth]);
     const [deviceType, setDeviceType] = useState<DeviceType>('desktop');
     const [sceneRevealed, setSceneRevealed] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
+    const [copyToast, setCopyToast] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!copyToast) return;
+        const timer = window.setTimeout(() => setCopyToast(null), 2800);
+        return () => window.clearTimeout(timer);
+    }, [copyToast]);
 
     const goToBooth = useCallback(
         (boothCode: string) => {
@@ -141,8 +160,12 @@ function MapPageContent() {
                             <span className={styles.topBarSpacer} aria-hidden />
                         )}
                         {booth ? <span className={styles.boothTag}>부스 {booth}</span> : null}
-                        {copyCoordsOnClick ? (
-                            <span className={styles.copyHint}>맵 클릭 → 좌표 복사</span>
+                        {mapEditTools ? (
+                            <span className={styles.copyHint}>
+                                {cameraPointLabel
+                                    ? `${cameraPointLabel} · 맵 클릭 → markPosition 복사`
+                                    : '맵 클릭 → 좌표 복사 · 좌측 카메라 헬퍼'}
+                            </span>
                         ) : null}
                     </div>
 
@@ -152,6 +175,12 @@ function MapPageContent() {
                         onSelectBooth={goToBooth}
                     />
 
+                    {copyToast ? (
+                        <div className={styles.copyToast} role="status">
+                            복사됨: {copyToast}
+                        </div>
+                    ) : null}
+
                     <div className={styles.canvasLayer}>
                         <ManciniCanvas quality="default" backgroundColor="#b8dff5">
                             <Suspense fallback={null}>
@@ -160,7 +189,11 @@ function MapPageContent() {
                                 <MapScene
                                     deviceType={deviceType}
                                     booth={booth}
-                                    copyCoordsOnClick={copyCoordsOnClick}
+                                    mapEditTools={mapEditTools && sceneRevealed}
+                                    onCoordCopied={setCopyToast}
+                                    onMapNotReady={() =>
+                                        setCopyToast('맵 로딩 중… 잠시 후 다시 클릭하세요')
+                                    }
                                 />
 
                                 <SceneReadyGate />
