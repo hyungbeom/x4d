@@ -44,7 +44,7 @@ export function AirShip({ onScreenClick, ...props }) {
                         document.body.style.cursor = ''
                     }}
                 >
-                    {/*<AirshipScreenMaterial videoUrl={SCREEN_VIDEO_SRC} />*/}
+                    <AirshipScreenMaterial videoUrl={SCREEN_VIDEO_SRC} />
                 </mesh>
             </mesh>
         </group>
