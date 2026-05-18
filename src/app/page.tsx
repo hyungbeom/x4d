@@ -308,6 +308,7 @@ function HomeContent() {
                                     position={[122, 270, 40]}
                                     scale={[1.5, 1.5, 1.5]}
                                     rotation={[0, Math.PI / 5, 0]}
+                                    screenVideoPaused={airshipVideoUi !== 'none'}
                                     onScreenClick={
                                         intro ? () => setAirshipVideoUi('confirm') : undefined
                                     }

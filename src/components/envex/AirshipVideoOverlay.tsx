@@ -33,14 +33,22 @@ export default function AirshipVideoOverlay({
     }, [ui, closeAll]);
 
     useEffect(() => {
+        if (ui !== 'player') return;
+
         const video = videoRef.current;
         if (!video) return;
-        if (ui === 'player') {
+
+        const playWhenReady = () => {
             void video.play().catch(() => {});
+        };
+
+        if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+            playWhenReady();
             return;
         }
-        video.pause();
-        video.currentTime = 0;
+
+        video.addEventListener('canplay', playWhenReady, { once: true });
+        return () => video.removeEventListener('canplay', playWhenReady);
     }, [ui]);
 
     if (ui === 'none' || typeof document === 'undefined') return null;
@@ -92,7 +100,8 @@ export default function AirshipVideoOverlay({
                     src={videoSrc}
                     controls
                     playsInline
-                    preload="metadata"
+                    preload="auto"
+                    muted
                 />
             </div>
         </div>,
