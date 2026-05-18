@@ -53,9 +53,11 @@
   z-index: 55;
   transform: translateX(-50%);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  max-width: min(96vw, 440px);
   pointer-events: auto;
 }
 

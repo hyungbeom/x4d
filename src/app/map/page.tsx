@@ -102,15 +102,15 @@ function MapScene({
             {/*    />*/}
             {/*) : null}*/}
             <MapModel skipAutoFit={hasBoothCamera}/>
-            {mapEditTools ? (
-                <MapClickCopyHandler
-                    enabled
-                    booth={booth}
-                    onCopied={onCoordCopied}
-                    onMapNotReady={onMapNotReady}
-                />
-            ) : null}
-            <MapBoothMarks booth={booth}/>
+            {/*{mapEditTools ? (*/}
+            {/*    <MapClickCopyHandler*/}
+            {/*        enabled*/}
+            {/*        booth={booth}*/}
+            {/*        onCopied={onCoordCopied}*/}
+            {/*        onMapNotReady={onMapNotReady}*/}
+            {/*    />*/}
+            {/*) : null}*/}
+            {booth ? <MapBoothMarks booth={booth} /> : null}
             <MapNavPath nav={mapNav}/>
         </>
     );
@@ -228,13 +228,13 @@ function MapPageContent() {
                             ) : null}
                         </div>
                     ) : null}
-                    {mapEditTools ? (
-                        <span className={styles.copyHint}>
-                                {cameraPointLabel
-                                    ? `${cameraPointLabel} · 맵 클릭 → markPosition 복사`
-                                    : '맵 클릭 → 좌표 복사 · 좌측 카메라 헬퍼'}
-                            </span>
-                    ) : null}
+                    {/*{mapEditTools ? (*/}
+                    {/*    <span className={styles.copyHint}>*/}
+                    {/*            {cameraPointLabel*/}
+                    {/*                ? `${cameraPointLabel} · 맵 클릭 → markPosition 복사`*/}
+                    {/*                : '맵 클릭 → 좌표 복사 · 좌측 카메라 헬퍼'}*/}
+                    {/*        </span>*/}
+                    {/*) : null}*/}
                 </div>
 
                 <MapCompanySearchModal
@@ -273,10 +273,15 @@ function MapPageContent() {
                         >
                             길찾기
                         </button>
+                        <MapViewModeToggle
+                            mode={viewMode}
+                            onChange={setViewMode}
+                            placement="inline"
+                        />
                     </div>
-                ) : null}
-
-                <MapViewModeToggle mode={viewMode} onChange={setViewMode}/>
+                ) : (
+                    <MapViewModeToggle mode={viewMode} onChange={setViewMode} />
+                )}
 
                 <div className={styles.canvasLayer}>
                     <ManciniCanvas quality="default" backgroundColor="#b8dff5">

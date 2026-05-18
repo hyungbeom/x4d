@@ -1,26 +1,21 @@
 import type { ReadonlyURLSearchParams } from 'next/navigation';
-import {
-    MAP_NAV_ENTRANCE_ID,
-    MAP_NAV_ENTRANCE_LABEL,
-    boothToNavNodeId,
-    getBoothMarkPosition,
-} from '@/utils/map/mapNavGraph';
+import { boothToNavNodeId, getBoothMarkPosition } from '@/utils/map/mapNavGraph';
 
-/** URL 쿼리 — ?booth= 목적지, ?from= 출발(기업찾기) */
+/** URL 쿼리 — ?booth= 목적지, ?from= 출발(기업찾기·길찾기) */
 export type MapNavQuery = {
     /** 목적지 부스 (?booth 또는 ?to) */
     toBooth: string;
-    /** 출발 부스 (?from) — 없으면 입구 */
+    /** 출발 부스 (?from) — 없으면 출발지 미설정 */
     fromBooth: string;
 };
 
 export type ResolvedMapNav = {
     query: MapNavQuery;
-    fromNodeId: string;
+    /** ?from= 이 있을 때만 설정 */
+    fromNodeId: string | null;
     toNodeId: string;
-    fromLabel: string;
+    fromLabel: string | null;
     toLabel: string;
-    /** 출발 부스 markPosition (from 없으면 입구 노드만) */
     fromMarkPosition: [number, number, number] | null;
     /** 목적지 부스 markPosition */
     toMarkPosition: [number, number, number] | null;
@@ -63,9 +58,9 @@ export function resolveMapNav(
 
     return {
         query,
-        fromNodeId: MAP_NAV_ENTRANCE_ID,
+        fromNodeId: null,
         toNodeId,
-        fromLabel: MAP_NAV_ENTRANCE_LABEL,
+        fromLabel: null,
         toLabel: query.toBooth.toUpperCase(),
         fromMarkPosition: null,
         toMarkPosition,

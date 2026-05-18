@@ -30,7 +30,9 @@ import {CHMicroscopeModel} from "@/resources/model/progist/CHMicroscopeModel";
 import {CHWaterModel} from "@/resources/model/progist/CHWaterModel";
 import {AirShip} from "@/resources/model/progist/AirShip";
 import {Cloud} from "@/resources/model/progist/Cloud";
-import AirshipVideoOverlay, { type AirshipVideoUi } from '@/components/envex/AirshipVideoOverlay';
+import AirshipYoutubeOverlay from '@/components/envex/AirshipYoutubeOverlay';
+import EnvexSeminarModal from '@/components/envex/EnvexSeminarModal';
+import {usePageTransition} from '@/utils/ui/usePageTransition';
 
 
 type CameraSnapshot = { c: [number, number, number]; t: [number, number, number]; z: number };
@@ -155,43 +157,62 @@ const PANEL_COUNT = 6;
 const panelContents: Record<number, { title: string; desc: string; extra?: string }> = {
     1: {
         title: '수질 Zone',
-        desc: '샘플: 하천·정수장·정화 장비 데모가 모여 있는 구역입니다. 터치하면 수질 지표 UI가 뜹니다.',
-        extra: 'pH · DO · 탁도 등 가상 센서 값이 3초마다 갱신되는 연출(샘플)입니다.',
+        desc: '하·폐수 처리부터 수질 정화까지 물 관리의 전 과정을 아우르는 구역입니다.\n' +
+            '고효율 펌프·멤브레인 등 첨단 수처리 설비와 스마트 수자원 관리 기술을 만나보실 수 있습니다.\n' +
+            '우리의 맑은 물을 지키는 혁신적인 환경 솔루션을 직접 체험해 보세요.\n' +
+            '아래 [기업리스트 보기]를 눌러 우수 참가 기업들을 만나보세요!',
+        extra: '',
     },
     2: {
         title: '대기 Zone',
-        desc: '샘플: 미세먼지·VOC·배출 시설 모니터링을 소개하는 공간입니다.',
-        extra: '집진기·탈황 설비와 연동된 대시보드 목업이 배치되어 있습니다.',
+        desc: '미세먼지, 유해가스 등 공기 중의 오염물질을 정화하는 핵심 구역입니다.\n' +
+            '배출가스를 완벽하게 제어하는 최첨단 집진기와 고효율 필터 설비들을 만나보실 수 있습니다.\n' +
+            '대기 상태를 실시간 모니터링하는 스마트 측정 시스템을 직접 확인해 보세요.\n' +
+            '아래 [기업리스트 보기]를 눌러 우수 참가 기업들을 만나보세요!',
+        extra: '',
     },
     3: {
         title: '측정·분석 Zone',
-        desc: '샘플: 현장 계측기부터 분석 리포트까지 한 줄로 보여 주는 구역입니다.',
-        extra: '랩 장비·휴대용 측정기·데이터 시각화 화면이 나란히 전시됩니다.',
+        desc: '다양한 환경 데이터를 정밀하게 진단하고 분석하는 구역입니다.\n' +
+            '수질·대기 연속자동측정기(TMS), 초정밀 가스 분석기 등 첨단 계측 장비들을 만나보실 수 있습니다.\n' +
+            '오염물질을 정확히 시각화하는 실시간 스마트 모니터링 솔루션을 직접 확인해 보세요.\n' +
+            '아래 [기업리스트 보기]를 눌러 우수 참가 기업들을 만나보세요!',
+        extra: '',
     },
     4: {
         title: '탈탄소 Zone',
-        desc: '샘플: RE100 · ESS · 탄소배출권 관련 스토리보드가 들어갈 자리입니다.',
-        extra: '신재생·저탄소 공정 사례 카드 6장 분량(가안)으로 구성 예정.',
+        desc: '기후 위기 대응과 온실가스 감축을 이끄는 탄소중립 핵심 구역입니다.\n' +
+            '탄소 포집·활용·저장(CCUS) 기술 및 친환경 고효율 에너지 설비들을 만나보실 수 있습니다.\n' +
+            '지속 가능한 미래를 앞당기는 저탄소 전환 솔루션을 직접 확인해 보세요.\n' +
+            '아래 [기업리스트 보기]를 눌러 우수 참가 기업들을 만나보세요!',
+        extra: '',
     },
     5: {
         title: '외국관 Pavilion',
-        desc: '샘플: 해외 기업·기관 부스가 배치되는 글로벌 존입니다.',
-        extra: '국가별 플래그·파트너 로고 월 — 실제 목록은 추후 반영.',
+        desc: '전 세계 우수 환경 기업들의 첨단 기술을 교류하는 글로벌 핵심 구역입니다.\n' +
+            '해외 각국의 혁신적인 친환경 설비와 선진 환경 솔루션을 만나보실 수 있습니다.\n' +
+            '글로벌 환경 산업의 최신 트렌드와 새로운 비즈니스 협력 기회를 직접 확인해 보세요.\n' +
+            '아래 [기업리스트 보기]를 눌러 우수 참가 기업들을 만나보세요!',
+        extra: '',
     },
     6: {
         title: '기관 및 단체',
-        desc: '샘플: 정부·공공·협회 부스 안내 데스크 구역입니다.',
-        extra: '지원 사업·인증·규제 Q&A 링크 모음(플레이스홀더).',
+        desc: '환경 분야의 핵심 정책과 연구 지원 사업을 안내하는 구역입니다.\n' +
+            '국내외 주요 환경 기관과 단체들의 혁신적인 R&D 성과 및 지원 제도를 만나보실 수 있습니다.\n' +
+            '미래 환경 산업을 이끌어갈 다양한 협력 프로그램과 비전을 직접 확인해 보세요.\n' +
+            '아래 [기업리스트 보기]를 눌러 참가 기관 및 단체들을 만나보세요!',
     },
 };
 
 function HomeContent() {
     const [intro, setIntro] = useState(false);
-    const [airshipVideoUi, setAirshipVideoUi] = useState<AirshipVideoUi>('none');
+    const [airshipYoutubeOpen, setAirshipYoutubeOpen] = useState(false);
     const [activePanelId, setActivePanelId] = useState<number>(0);
     const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
     const [autoTour, setAutoTour] = useState(false);
+    const [seminarOpen, setSeminarOpen] = useState(false);
     const viewportRef = useRef<HTMLDivElement>(null);
+    const seminarBtnRef = useRef<HTMLButtonElement>(null);
     const { setModuleReady } = useBdtecSceneLoadingActions();
 
     const AUTO_TOUR_INTERVAL_MS = 5000;
@@ -212,12 +233,7 @@ function HomeContent() {
         setActivePanelId(newValue);
     };
 
-    const handleNextPanel = () => {
-        setActivePanelId((prev) => {
-            if (prev < 1 || prev >= PANEL_COUNT) return 1;
-            return prev + 1;
-        });
-    };
+    const navigate = usePageTransition();
 
     const currentPanelData = panelContents[activePanelId] ?? { title: '', desc: '', extra: '' };
 
@@ -308,9 +324,8 @@ function HomeContent() {
                                     position={[122, 270, 40]}
                                     scale={[1.5, 1.5, 1.5]}
                                     rotation={[0, Math.PI / 5, 0]}
-                                    screenVideoPaused={airshipVideoUi === 'player'}
                                     onScreenClick={
-                                        intro ? () => setAirshipVideoUi('confirm') : undefined
+                                        intro ? () => setAirshipYoutubeOpen(true) : undefined
                                     }
                                 />
                                 <CHWaterModel position={[-132,15,35]} rotation={[0,Math.PI/4,0]}/>
@@ -354,16 +369,36 @@ function HomeContent() {
                         </div>
                     )}
 
-                    {intro && activePanelId >= 1 && activePanelId <= PANEL_COUNT && (
-                        <button
-                            type="button"
-                            className={styles.panelNextBtn}
-                            onClick={handleNextPanel}
-                            aria-label="다음 구역으로 이동"
-                        >
-                            Next
-                        </button>
+                    {intro && (
+                        <div className={styles.panelActionStack}>
+                            <button
+                                type="button"
+                                className={styles.panelNextBtn}
+                                onClick={() => navigate('/map', 'blinds')}
+                                aria-label="부스 찾기 — 전시장 지도로 이동"
+                            >
+                                부스 찾기
+                            </button>
+                            {deviceType === 'mobile' ? (
+                                <button
+                                    ref={seminarBtnRef}
+                                    type="button"
+                                    className={`${styles.panelNextBtn} ${styles.panelSeminarBtn} ${seminarOpen ? styles.panelBtnHidden : ''}`}
+                                    onClick={() => setSeminarOpen(true)}
+                                    aria-label="세미나 일정 보기"
+                                    aria-expanded={seminarOpen}
+                                >
+                                    세미나 일정
+                                </button>
+                            ) : null}
+                        </div>
                     )}
+
+                    <EnvexSeminarModal
+                        open={seminarOpen}
+                        onClose={() => setSeminarOpen(false)}
+                        triggerRef={seminarBtnRef}
+                    />
 
                     <InfoPanel
                         isOpen={intro && activePanelId >= 1 && activePanelId <= PANEL_COUNT}
@@ -377,9 +412,9 @@ function HomeContent() {
                     />
 
                 </div>
-                    <AirshipVideoOverlay
-                        ui={airshipVideoUi}
-                        onUiChange={setAirshipVideoUi}
+                    <AirshipYoutubeOverlay
+                        open={airshipYoutubeOpen}
+                        onClose={() => setAirshipYoutubeOpen(false)}
                     />
 
                     <EnvexEntryOverlay

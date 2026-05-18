@@ -255,7 +255,7 @@ export function getMapBoothMarkPlacements(boothFilter?: string | null): MapBooth
     );
 
     const key = boothFilter?.trim();
-    if (!key) return all;
+    if (!key) return [];
 
     const normalized = key.toUpperCase();
     return all.filter((placement) => placement.booth.toUpperCase() === normalized);

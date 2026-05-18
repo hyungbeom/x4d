@@ -304,7 +304,7 @@ export default function MapNavSearchModal({
 
                 <p className={styles.hint}>
                     부스번호 또는 회사명을 입력하면 아래에 일치하는 업체가 표시됩니다.
-                    출발을 비우면 입구에서 안내합니다.
+                    출발지를 선택하면 경로가 표시됩니다.
                 </p>
 
                 <div className={styles.body}>

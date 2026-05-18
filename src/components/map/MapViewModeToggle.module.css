@@ -40,9 +40,10 @@
   background: rgba(14, 165, 233, 0.1);
 }
 
-/* 모바일·태블릿 하단 중앙 버튼과 겹치지 않게 */
-@media (max-width: 1024px) {
-  .toggle {
-    bottom: calc(58px + env(safe-area-inset-bottom, 0px));
-  }
+/* 하단 기업찾기·길찾기와 한 줄 */
+.toggleInline {
+  position: static;
+  right: auto;
+  bottom: auto;
+  flex-shrink: 0;
 }

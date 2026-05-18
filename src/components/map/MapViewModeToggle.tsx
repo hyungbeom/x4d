@@ -6,11 +6,21 @@ import styles from './MapViewModeToggle.module.css';
 type MapViewModeToggleProps = {
     mode: MapViewMode;
     onChange: (mode: MapViewMode) => void;
+    /** fixed: 우하단(데스크톱), inline: 하단 액션바 안 */
+    placement?: 'fixed' | 'inline';
 };
 
-export function MapViewModeToggle({ mode, onChange }: MapViewModeToggleProps) {
+export function MapViewModeToggle({
+    mode,
+    onChange,
+    placement = 'fixed',
+}: MapViewModeToggleProps) {
     return (
-        <div className={styles.toggle} role="group" aria-label="맵 보기 모드">
+        <div
+            className={`${styles.toggle} ${placement === 'inline' ? styles.toggleInline : ''}`}
+            role="group"
+            aria-label="맵 보기 모드"
+        >
             <button
                 type="button"
                 className={`${styles.btn} ${mode === '2d' ? styles.btnActive : ''}`}

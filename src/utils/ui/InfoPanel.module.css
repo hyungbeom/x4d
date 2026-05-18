@@ -147,7 +147,7 @@
   margin: 0;
   flex: 1;
   min-width: 0;
-  font-size: 22px;
+  font-size: 25px;
   font-weight: 700;
   line-height: 1.25;
   color: #1a8a8a;
@@ -201,7 +201,7 @@
 
 .detailBtn {
   align-self: center;
-  margin-top: 4px;
+  margin-top: 20px;
   padding: 11px 22px;
   border-radius: 999px;
   border: 1.5px solid #6ab8b6;
@@ -269,15 +269,16 @@
   }
 }
 
-/* 홈 — 상단 헤더 바로 아래 (+10px 간격) */
+/* 홈 — 상단 헤더(92vw)와 동일 좌우 여백 */
 .teaserAboveBottomNav {
   top: calc(58px + 10px + env(safe-area-inset-top, 0px));
   left: 50%;
   right: auto;
   bottom: auto;
   transform: translateX(-50%);
-  width: min(88vw, 360px);
-  max-width: 360px;
+  width: 92vw;
+  max-width: none;
+  box-sizing: border-box;
 }
 
 @media (max-width: 1024px) and (min-width: 769px) {
@@ -287,10 +288,25 @@
 }
 
 @media (max-width: 768px) {
+  .teaser {
+    left: 50%;
+    right: auto;
+    width: 92vw;
+    max-width: none;
+    transform: translateX(-50%);
+    border-radius: 28px;
+    padding: 20px 18px 18px;
+    box-sizing: border-box;
+  }
+
   .teaserAboveBottomNav {
     top: calc(54px + 10px + env(safe-area-inset-top, 0px));
-    width: min(92vw, 340px);
     z-index: 30;
+  }
+
+  .detailBtn {
+    width: 100%;
+    max-width: none;
   }
 }
 

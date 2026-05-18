@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import { MapBoothMark } from '@/resources/model/MapBoothMark';
 import {
-    MAP_NAV_ENTRANCE_ID,
     MAP_NAV_FAST_PATH_Y_OFFSET,
     MAP_NAV_PATH_Y,
     findMapNavRoutes,
@@ -130,7 +129,7 @@ export function MapNavPath({ nav }: MapNavPathProps) {
     const baseRoadEdges = useMemo(() => getMapNavGraphEdges(), []);
 
     const routes = useMemo(() => {
-        if (!nav) return { fast: [] as THREE.Vector3[], full: [] as THREE.Vector3[] };
+        if (!nav?.fromNodeId) return { fast: [] as THREE.Vector3[], full: [] as THREE.Vector3[] };
         if (nav.fromNodeId === nav.toNodeId) {
             return { fast: [] as THREE.Vector3[], full: [] as THREE.Vector3[] };
         }
@@ -138,11 +137,8 @@ export function MapNavPath({ nav }: MapNavPathProps) {
     }, [nav]);
 
     const departureMarkPosition = useMemo((): [number, number, number] | null => {
-        if (!nav) return null;
+        if (!nav?.fromNodeId) return null;
         if (nav.fromMarkPosition) return nav.fromMarkPosition;
-        if (nav.fromNodeId === MAP_NAV_ENTRANCE_ID) {
-            return navNodeToMarkPlacement(MAP_NAV_ENTRANCE_ID);
-        }
         return navNodeToMarkPlacement(nav.fromNodeId);
     }, [nav]);
 
@@ -251,5 +247,6 @@ export function MapNavPath({ nav }: MapNavPathProps) {
 
 export function getMapNavPathLabel(nav: ResolvedMapNav | null): string | null {
     if (!nav) return null;
+    if (!nav.fromNodeId) return `도착 ${nav.toLabel}`;
     return `도로망(파랑) · 빠른길(빨강) · ${nav.fromLabel}(${nav.fromNodeId}) → ${nav.toLabel}(${nav.toNodeId})`;
 }

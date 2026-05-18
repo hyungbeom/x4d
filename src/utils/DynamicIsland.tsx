@@ -127,32 +127,42 @@ export default function DynamicIsland({
 
         const targetHeight =
             mode === 'input' ? openInputHeight : mode === 'thinking' ? openThinkingHeight : openResultHeight;
+        const openWidth = Math.min(window.innerWidth * 0.9, 350);
+        const openTop = Math.max(12, 10);
 
         if (isExpanded) {
-            if (isInline && slotRect) {
+            if (isInline) {
                 setInlineDocked(false);
-                gsap.set(island, {
-                    position: 'fixed',
-                    left: slotRect.left + slotRect.width / 2,
-                    top: slotRect.top,
-                    xPercent: -50,
-                    width: slotRect.width,
-                    height: slotRect.height,
-                    maxWidth: slotRect.width,
-                    right: 'auto',
-                    transform: 'none',
-                });
+                if (slotRect) {
+                    gsap.set(island, {
+                        position: 'fixed',
+                        left: slotRect.left + slotRect.width / 2,
+                        top: slotRect.top,
+                        xPercent: -50,
+                        yPercent: 0,
+                        width: slotRect.width,
+                        height: slotRect.height,
+                        maxWidth: slotRect.width,
+                        right: 'auto',
+                        transform: 'none',
+                    });
+                }
             }
 
             gsap.to(initialContent, { opacity: 0, duration: 0.2 });
             gsap.to(island, {
-                width: Math.min(window.innerWidth * 0.9, 350),
-                maxWidth: 350,
+                position: 'fixed',
+                left: '50%',
+                top: openTop,
+                xPercent: -50,
+                yPercent: 0,
+                right: 'auto',
+                transform: 'none',
+                width: openWidth,
+                maxWidth: openWidth,
+                minWidth: 0,
                 height: targetHeight,
                 borderRadius: isMobile ? '16px' : '24px',
-                ...(isInline && slotRect
-                    ? { left: slotRect.left + slotRect.width / 2, top: slotRect.top, xPercent: -50 }
-                    : {}),
                 duration: 0.55,
                 ease: 'power3.out',
                 delay: 0.08,
@@ -301,6 +311,16 @@ export default function DynamicIsland({
         }
     };
 
+    const closedSizeStyle =
+        isExpanded && !inlineDocked
+            ? {}
+            : {
+                  width: isInline && inlineDocked ? '100%' : closedWidth,
+                  height: isInline && inlineDocked ? '100%' : closedHeight,
+                  minWidth: isInline && inlineDocked ? closedWidth : undefined,
+                  maxWidth: isInline && inlineDocked ? closedWidth : undefined,
+              };
+
     return (
         <>
             <div
@@ -315,9 +335,7 @@ export default function DynamicIsland({
                     zIndex: 9999,
                     cursor: isExpanded ? 'default' : 'pointer',
                     overflow: 'hidden',
-                    width: isInline && inlineDocked ? '100%' : closedWidth,
-                    height: isInline && inlineDocked ? '100%' : closedHeight,
-                    minWidth: isInline && inlineDocked ? closedWidth : undefined,
+                    ...closedSizeStyle,
                     backgroundColor: 'rgba(20, 20, 20, 0.85)',
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
