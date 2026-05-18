@@ -239,7 +239,7 @@ export function DataModel(props:any) {
                     position={[0, 0.01, -0.12]}
                     scale={[0.64, 0.54, 0.66]}
                 >
-                    <meshPhysicalMaterial
+                    <meshStandardMaterial
                         ref={data}
                         toneMapped={false}
                         transparent={true}

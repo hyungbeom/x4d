@@ -55,7 +55,7 @@ export function ManciniCanvas({
                 far: 500000,
                 fov: 25,
             }}
-            shadows="variance"
+            shadows
             gl={async (props) => {
                 const { powerPreference: _ignored, ...rest } = props as Record<string, unknown>;
                 const renderer = new WebGPURenderer({
@@ -73,7 +73,6 @@ export function ManciniCanvas({
                 scene.background = new THREE.Color(backgroundColorRef.current);
                 gl.toneMapping = THREE.ACESFilmicToneMapping;
                 gl.toneMappingExposure = 1.1;
-                gl.localClippingEnabled = true;
                 setWebgpuReady(true);
             }}
         >

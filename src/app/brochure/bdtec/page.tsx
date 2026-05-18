@@ -9,6 +9,7 @@ import PageWrapper from "@/utils/ui/PageWrapper";
 import styles from "./page.module.css";
 import BdtecEntryOverlay from "@/components/bdtec/BdtecEntryOverlay";
 import BdtecSceneHeroCopy from "@/components/bdtec/BdtecSceneHeroCopy";
+import BdtecSpecModal from "@/components/bdtec/BdtecSpecModal";
 import { SceneLoadingProvider } from "@/utils/three/SceneLoadingContext";
 import dynamic from "next/dynamic";
 
@@ -80,13 +81,6 @@ export default function Home() {
         handleVariableChange(0);
     };
 
-    const handleNextPanel = () => {
-        setActivePanelId((prev) => {
-            if (prev < 1 || prev >= 5) return 1;
-            return prev + 1;
-        });
-    };
-
     const handleAutoTourToggle = () => {
         setAutoTour((prev) => {
             const next = !prev;
@@ -132,14 +126,7 @@ export default function Home() {
                             onAutoTourToggle={handleAutoTourToggle}
                             onLogoClick={handleLogoClick}
                         />
-                        <button
-                            type="button"
-                            className={styles.panelNextBtn}
-                            onClick={handleNextPanel}
-                            aria-label="다음 구역으로 이동"
-                        >
-                            Next
-                        </button>
+                        <BdtecSpecModal visible={intro} />
                     </div>
                     {/*{process.env.NODE_ENV === 'development' && <DomStats />}*/}
 
@@ -157,7 +144,7 @@ export default function Home() {
 
                     <div
                         ref={blurContainerRef}
-                        className={`${styles.blurContainer} ${deviceType !== 'desktop' ? styles.blurContainer3dTouch : ''} ${styles.blurContainerVisible} ${!intro ? styles.blurContainerIntroWhite : ''}`}
+                        className={`${styles.blurContainer} ${deviceType !== 'desktop' ? styles.blurContainer3dTouch : ''} ${styles.blurContainerVisible}`}
                     >
                         <div
                             ref={canvasHostRef}

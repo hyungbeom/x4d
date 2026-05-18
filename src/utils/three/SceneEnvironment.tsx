@@ -27,6 +27,8 @@ export function SceneEnvironment({
 
     useLayoutEffect(() => {
         scene.background = opaque ? mixColors(colorTop, colorBottom) : null;
+        scene.environment = null;
+        scene.environmentIntensity = 1;
     }, [scene, colorTop, colorBottom, opaque]);
 
     return null;

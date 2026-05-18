@@ -1,16 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useBdtecSceneLoadingActions } from '@/utils/three/SceneLoadingContext';
+import { useSceneSuspenseReady } from '@/utils/three/useSceneSuspenseReady';
 
-/** Suspense 경계 안: 3D 자식이 모두 마운트되면 ready 신호 */
+/** Suspense 경계 안: 3D 자식·텍스처 준비 후 ready 신호 (useLayoutEffect) */
 export function SceneReadyGate() {
-    const { setSuspenseReady } = useBdtecSceneLoadingActions();
-
-    useEffect(() => {
-        setSuspenseReady(true);
-        return () => setSuspenseReady(false);
-    }, [setSuspenseReady]);
-
+    useSceneSuspenseReady();
     return null;
 }

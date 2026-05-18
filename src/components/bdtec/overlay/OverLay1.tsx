@@ -35,9 +35,11 @@ export default function Overlay1() {
                         width: 260px; /* 📱 모바일 너비 */
                         padding: 15px;
                         z-index: 10;
-                        background: rgba(18, 61, 82, 0.06);
-                        border: 1px solid rgba(18, 61, 82, 0.12);
-                        box-shadow: 0 8px 24px rgba(18, 61, 82, 0.08);
+                        background: rgba(255, 255, 255, 0.72);
+                        border: 1px solid rgba(18, 61, 82, 0.14);
+                        box-shadow: 0 8px 24px rgba(18, 61, 82, 0.1);
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
                         color: #123d52;
                         word-break: keep-all;
                         will-change: transform, opacity;

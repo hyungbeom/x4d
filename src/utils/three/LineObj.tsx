@@ -159,15 +159,13 @@ export default function LineObj({
             <mesh>
                 {/* 🚀 5 대신 tubeRadius 적용 */}
                 <tubeGeometry args={[tubeMemo.curve, 400, tubeRadius, 64, tubeMemo.finalIsClosed]} />
-                <meshPhysicalMaterial
-                    color="#ffffff"
-                    transparent={true}
-                    transmission={1}
-                    opacity={1}
-                    roughness={0.05}
-                    thickness={tubeRadius} // 팁: 유리 재질의 두께감도 tubeRadius에 맞추면 좋습니다
-                    ior={1.6}
-                    clearcoat={1}
+                <meshStandardMaterial
+                    color="#e8f8ff"
+                    transparent
+                    opacity={0.38}
+                    roughness={0.12}
+                    metalness={0.15}
+                    depthWrite={false}
                 />
             </mesh>
 
@@ -178,11 +176,11 @@ export default function LineObj({
                     color="#00ffcc"
                     emissive="#00ffcc"
                     emissiveIntensity={2}
-                    alphaMap={lineMaskTexture}
-                    transparent={false}
-                    alphaTest={0.5}
+                    transparent
+                    opacity={0.9}
                     side={THREE.DoubleSide}
                     toneMapped={false}
+                    depthWrite={false}
                 />
             </mesh>
         </group>

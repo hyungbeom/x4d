@@ -2,10 +2,11 @@
 
 import React, { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useBdtecSceneLoadingActions } from '@/utils/three/SceneLoadingContext';
-import { SceneReadyGate } from '@/utils/three/SceneReadyGate';
 import * as THREE from 'three';
-import { CameraControls, Environment } from '@react-three/drei';
+import { CameraControls } from '@react-three/drei';
 import { BrochureGlassFloor } from '@/utils/three/BrochureGlassFloor';
+import { BdtecSceneLoadGate } from '@/utils/three/BdtecSceneLoadGate';
+import { BdtecAssetRegistry } from '@/app/brochure/bdtec/mobile/BdtecAssetRegistry';
 import { SceneEnvironment } from '@/utils/three/SceneEnvironment';
 import { BdtecLightEnvironment } from '@/utils/three/BdtecLightEnvironment';
 import type CameraControlsImpl from 'camera-controls';
@@ -136,20 +137,12 @@ export default function BdtecScene({ quality, activePanelId, deviceType }: Bdtec
             <CameraController activePanelId={activePanelId} deviceType={deviceType} />
 
             <Suspense fallback={null}>
+                <BdtecAssetRegistry />
                 <SceneEnvironment colorTop="#1e3a52" colorBottom="#101c2a" opaque />
-                <Environment preset="warehouse" environmentIntensity={0.38} />
                 <BdtecLightEnvironment />
-
-                <BrochureGlassFloor
-                    y={FLOOR_Y}
-                    tint="#0e1e30"
-                    fadeStrength={0.52}
-                    mirrorContent={<BdtecSceneModels />}
-                />
-
+                <BrochureGlassFloor y={FLOOR_Y} tint="#0e1e30" />
                 <BdtecSceneModels />
-
-                <SceneReadyGate />
+                <BdtecSceneLoadGate />
             </Suspense>
         </ManciniCanvas>
     );

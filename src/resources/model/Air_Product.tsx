@@ -68,9 +68,16 @@ export function AirProduct(props: any) {
                 castShadow
                 receiveShadow
                 geometry={nodes.Cover.geometry}
-                material={materials.transparency}
                 position={[2.103, 0, 0.978]}
-            />
+            >
+                <meshStandardMaterial
+                    transparent
+                    opacity={0.35}
+                    roughness={0.1}
+                    metalness={0.05}
+                    depthWrite={false}
+                />
+            </mesh>
 
             <mesh castShadow receiveShadow geometry={nodes.Clip.geometry} material={materials.Metal}/>
             <mesh castShadow receiveShadow geometry={nodes.Panel.geometry} material={materials.Cab}/>

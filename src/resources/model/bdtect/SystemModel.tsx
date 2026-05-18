@@ -39,7 +39,7 @@ export function SystemModel(props:any) {
                         material={nodes.Ellipse.material}
                         position={[25.099, 0.495, 0]}
                     >
-                        <meshPhysicalMaterial
+                        <meshStandardMaterial
                             ref={ellipse}
                             toneMapped={false}
                             transparent={true}
@@ -53,7 +53,7 @@ export function SystemModel(props:any) {
                         material={nodes.Rectangle003.material}
                         position={[-7.599, -0.495, 0]}
                     >
-                        <meshPhysicalMaterial
+                        <meshStandardMaterial
                             ref={enter}
                             toneMapped={false}
                             transparent={true}
@@ -90,7 +90,7 @@ export function SystemModel(props:any) {
                     rotation={[Math.PI / 2, 0, 0]}
                     scale={[-1.203, -1.203, -0.704]}
                 >
-                    <meshPhysicalMaterial {...BDTEC_GLASS_CASE} />
+                    <meshStandardMaterial {...BDTEC_GLASS_CASE} />
                 </mesh>
                 <GlassCaseEdges
                     geometry={nodes.Cube002.geometry}
@@ -107,7 +107,7 @@ export function SystemModel(props:any) {
                     rotation={[Math.PI / 2, 0, 0]}
                     scale={[-1.203, -1.203, -1.342]}
                 >
-                    <meshPhysicalMaterial {...BDTEC_GLASS_CASE} />
+                    <meshStandardMaterial {...BDTEC_GLASS_CASE} />
                 </mesh>
                 <GlassCaseEdges
                     geometry={nodes.Cube003.geometry}
@@ -157,7 +157,7 @@ export function SystemModel(props:any) {
                     rotation={[-Math.PI / 2, 0, 0]}
                     scale={[0.697, 0.652, 0.589]}
                 >
-                    <meshPhysicalMaterial
+                    <meshStandardMaterial
                         color="#ffd700"
                         metalness={1}
                         roughness={0.2}
@@ -174,7 +174,7 @@ export function SystemModel(props:any) {
                     rotation={[-Math.PI / 2, 0, 0]}
                     scale={[0.856, 0.832, 0.759]}
                 >
-                    <meshPhysicalMaterial
+                    <meshStandardMaterial
                         color="#ffd700"
                         metalness={1}
                         roughness={0.2}
@@ -405,15 +405,12 @@ export function SystemModel(props:any) {
                     position={[33.342, -103.896, 86.326]}
                     rotation={[0, 0, -Math.PI]}
                 >
-                    <meshPhysicalMaterial
+                    <meshStandardMaterial
                         color="#4da6ff"
-                        transmission={1}
-                        opacity={1}
-                        transparent={true}
-                        roughness={0.05}
-                        metalness={0.1}
-                        ior={1.5}
-                        thickness={1.5}
+                        transparent
+                        opacity={0.55}
+                        roughness={0.12}
+                        metalness={0.2}
                     />
                 </mesh>
 
@@ -450,7 +447,7 @@ export function SystemModel(props:any) {
                     position={[58.508, -118.672, 106.652]}
                     rotation={[-Math.PI / 2, Math.PI / 2, 0]}
                 >
-                    <meshPhysicalMaterial
+                    <meshStandardMaterial
                         ref={panel}
                         toneMapped={false}
                         transparent={true}
@@ -466,7 +463,7 @@ export function SystemModel(props:any) {
                     rotation={[-Math.PI / 2, Math.PI / 2, 0]}
                 >
 
-                    <meshPhysicalMaterial
+                    <meshStandardMaterial
                         ref={panel2}
                         toneMapped={false}
                         transparent={true}
@@ -481,7 +478,7 @@ export function SystemModel(props:any) {
                     position={[58.508, -118.672, 127.094]}
                     rotation={[-Math.PI / 2, Math.PI / 2, 0]}
                 >
-                    <meshPhysicalMaterial
+                    <meshStandardMaterial
                         ref={panel3}
                         toneMapped={false}
                         transparent={true}

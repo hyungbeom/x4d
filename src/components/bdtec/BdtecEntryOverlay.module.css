@@ -2,8 +2,9 @@
   position: absolute;
   inset: 0;
   z-index: 2000;
-  background: #ffffff;
-  filter: none;
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   overflow: hidden;
 }
 

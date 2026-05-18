@@ -12,6 +12,8 @@ import styles from './BdtecEntryOverlay.module.css';
 
 const HOLD_AT_100_MS = 500;
 const INTRO_FADE_MS = 0.5;
+/** 실제 로딩 완료 후 100%까지 채우는 시간 */
+const FILL_TO_100_SEC = 2;
 type Phase = 'loading' | 'intro' | 'exit' | 'gone';
 
 type BdtecEntryOverlayProps = {
@@ -30,8 +32,6 @@ function computePct(loading: ReturnType<typeof useBdtecSceneLoadingState>, fully
     if (canvasMounted) floor = Math.max(floor, 22);
     if (webgpuReady) floor = Math.max(floor, 35);
     if (suspenseReady) floor = Math.max(floor, 72);
-    if (fullyReady) return 100;
-
     const blended = active ? Math.max(floor, assetPct * 0.85) : Math.max(floor, assetPct);
     return Math.min(99, Math.round(blended));
 }
@@ -52,13 +52,27 @@ export default function BdtecEntryOverlay({
     const startBtnRef = useRef<HTMLButtonElement>(null);
     const barFillRef = useRef<HTMLDivElement>(null);
     const pctRef = useRef(0);
+    const mountTimeRef = useRef(performance.now());
+    const fillTo100StartedRef = useRef(false);
     const transitionedRef = useRef(false);
     const exitStartedRef = useRef(false);
 
     const [phase, setPhase] = useState<Phase>('loading');
     const [displayPct, setDisplayPct] = useState(0);
+    const [loadTick, setLoadTick] = useState(0);
 
-    const targetPct = useMemo(() => computePct(loading, fullyReady), [loading, fullyReady]);
+    useEffect(() => {
+        if (fullyReady) return;
+        const id = window.setInterval(() => setLoadTick((n) => n + 1), 120);
+        return () => window.clearInterval(id);
+    }, [fullyReady]);
+
+    const assetTargetPct = useMemo(() => {
+        const raw = computePct(loading, fullyReady);
+        const elapsed = performance.now() - mountTimeRef.current;
+        const timeCap = (elapsed / (FILL_TO_100_SEC * 1000)) * 99;
+        return Math.min(99, raw, timeCap);
+    }, [loading, fullyReady, loadTick]);
 
     const transitionToIntro = useCallback(() => {
         if (transitionedRef.current) return;
@@ -95,17 +109,19 @@ export default function BdtecEntryOverlay({
     }, []);
 
     useEffect(() => {
+        if (fullyReady) return;
+
         const bar = barFillRef.current;
         if (!bar) {
-            setDisplayPct(targetPct);
+            setDisplayPct(assetTargetPct);
             return;
         }
 
         const proxy = { value: pctRef.current };
         gsap.killTweensOf(proxy);
         gsap.to(proxy, {
-            value: targetPct,
-            duration: fullyReady ? 0.4 : 0.22,
+            value: assetTargetPct,
+            duration: 0.22,
             ease: 'power2.out',
             onUpdate: () => {
                 const next = Math.round(proxy.value);
@@ -114,7 +130,33 @@ export default function BdtecEntryOverlay({
                 bar.style.transform = `scaleX(${next / 100})`;
             },
         });
-    }, [targetPct, fullyReady]);
+    }, [assetTargetPct, fullyReady]);
+
+    useEffect(() => {
+        if (!fullyReady || fillTo100StartedRef.current) return;
+        fillTo100StartedRef.current = true;
+
+        const bar = barFillRef.current;
+        if (!bar) {
+            pctRef.current = 100;
+            setDisplayPct(100);
+            return;
+        }
+
+        const proxy = { value: pctRef.current };
+        gsap.killTweensOf(proxy);
+        gsap.to(proxy, {
+            value: 100,
+            duration: FILL_TO_100_SEC,
+            ease: 'power2.inOut',
+            onUpdate: () => {
+                const next = Math.round(proxy.value);
+                pctRef.current = next;
+                setDisplayPct(next);
+                bar.style.transform = `scaleX(${next / 100})`;
+            },
+        });
+    }, [fullyReady]);
 
     useEffect(() => {
         if (!fullyReady || transitionedRef.current || displayPct < 100) return;

@@ -106,14 +106,10 @@
   overscroll-behavior: none;
 }
 
-/* 인트로: 3D 숨기고 흰 배경 */
-.blurContainerIntroWhite {
-  background: #ffffff;
-}
-
+/* 인트로·로딩: 3D 씬을 반투명 오버레이 뒤에서 보이게 */
 .canvasHostDuringIntro {
-  opacity: 0;
-  visibility: hidden;
+  opacity: 0.72;
+  visibility: visible;
   pointer-events: none;
 }
 
