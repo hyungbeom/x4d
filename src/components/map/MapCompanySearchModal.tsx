@@ -1,10 +1,7 @@
 ﻿'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-    searchMapCompanies,
-    type MapSearchableCompany,
-} from '@/utils/map/mapCameraPoints';
+import { searchMapCompanies } from '@/utils/map/mapCameraPoints';
 import { gsap } from '@/lib/brochureGsap';
 import styles from './MapCompanySearchModal.module.css';
 
@@ -26,19 +23,29 @@ export default function MapCompanySearchModal({
 
     const [mounted, setMounted] = useState(false);
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState<MapSearchableCompany[]>([]);
-    const [message, setMessage] = useState('');
+
+    const trimmed = query.trim();
+    const results = trimmed ? searchMapCompanies(query) : [];
 
     const reset = useCallback(() => {
         setQuery('');
-        setResults([]);
-        setMessage('');
     }, []);
 
     const runClose = useCallback(() => {
         if (animatingRef.current) return;
         onClose();
     }, [onClose]);
+
+    const handlePick = (booth: string) => {
+        onSelectBooth(booth);
+        runClose();
+    };
+
+    const handleSubmit = () => {
+        if (results.length === 1) {
+            handlePick(results[0].booth);
+        }
+    };
 
     useEffect(() => {
         if (open) setMounted(true);
@@ -115,31 +122,6 @@ export default function MapCompanySearchModal({
         return () => window.removeEventListener('keydown', onKey);
     }, [mounted, open, runClose]);
 
-    const handleSearch = () => {
-        const matches = searchMapCompanies(query);
-        setResults(matches);
-
-        if (matches.length === 0) {
-            setMessage(
-                '검색 결과가 없습니다. 기업명 또는 부스번호를 확인해 주세요.',
-            );
-            return;
-        }
-
-        if (matches.length === 1) {
-            onSelectBooth(matches[0].booth);
-            runClose();
-            return;
-        }
-
-        setMessage(`${matches.length}건이 검색되었습니다. 이동할 기업을 선택하세요.`);
-    };
-
-    const handlePick = (booth: string) => {
-        onSelectBooth(booth);
-        runClose();
-    };
-
     if (!mounted) return null;
 
     return (
@@ -171,6 +153,10 @@ export default function MapCompanySearchModal({
                     </button>
                 </div>
 
+                <p className={styles.hint}>
+                    부스번호 또는 회사명을 입력하면 아래에 일치하는 업체가 표시됩니다.
+                </p>
+
                 <div className={styles.searchRow}>
                     <input
                         ref={inputRef}
@@ -178,42 +164,45 @@ export default function MapCompanySearchModal({
                         className={styles.input}
                         placeholder="기업명 또는 부스번호 (예: A12)"
                         value={query}
-                        onChange={(e) => {
-                            setQuery(e.target.value);
-                            setMessage('');
-                            setResults([]);
-                        }}
+                        onChange={(e) => setQuery(e.target.value)}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                                 e.preventDefault();
-                                handleSearch();
+                                handleSubmit();
                             }
                         }}
                         enterKeyHint="search"
                         autoComplete="off"
+                        role="combobox"
+                        aria-expanded={trimmed.length > 0 && results.length > 0}
+                        aria-controls="company-search-suggest-list"
                     />
-                    <button type="button" className={styles.findBtn} onClick={handleSearch}>
-                        찾기
-                    </button>
                 </div>
 
-                {message ? <p className={styles.message}>{message}</p> : null}
-
-                {results.length > 1 ? (
-                    <ul className={styles.resultList}>
+                {trimmed && results.length > 0 ? (
+                    <ul
+                        id="company-search-suggest-list"
+                        className={styles.suggestList}
+                        role="listbox"
+                        aria-label="기업 검색 결과"
+                    >
                         {results.map((item) => (
-                            <li key={item.booth}>
+                            <li key={item.booth} role="option">
                                 <button
                                     type="button"
-                                    className={styles.resultItem}
+                                    className={styles.suggestItem}
                                     onClick={() => handlePick(item.booth)}
                                 >
-                                    <span className={styles.resultBooth}>{item.booth}</span>
-                                    <span className={styles.resultLabel}>{item.label}</span>
+                                    <span className={styles.suggestBooth}>{item.booth}</span>
+                                    <span className={styles.suggestLabel}>{item.label}</span>
                                 </button>
                             </li>
                         ))}
                     </ul>
+                ) : null}
+
+                {trimmed && results.length === 0 ? (
+                    <p className={styles.noResult}>검색 결과가 없습니다.</p>
                 ) : null}
             </div>
         </div>

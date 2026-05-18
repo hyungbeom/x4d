@@ -12,7 +12,15 @@ import { Light_Environment } from '@/utils/three/Light_Environment';
 import { SceneReadyGate } from '@/utils/three/SceneReadyGate';
 import MapSceneLoader from '@/components/map/MapSceneLoader';
 import MapCompanySearchModal from '@/components/map/MapCompanySearchModal';
+import MapNavSearchModal from '@/components/map/MapNavSearchModal';
 import { MapClickCopyHandler } from '@/components/map/MapClickCopyHandler';
+import { MapNavPath, getMapNavPathLabel } from '@/components/map/MapNavPath';
+import {
+    buildMapUrlAfterCompanySelect,
+    buildMapUrlForNavRoute,
+    parseMapNavQuery,
+    resolveMapNav,
+} from '@/utils/map/mapNavParams';
 import {
     SceneLoadingProvider,
     useBdtecSceneLoadingActions,
@@ -21,7 +29,14 @@ import PageWrapper from '@/utils/ui/PageWrapper';
 import { usePageTransition } from '@/utils/ui/usePageTransition';
 import CameraHelper from '@/utils/three/CamHelper';
 import { applyMapCameraSnapshot } from '@/utils/map/applyMapCameraSnapshot';
-import { getMapCameraSnapshot, resolveMapCameraPoint } from '@/utils/map/mapCameraPoints';
+import { applyMapViewModeControls } from '@/utils/map/applyMapViewModeControls';
+import { resolveMapCameraPoint } from '@/utils/map/mapCameraPoints';
+import {
+    getMap2DTopViewSnapshot,
+    getMap3DViewSnapshot,
+    type MapViewMode,
+} from '@/utils/map/mapViewCamera';
+import { MapViewModeToggle } from '@/components/map/MapViewModeToggle';
 import { useMapEditTools } from '@/utils/map/useMapEditTools';
 import styles from './page.module.css';
 
@@ -30,12 +45,16 @@ type DeviceType = 'desktop' | 'tablet' | 'mobile';
 function MapScene({
     deviceType,
     booth,
+    viewMode,
+    mapNav,
     mapEditTools,
     onCoordCopied,
     onMapNotReady,
 }: {
     deviceType: DeviceType;
     booth: string;
+    viewMode: MapViewMode;
+    mapNav: ReturnType<typeof resolveMapNav>;
     mapEditTools: boolean;
     onCoordCopied?: (text: string) => void;
     onMapNotReady?: () => void;
@@ -45,11 +64,17 @@ function MapScene({
 
     useEffect(() => {
         const controls = cameraControlsRef.current;
-        if (!controls || !hasBoothCamera) return;
+        if (!controls) return;
 
-        const snapshot = getMapCameraSnapshot(booth, deviceType);
+        applyMapViewModeControls(controls, viewMode);
+
+        const snapshot =
+            viewMode === '2d'
+                ? getMap2DTopViewSnapshot(booth || null, deviceType)
+                : getMap3DViewSnapshot(booth || null, deviceType);
+
         applyMapCameraSnapshot(controls, snapshot, true);
-    }, [booth, deviceType, hasBoothCamera]);
+    }, [booth, deviceType, viewMode]);
 
     return (
         <>
@@ -59,14 +84,14 @@ function MapScene({
                 smoothTime={0.45}
                 draggingSmoothTime={0.12}
             />
-            {mapEditTools ? (
-                <CameraHelper
-                    controlsRef={cameraControlsRef}
-                    activePanelId={0}
-                    deviceType={deviceType}
-                    contextLabel={booth ? `booth ${booth}` : 'map'}
-                />
-            ) : null}
+            {/*{mapEditTools ? (*/}
+            {/*    <CameraHelper*/}
+            {/*        controlsRef={cameraControlsRef}*/}
+            {/*        activePanelId={0}*/}
+            {/*        deviceType={deviceType}*/}
+            {/*        contextLabel={booth ? `booth ${booth}` : 'map'}*/}
+            {/*    />*/}
+            {/*) : null}*/}
             <MapModel skipAutoFit={hasBoothCamera} />
             {mapEditTools ? (
                 <MapClickCopyHandler
@@ -77,6 +102,7 @@ function MapScene({
                 />
             ) : null}
             <MapBoothMarks booth={booth} />
+            <MapNavPath nav={mapNav} />
         </>
     );
 }
@@ -86,17 +112,24 @@ function MapPageContent() {
     const searchParams = useSearchParams();
     const navigate = usePageTransition();
     const { setModuleReady, reset } = useBdtecSceneLoadingActions();
-    const booth = useMemo(() => searchParams.get('booth') ?? '', [searchParams]);
+    const navQuery = useMemo(() => parseMapNavQuery(searchParams), [searchParams]);
+    const booth = navQuery.toBooth;
+    const fromBooth = navQuery.fromBooth;
+    const mapNav = useMemo(() => resolveMapNav(searchParams), [searchParams]);
     const mapEditTools = useMapEditTools(booth, searchParams);
     const cameraPointLabel = useMemo(() => {
         if (!booth) return '';
+        const navLabel = getMapNavPathLabel(mapNav);
         const point = resolveMapCameraPoint(booth);
-        return point ? `${point.id} · ${point.label ?? booth}` : booth;
-    }, [booth]);
+        const base = point ? `${point.id} · ${point.label ?? booth}` : booth;
+        return navLabel ? `${base} · ${navLabel}` : base;
+    }, [booth, mapNav]);
     const [deviceType, setDeviceType] = useState<DeviceType>('desktop');
     const [sceneRevealed, setSceneRevealed] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
+    const [navOpen, setNavOpen] = useState(false);
     const [copyToast, setCopyToast] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState<MapViewMode>('2d');
 
     useEffect(() => {
         if (!copyToast) return;
@@ -104,13 +137,20 @@ function MapPageContent() {
         return () => window.clearTimeout(timer);
     }, [copyToast]);
 
-    const goToBooth = useCallback(
+    const handleCompanySelect = useCallback(
         (boothCode: string) => {
             const code = boothCode.trim();
             if (!code) return;
-            router.replace(`/map?booth=${encodeURIComponent(code)}`);
+            router.replace(buildMapUrlAfterCompanySelect(searchParams, code));
         },
-        [router],
+        [router, searchParams],
+    );
+
+    const handleNavApply = useCallback(
+        (fromBoothCode: string, toBoothCode: string) => {
+            router.replace(buildMapUrlForNavRoute(searchParams, fromBoothCode, toBoothCode));
+        },
+        [router, searchParams],
     );
 
     useEffect(() => {
@@ -148,18 +188,13 @@ function MapPageContent() {
                         >
                             ← 브로슈어로
                         </button>
-                        {deviceType === 'mobile' ? (
-                            <button
-                                type="button"
-                                className={styles.findCompanyBtn}
-                                onClick={() => setSearchOpen(true)}
-                            >
-                                기업찾기
-                            </button>
-                        ) : (
-                            <span className={styles.topBarSpacer} aria-hidden />
-                        )}
-                        {booth ? <span className={styles.boothTag}>부스 {booth}</span> : null}
+                        <span className={styles.topBarSpacer} aria-hidden />
+                        {fromBooth ? (
+                            <span className={styles.fromBoothTag}>출발 {fromBooth}</span>
+                        ) : null}
+                        {booth ? (
+                            <span className={styles.boothTag}>목적지 {booth}</span>
+                        ) : null}
                         {mapEditTools ? (
                             <span className={styles.copyHint}>
                                 {cameraPointLabel
@@ -172,7 +207,15 @@ function MapPageContent() {
                     <MapCompanySearchModal
                         open={searchOpen}
                         onClose={() => setSearchOpen(false)}
-                        onSelectBooth={goToBooth}
+                        onSelectBooth={handleCompanySelect}
+                    />
+
+                    <MapNavSearchModal
+                        open={navOpen}
+                        onClose={() => setNavOpen(false)}
+                        onApplyRoute={handleNavApply}
+                        initialFromBooth={fromBooth}
+                        initialToBooth={booth}
                     />
 
                     {copyToast ? (
@@ -180,6 +223,27 @@ function MapPageContent() {
                             복사됨: {copyToast}
                         </div>
                     ) : null}
+
+                    {deviceType !== 'desktop' ? (
+                        <div className={styles.bottomActions}>
+                            <button
+                                type="button"
+                                className={styles.findCompanyBtn}
+                                onClick={() => setSearchOpen(true)}
+                            >
+                                기업찾기
+                            </button>
+                            <button
+                                type="button"
+                                className={styles.findNavBtn}
+                                onClick={() => setNavOpen(true)}
+                            >
+                                길찾기
+                            </button>
+                        </div>
+                    ) : null}
+
+                    <MapViewModeToggle mode={viewMode} onChange={setViewMode} />
 
                     <div className={styles.canvasLayer}>
                         <ManciniCanvas quality="default" backgroundColor="#b8dff5">
@@ -189,6 +253,8 @@ function MapPageContent() {
                                 <MapScene
                                     deviceType={deviceType}
                                     booth={booth}
+                                    viewMode={viewMode}
+                                    mapNav={mapNav}
                                     mapEditTools={mapEditTools && sceneRevealed}
                                     onCoordCopied={setCopyToast}
                                     onMapNotReady={() =>

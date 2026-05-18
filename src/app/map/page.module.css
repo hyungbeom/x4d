@@ -46,13 +46,24 @@
   display: block;
 }
 
-.findCompanyBtn {
-  justify-self: center;
-  padding: 5px 12px;
+.bottomActions {
+  position: fixed;
+  left: 50%;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 55;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.findCompanyBtn,
+.findNavBtn {
+  padding: 8px 16px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.88);
-  color: #0d4a6a;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -60,7 +71,19 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   font-family: inherit;
+}
+
+.findCompanyBtn {
+  background: rgba(255, 255, 255, 0.88);
+  color: #0d4a6a;
   box-shadow: 0 2px 8px rgba(14, 116, 144, 0.15);
+}
+
+.findNavBtn {
+  background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.35);
 }
 
 .topBar > * {
@@ -80,6 +103,17 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   font-family: inherit;
+}
+
+.fromBoothTag {
+  justify-self: end;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.35);
 }
 
 .boothTag {
@@ -110,7 +144,7 @@
 .copyToast {
   position: fixed;
   left: 50%;
-  bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(64px + env(safe-area-inset-bottom, 0px));
   z-index: 200;
   transform: translateX(-50%);
   max-width: min(92vw, 420px);

@@ -47,7 +47,7 @@ export type MapCameraPointConfig = {
     markPosition?: [number, number, number];
 };
 
-export const MAP_CAMERA_POINT_COUNT = 70;
+export const MAP_CAMERA_POINT_COUNT = 400;
 
 export const MAP_CAMERA_OVERVIEW_ID = 'overview';
 

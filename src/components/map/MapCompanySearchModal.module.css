@@ -19,6 +19,8 @@
   flex-direction: column;
   gap: 12px;
   padding: 16px;
+  overflow: hidden;
+  min-height: 0;
   border-radius: 16px;
   background: linear-gradient(180deg, #f8fcff 0%, #e8f4fc 100%);
   border: 1px solid rgba(255, 255, 255, 0.9);
@@ -52,6 +54,13 @@
   font-family: inherit;
 }
 
+.hint {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #64748b;
+}
+
 .searchRow {
   display: flex;
   gap: 8px;
@@ -59,7 +68,9 @@
 
 .input {
   flex: 1;
+  width: 100%;
   min-width: 0;
+  box-sizing: border-box;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid rgba(14, 116, 144, 0.25);
@@ -74,63 +85,57 @@
   outline-offset: 1px;
 }
 
-.findBtn {
-  flex-shrink: 0;
-  padding: 10px 14px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.message {
+.noResult {
   margin: 0;
-  font-size: 12px;
-  line-height: 1.45;
-  color: #3d6b82;
+  padding: 6px 4px;
+  font-size: 11px;
+  color: #94a3b8;
 }
 
-.resultList {
+.suggestList {
   margin: 0;
   padding: 0;
   list-style: none;
-  overflow-y: auto;
-  max-height: 240px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  max-height: min(40dvh, 280px);
+  overflow-y: auto;
 }
 
-.resultItem {
+.suggestItem {
   width: 100%;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid rgba(14, 116, 144, 0.15);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.85);
+  padding: 8px 10px;
+  border: 1px solid rgba(14, 116, 144, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   text-align: left;
   font-family: inherit;
+  transition: background 0.15s ease;
 }
 
-.resultBooth {
+.suggestItem:hover,
+.suggestItem:focus-visible {
+  background: #e0f2fe;
+  outline: none;
+}
+
+.suggestBooth {
   flex-shrink: 0;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 3px 7px;
+  border-radius: 5px;
   background: linear-gradient(180deg, #ff9a4d 0%, #f97316 100%);
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
 }
 
-.resultLabel {
-  font-size: 13px;
+.suggestLabel {
+  font-size: 12px;
   font-weight: 600;
   color: #123d52;
   line-height: 1.35;
