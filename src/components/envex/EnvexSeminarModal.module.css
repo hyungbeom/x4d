@@ -1,0 +1,353 @@
+.shell {
+  position: fixed;
+  z-index: 10050;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: linear-gradient(
+    180deg,
+    #9ec8ef 0%,
+    #b5daf4 18%,
+    #cce6f8 36%,
+    #e3f2fb 58%,
+    #f4f9fd 80%,
+    #ffffff 100%
+  );
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: auto;
+}
+
+.panel {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(16px, 3vh, 40px) clamp(14px, 3.5vw, 32px);
+  box-sizing: border-box;
+  color: #123d52;
+  opacity: 0;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-bottom: 14px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #4a8fd4;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(20px, 4.2vw, 32px);
+  font-weight: 800;
+  word-break: keep-all;
+  color: #123d52;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  font-size: clamp(11px, 1.8vw, 13px);
+  color: #5a7d96;
+  font-weight: 500;
+}
+
+.closeBtn {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(74, 143, 212, 0.28);
+  background: linear-gradient(180deg, #ffffff 0%, #e8f4fc 100%);
+  color: #123d52;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(74, 143, 212, 0.12);
+}
+
+.closeBtn:hover {
+  background: #fff;
+}
+
+.searchRow {
+  flex-shrink: 0;
+  margin-bottom: 14px;
+}
+
+.searchLabel {
+  display: block;
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #123d52;
+}
+
+.searchBar {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(74, 143, 212, 0.22);
+  background: rgba(255, 255, 255, 0.95);
+  color: #123d52;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.searchInput::placeholder {
+  color: #8aa3b5;
+}
+
+.searchInput:focus {
+  border-color: #4a8fd4;
+  box-shadow: 0 0 0 3px rgba(74, 143, 212, 0.15);
+}
+
+.searchBtn {
+  flex-shrink: 0;
+  padding: 11px 22px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1e5f8a 0%, #123d52 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.12s ease;
+}
+
+.searchBtn:hover {
+  filter: brightness(1.08);
+}
+
+.searchBtn:active {
+  transform: scale(0.98);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-bottom: 14px;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  padding: 48px 24px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #6b8299;
+  list-style: none;
+}
+
+.filterBtn {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(74, 143, 212, 0.22);
+  background: rgba(255, 255, 255, 0.9);
+  color: #5a7d96;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.filterBtnActive {
+  background: linear-gradient(180deg, #1e5f8a 0%, #123d52 100%);
+  border-color: transparent;
+  color: #fff;
+}
+
+.list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0 2px 8px 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  padding: 16px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid rgba(18, 61, 82, 0.08);
+  box-shadow: 0 2px 12px rgba(18, 61, 82, 0.06);
+}
+
+.cardTitle {
+  margin: 0 0 8px;
+  font-size: clamp(14px, 1.8vw, 16px);
+  font-weight: 800;
+  line-height: 1.45;
+  color: #0f2d3d;
+  word-break: keep-all;
+}
+
+.cardOrganizer {
+  margin: 0 0 12px;
+  font-size: clamp(12px, 1.5vw, 13px);
+  line-height: 1.4;
+  color: #6b8299;
+  word-break: keep-all;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef4f8;
+  color: #3d6b82;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+@media (min-width: 1025px) {
+  .panel {
+    padding: clamp(24px, 4vh, 48px) clamp(32px, 5vw, 64px);
+  }
+
+  .header,
+  .searchRow,
+  .filters {
+    width: 100%;
+    max-width: 1320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .searchRow {
+    margin-bottom: 18px;
+  }
+
+  .searchLabel {
+    font-size: 14px;
+  }
+
+  .searchInput {
+    padding: 12px 18px;
+    font-size: 15px;
+  }
+
+  .searchBtn {
+    padding: 12px 28px;
+    font-size: 15px;
+  }
+
+  .header {
+    margin-bottom: 20px;
+  }
+
+  .filters {
+    margin-bottom: 20px;
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-content: start;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 4px 12px 0;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 168px;
+    padding: 20px 22px;
+    border-radius: 16px;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 24px rgba(18, 61, 82, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .cardTitle {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .cardOrganizer {
+    flex: 1;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+
+  .tags {
+    margin-top: auto;
+    gap: 8px;
+  }
+
+  .tag {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .tag {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .closeBtn {
+    align-self: flex-end;
+  }
+}

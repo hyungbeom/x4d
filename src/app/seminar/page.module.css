@@ -1,0 +1,117 @@
+.main {
+  min-height: 100dvh;
+  padding: calc(56px + env(safe-area-inset-top, 0px)) 16px
+    calc(24px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(
+    180deg,
+    #8ecfef 0%,
+    #b3e0f7 38%,
+    #d4effa 72%,
+    #f0f9ff 100%
+  );
+}
+
+.topBar {
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  left: 16px;
+  z-index: 10;
+}
+
+.backBtn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: inherit;
+}
+
+.openBtn {
+  position: fixed;
+  right: 14px;
+  bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  z-index: 55;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(186, 230, 253, 0.9);
+  background: rgba(14, 116, 144, 0.55);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.content {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.title {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0d4a6a;
+}
+
+.lead {
+  margin: 0 0 20px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #3d6b82;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(14, 116, 144, 0.15);
+  box-shadow: 0 2px 10px rgba(15, 45, 61, 0.08);
+}
+
+.time {
+  flex-shrink: 0;
+  min-width: 44px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #0ea5e9;
+}
+
+.itemBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.itemTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d4a6a;
+  line-height: 1.35;
+}
+
+.place {
+  font-size: 12px;
+  color: #5b8fa8;
+}
