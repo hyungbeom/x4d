@@ -68,7 +68,7 @@ export function DataModel(props:any) {
                     />
                 </group>
               
-                <group rotation={[0,-Math.PI/2,0]} position={[-125.42, 194.59, -86.112]}>
+                <group rotation={[0,-Math.PI/3,0]} position={[-125.42, 260.59, -86.112]}>
                     <group position={[-48.668, 24.82, -40.987]}>
                         <mesh
                             castShadow

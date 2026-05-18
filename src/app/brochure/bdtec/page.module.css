@@ -1,10 +1,32 @@
+.canvasHost {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .scrollMain {
   position: relative;
   height: 300vh;
   width: 100dvw;
-  background-color: #e5e5e5;
+  background: linear-gradient(
+    180deg,
+    #b3daf5 0%,
+    #d4ebfa 45%,
+    #f5fbff 78%,
+    #ffffff 100%
+  );
   overflow-x: hidden;
   overflow-y: clip;
+}
+
+/* 전체 래퍼는 클릭 통과 — NavBar·버튼 등 자식만 pointer-events: auto */
+.brochureUi {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
 }
 
 .stickyViewport {
@@ -12,6 +34,13 @@
   top: 0;
   height: 100dvh;
   overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    #b3daf5 0%,
+    #c5e3f8 32%,
+    #e8f4fc 68%,
+    #ffffff 100%
+  );
 }
 
 .introWrapper {
@@ -19,6 +48,7 @@
   inset: 0;
   z-index: 30;
   pointer-events: none;
+  background: #ffffff;
 }
 
 .overlaySafeZone {
@@ -60,7 +90,14 @@
 .blurContainer {
   width: 100%;
   height: 100%;
-  background-color: #0c1018;
+  background: linear-gradient(
+    180deg,
+    #a8d4f0 0%,
+    #b8dff5 28%,
+    #d8eef9 58%,
+    #f0f9ff 82%,
+    #ffffff 100%
+  );
 }
 
 /* R3F WebGPU: 브라우저가 드래그를 스크롤/제스처로 가로채면 Orbit에 pointermove가 안 올 수 있음 */
@@ -69,12 +106,15 @@
   overscroll-behavior: none;
 }
 
-.blurContainerIntro {
-  filter: blur(5px);
+/* 인트로: 3D 숨기고 흰 배경 */
+.blurContainerIntroWhite {
+  background: #ffffff;
 }
 
-.blurContainerReady {
-  filter: blur(0);
+.canvasHostDuringIntro {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .blurContainerHidden {
@@ -104,6 +144,7 @@
   right: clamp(16px, 3vw, 28px);
   bottom: calc(108px + env(safe-area-inset-bottom, 0px));
   z-index: 55;
+  pointer-events: auto;
   padding: 8px 14px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.85);

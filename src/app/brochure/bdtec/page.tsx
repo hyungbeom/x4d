@@ -1,22 +1,23 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import Overlay1 from "@/components/bdtec/overlay/OverLay1";
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import NavBar from "@/utils/ui/NavBar";
 import InfoPanel from "@/utils/ui/InfoPanel";
 import PageWrapper from "@/utils/ui/PageWrapper";
 import styles from "./page.module.css";
-import BdtecBrochureLoader from "@/components/bdtec/BdtecBrochureLoader";
+import BdtecEntryOverlay from "@/components/bdtec/BdtecEntryOverlay";
 import BdtecSceneHeroCopy from "@/components/bdtec/BdtecSceneHeroCopy";
 import { SceneLoadingProvider } from "@/utils/three/SceneLoadingContext";
-import BdtecScene from "@/app/brochure/bdtec/mobile/Mobile";
 import dynamic from "next/dynamic";
 
+const BdtecScene = dynamic(() => import('@/app/brochure/bdtec/mobile/Mobile'), {
+    ssr: false,
+});
 
 const DynamicIsland = dynamic(() => import('@/utils/DynamicIsland'), {
-    ssr: false // 서버 사이드 렌더링을 끄고 브라우저에서만 그리도록 강제합니다.
+    ssr: false,
 });
 
 const panelContents: Record<number, { title: string; desc: string; extra?: string }> = {
@@ -35,13 +36,12 @@ export default function Home() {
     // 🚀 1. 기기 타입을 3가지로 세분화하여 관리합니다.
     const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
     const [autoTour, setAutoTour] = useState(false);
-    const [sceneRevealed, setSceneRevealed] = useState(false);
-
     const AUTO_TOUR_INTERVAL_MS = 5000;
 
     const mainContainerRef = useRef(null);
-    const introWrapperRef = useRef<HTMLDivElement>(null);
     const blurContainerRef = useRef<HTMLDivElement>(null);
+    const canvasHostRef = useRef<HTMLDivElement>(null);
+    const brochureUiRef = useRef<HTMLDivElement>(null);
 
     const navMenus = [
         { title: 'BDI-100', onClick: () => handleVariableChange(1) },
@@ -111,49 +111,16 @@ export default function Home() {
         return () => window.clearInterval(intervalId);
     }, [autoTour, intro]);
 
-    function getStart() {
-        if (introWrapperRef.current) {
-            gsap.to(introWrapperRef.current, {
-                opacity: 0, duration: 1, ease: "power2.inOut",
-                onComplete: () => setIntro(true)
-            });
-        } else {
-            setIntro(true);
-        }
-
-        if (blurContainerRef.current) {
-            gsap.to(blurContainerRef.current, {
-                filter: "blur(0px)", duration: 1, ease: "power2.inOut"
-            });
-        }
-    }
-
     const currentPanelData = panelContents[activePanelId] || { title: "", desc: "", extra: "" };
 
     return (
         <SceneLoadingProvider>
-            <BdtecBrochureLoader onGone={() => setSceneRevealed(true)} />
-            <PageWrapper>
+            <PageWrapper type="fade">
             <main ref={mainContainerRef} className={styles.scrollMain}>
                 <div className={styles.stickyViewport}>
 
-                    {!intro && (
-                        <div ref={introWrapperRef} className={styles.introWrapper}>
-                            <div className={styles.overlaySafeZone}>
-                                <Overlay1 />
-                            </div>
-                            <div className={styles.startBtnContainer}>
-                                <button type="button" className={styles.startBtn} onClick={getStart}>
-                                    비디텍 브로슈어 시작하기
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {intro && (
-
-                        <>
-                            <DynamicIsland/>
+                    <div ref={brochureUiRef} className={styles.brochureUi} aria-hidden={!intro}>
+                        <DynamicIsland />
                         <NavBar
                             logoSrc="/model/bdtec/logo.svg"
                             menus={navMenus}
@@ -173,8 +140,7 @@ export default function Home() {
                         >
                             Next
                         </button>
-                        </>
-                    )}
+                    </div>
                     {/*{process.env.NODE_ENV === 'development' && <DomStats />}*/}
 
                     <BdtecSceneHeroCopy
@@ -191,13 +157,24 @@ export default function Home() {
 
                     <div
                         ref={blurContainerRef}
-                        className={`${styles.blurContainer} ${intro ? styles.blurContainerReady : styles.blurContainerIntro} ${deviceType !== 'desktop' ? styles.blurContainer3dTouch : ''} ${sceneRevealed ? styles.blurContainerVisible : styles.blurContainerHidden}`}
+                        className={`${styles.blurContainer} ${deviceType !== 'desktop' ? styles.blurContainer3dTouch : ''} ${styles.blurContainerVisible} ${!intro ? styles.blurContainerIntroWhite : ''}`}
                     >
-                        {/* 🚀 3. R3F 씬으로 deviceType 프롭스를 전달합니다. Spline은 사라졌습니다! */}
-                        <BdtecScene
-                            quality={quality}
-                            activePanelId={activePanelId}
-                            deviceType={deviceType}
+                        <div
+                            ref={canvasHostRef}
+                            data-bdtec-canvas-host
+                            className={`${styles.canvasHost} ${!intro ? styles.canvasHostDuringIntro : ''}`}
+                        >
+                            <BdtecScene
+                                quality={quality}
+                                activePanelId={activePanelId}
+                                deviceType={deviceType}
+                            />
+                        </div>
+                        <BdtecEntryOverlay
+                            blurContainerRef={blurContainerRef}
+                            canvasHostRef={canvasHostRef}
+                            brochureUiRef={brochureUiRef}
+                            onReveal={() => setIntro(true)}
                         />
                     </div>
                 </div>

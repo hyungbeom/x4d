@@ -15,7 +15,7 @@ import {ManciniCanvas} from "@/app/brochure/bdtec/mobile/ManciniCanvas";
 import LineObj from "@/utils/three/LineObj";
 
 // 3D 모델
-import {Tank} from "@/resources/model/bdtect/Tank";
+
 import {AirProduct} from "@/resources/model/Air_Product";
 import {Factory} from "@/resources/model/bdtect/Factory";
 import {Wifi} from "@/resources/model/bdtect/Wifi";
@@ -24,6 +24,7 @@ import {Modem} from "@/resources/model/bdtect/Modem";
 import {DataModel} from "@/resources/model/bdtect/Data";
 import {SplineSmokeParticles} from "@/utils/three/SplineParticles";
 import {Light_Environment} from "@/utils/three/Light_Environment";
+import { Tank } from "@/resources/model/bdtect/Tank";
 
 // ... (FloatingTankLine 컴포넌트 유지) ...
 function FloatingTankLine() {
@@ -170,29 +171,29 @@ export default function BdtecScene({quality, activePanelId, deviceType}: BdtecSc
     const PipeLine5 = useMemo(() => [new THREE.Vector3(-40, 80, 135), new THREE.Vector3(-40, 80, -300), new THREE.Vector3(320, 80, -300), new THREE.Vector3(320, 80, -135), new THREE.Vector3(570, 80, -135)], []);
 
     return (
-        <ManciniCanvas quality={quality}>
+        <ManciniCanvas quality={quality} backgroundColor="#b8dff5">
             <CameraController activePanelId={activePanelId} deviceType={deviceType}/>
 
             <Suspense fallback={null}>
                 {/*<SceneEnvironment preset="forest" blur={1} environmentIntensity={0.8}/>*/}
-                <SceneEnvironment colorTop="#0a0a0a" colorBottom="#121820" opaque />
+                <SceneEnvironment colorTop="#a8d4f0" colorBottom="#ffffff" />
                 <Light_Environment />
                 <BrochureGrid
                     cellSize={32}
                     sectionSize={160}
                     cellColor="#d0c8cc"
-                    sectionColor="#6b8fa8"
+                    sectionColor="#1a4d8c"
                     animateColors
                     pulseSpeed={2}
                     cellColorTo="#ffffff"
-                    sectionColorTo="#b8e4ff"
+                    sectionColorTo="#2563b3"
                     hdrPulse
                 />
 
                 <FloatingTankLine/>
 
                 <AirProduct scale={[20, 20, 20]} position={[-40, 215, 45]}/>
-                <Tank scale={[70, 70, 70]} position={[0, 0, 370]} rotation={[0, -Math.PI / 2, 0]}/>
+                <Tank scale={[80, 80, 80]} position={[0, 0, 370]} rotation={[0,0, 0]}/>
                 <Modem scale={[100, 100, 100]} position={[0, 0, 450]}/>
                 <SplineSmokeParticles
                     spawnPosition={[-350, 200, -5]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정
@@ -224,9 +225,9 @@ export default function BdtecScene({quality, activePanelId, deviceType}: BdtecSc
                     spawnPosition={[-545, 110, -60]} // 카메라가 보고 있는 메인 모델 근처 좌표로 설정
                     count={20}    // 기본 크기의 20배로 뻥튀기 (눈에 보일 때까지 올려보세요)
                 />
-                <Factory scale={[40, 40, 40]} rotation={[0, -Math.PI / 2, 0]} position={[-420, 0, -20]}/>
+                <Factory scale={[58, 58, 58]} rotation={[0, -Math.PI / 2, 0]} position={[-420, -100, -5]}/>
                 <Modem scale={[100, 100, 100]} position={[-450, 0, 80]}/>
-                <Wifi scale={[150, 150, 150]} position={[300, 0, 88]}/>
+                <Wifi scale={[90, 90, 90]} position={[300, 0, 88]}/>
                 <SystemModel scale={[100, 100, 100]} position={[0, 130, 0]} rotation={[0, 0, 0]}/>
                 <DataModel scale={[50, 50, 50]} position={[590, 0, -30]} rotation={[0, Math.PI / 2, 0]}/>
 

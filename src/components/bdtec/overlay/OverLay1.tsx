@@ -7,7 +7,7 @@ export default function Overlay1() {
                 {`
                     /* --- 1. 좌측 상단 헤더 & 로고 --- */
                     .overlay-header {
-                        color : white;
+                        color: #123d52;
                         position: absolute;
                         top: 0;
                         left: 0;
@@ -35,12 +35,10 @@ export default function Overlay1() {
                         width: 260px; /* 📱 모바일 너비 */
                         padding: 15px;
                         z-index: 10;
-                        background: rgba(255, 255, 255, 0.1);
-                        backdrop-filter: blur(3px);
-                        -webkit-backdrop-filter: blur(3px);
-                        border: 1px solid rgba(255, 255, 255, 0.2);
-                        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-                        color: #ffffff;
+                        background: rgba(18, 61, 82, 0.06);
+                        border: 1px solid rgba(18, 61, 82, 0.12);
+                        box-shadow: 0 8px 24px rgba(18, 61, 82, 0.08);
+                        color: #123d52;
                         word-break: keep-all;
                         will-change: transform, opacity;
                         pointer-events: none; /* 클릭 무시 (시작 버튼 클릭 방해 방지) */
