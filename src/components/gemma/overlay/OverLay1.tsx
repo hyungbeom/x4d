@@ -1,113 +1,249 @@
+'use client';
 
-import React from 'react';
+import React, { type RefObject } from 'react';
 
-export default function Overlay1() {
+const GEMMA_LOGO_SRC = '/model/gemma/gemma_logo.png';
+
+type Overlay1Props = {
+    showProductDetail?: boolean;
+    productDetailRef?: RefObject<HTMLButtonElement | null>;
+    onProductDetailClick?: () => void;
+};
+
+export default function Overlay1({
+    showProductDetail = false,
+    productDetailRef,
+    onProductDetailClick,
+}: Overlay1Props) {
     return (
         <>
             <style>
                 {`
-                    /* --- 1. 좌측 상단 헤더 & 로고 --- */
+                    .gemma-overlay-root {
+                        position: fixed;
+                        inset: 0;
+                        z-index: 10;
+                        pointer-events: none;
+                    }
+
                     .overlay-header {
-                    color : white;
+                        color: #123d52;
                         position: absolute;
                         top: 0;
                         left: 0;
                         z-index: 10;
-                        padding: 15px; /* 모바일 기본 패딩 */
+                        padding: 20px;
                     }
+
                     .overlay-text {
                         padding: 10px 15px;
                         font-weight: 600;
-                        font-size: 16px; /* 모바일 글자 크기 */
+                        font-size: 16px;
                         line-height: 1.4;
                     }
+
                     .overlay-logo {
-                        width: 80%; /* 모바일 로고 크기 */
+                        width: 80%;
                         margin-top: 10px;
                         margin-left: 15px;
+                        display: block;
                     }
 
-                    /* --- 2. 좌측 하단 정보 카드 (모바일 기준) --- */
+                    .product-detail-btn {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-top: 14px;
+                        margin-left: 15px;
+                        padding: 10px 20px;
+                        border-radius: 999px;
+                        border: 1.5px solid rgba(72, 168, 154, 0.65);
+                        background: linear-gradient(
+                            180deg,
+                            rgba(255, 255, 255, 0.92) 0%,
+                            rgba(228, 245, 242, 0.88) 100%
+                        );
+                        color: #0f3d42;
+                        font-size: 13px;
+                        font-weight: 700;
+                        letter-spacing: -0.02em;
+                        line-height: 1;
+                        white-space: nowrap;
+                        cursor: pointer;
+                        pointer-events: auto;
+                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+                        transition:
+                            background-color 0.2s ease,
+                            border-color 0.2s ease,
+                            transform 0.12s ease;
+                    }
+
+                    .product-detail-btn:hover {
+                        background: #ffffff;
+                        border-color: #48a89a;
+                        transform: translateY(-1px);
+                    }
+
+                    .product-detail-btn:active {
+                        transform: scale(0.97);
+                    }
+
+                    .product-detail-btn--hidden {
+                        opacity: 0;
+                        pointer-events: none;
+                    }
+
                     .info-card {
                         position: absolute;
-                        bottom: 15px;
+                        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
                         left: 15px;
-                        width: 260px; /* 📱 모바일 너비 */
-                        padding: 15px;
+                        width: min(260px, 72vw);
+                        max-width: 320px;
+                        padding: 12px 14px;
                         z-index: 10;
-                        background: rgba(255, 255, 255, 0.1);
-                        backdrop-filter: blur(3px);
-                        -webkit-backdrop-filter: blur(3px);
-                        border: 1px solid rgba(255, 255, 255, 0.2);
-                        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-                        color: #ffffff;
+                        isolation: isolate;
+                        background: transparent;
+                        border: 1px solid rgba(255, 255, 255, 0.28);
+                        box-shadow:
+                            0 6px 20px rgba(0, 0, 0, 0.08),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.35);
+                        border-radius: 12px;
                         word-break: keep-all;
                         will-change: transform, opacity;
                         pointer-events: none;
                     }
+
+                    .info-card::before {
+                        content: '';
+                        position: absolute;
+                        inset: 0;
+                        border-radius: inherit;
+                        background: rgba(255, 255, 255, 0.16);
+                        backdrop-filter: blur(6px) saturate(1.05);
+                        -webkit-backdrop-filter: blur(6px) saturate(1.05);
+                        z-index: 0;
+                        pointer-events: none;
+                    }
+
+                    .info-card-title,
+                    .info-card-desc {
+                        position: relative;
+                        z-index: 1;
+                        color: #ffffff;
+                    }
+
                     .info-card-title {
                         font-size: 14px;
-                        font-weight: bold;
+                        font-weight: 800;
                         margin-bottom: 12px;
                     }
+
                     .info-card-desc {
                         font-size: 11px;
-                        opacity: 0.9;
+                        font-weight: 500;
                         white-space: normal;
                     }
 
-                    /* --- 🖥️ 태블릿 사이즈 (768px 이상) --- */
                     @media (min-width: 768px) {
-                        .overlay-header { padding: 30px; }
-                        .overlay-text { padding: 20px 30px; font-size: 20px; }
-                        .overlay-logo { width: auto; margin-left: 30px; }
-                        
+                        .overlay-header {
+                            padding: 30px;
+                        }
+
+                        .overlay-text {
+                            padding: 20px 30px;
+                            font-size: 20px;
+                        }
+
+                        .overlay-logo {
+                            width: auto;
+                            margin-left: 30px;
+                        }
+
+                        .product-detail-btn {
+                            margin-left: 30px;
+                            margin-top: 18px;
+                            padding: 12px 24px;
+                            font-size: 14px;
+                        }
+
                         .info-card {
-                            bottom: 30px;
+                            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
                             left: 30px;
-                            width: 500px; /* 💻 태블릿 너비 */
+                            width: min(500px, 52vw);
+                            max-width: 500px;
                             padding: 20px;
                         }
-                        .info-card-title { font-size: 16px; margin-bottom: 16px; }
-                        .info-card-desc { font-size: 12px; }
+
+                        .info-card-title {
+                            font-size: 16px;
+                            margin-bottom: 16px;
+                        }
+
+                        .info-card-desc {
+                            font-size: 12px;
+                        }
                     }
 
-                    /* --- 🖥️ 데스크탑 사이즈 (1024px 이상) --- */
                     @media (min-width: 1024px) {
                         .info-card {
-                            bottom: 40px;
-                            left: 40px;
-                            width: 700px; /* 🖥️ 데스크탑 너비 */
+                            bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+                            left: 50px;
+                            width: min(700px, 58vw);
+                            max-width: 60%;
                             padding: 25px;
                         }
-                        .info-card-title { font-size: 18px; margin-bottom: 20px; }
-                        .info-card-desc { font-size: 14px; line-height: 1.5; }
+
+                        .info-card-title {
+                            font-size: 18px;
+                            margin-bottom: 20px;
+                        }
+
+                        .info-card-desc {
+                            font-size: 14px;
+                            line-height: 1.5;
+                        }
+
                         .overlay-logo {
-                            width : 300px;
+                            width: 300px;
+                        }
+
+                        .product-detail-btn {
+                            margin-left: 30px;
+                            margin-top: 20px;
+                            padding: 12px 28px;
+                            font-size: 15px;
                         }
                     }
                 `}
             </style>
 
-            {/* 좌측 상단 헤더 영역 */}
-            <div className="overlay-header">
-                <div className="overlay-text" style={{textAlign : 'left'}}>
-                    <div>Environmental Iot</div>
-                    <div>Total Technology Company</div>
+            <div className="gemma-overlay-root">
+                <div className="overlay-header">
+                    <div className="overlay-text" style={{ textAlign: 'left' }}>
+                        <div>Environmental Iot</div>
+                        <div>Total Technology Company</div>
+                    </div>
+                    <img className="overlay-logo" src={GEMMA_LOGO_SRC} alt={'\uC810\uB9C8 \uB85C\uACE0'} />
+                    <button
+                        ref={productDetailRef}
+                        type="button"
+                        className={`product-detail-btn ${showProductDetail ? '' : 'product-detail-btn--hidden'}`}
+                        onClick={onProductDetailClick}
+                        aria-label={'\uC81C\uD488 \uC0C1\uC138\uBCF4\uAE30'}
+                    >
+                        {'\uC81C\uD488 \uC0C1\uC138\uBCF4\uAE30'}
+                    </button>
                 </div>
-                <img className="overlay-logo" src="/model/bdtec/logo.svg"  alt="듀온 로고" />
-            </div>
 
-            {/* 좌측 하단 정보 카드 영역 */}
-            <div className="info-card">
-                <div className="info-card-title">
-                   IoT Gateway(환경 사물인터넷) <br/> BDI - 100 <br/>
-                </div>
-                <div className="info-card-desc">
-                   24시간 지속적인 모니터링으로 집진상태 판단과 측정 시스템 제공
-                    <br/>
-                    <br/>
-                    오염 방지 시설의 가동여부를 24시간 실시간으로 모니터링하고 온도/차압/전류 등의 방지시설 운영 수집정보로 환경관리공단 서버(www.greenlink.or.kr)에 보안된 데이터로 안전하게 전송하는 시스템 입니다.
+                <div className="info-card">
+                    <div className="info-card-title">
+                        {'\uC218\uC9C8\u00B7\uD658\uACBD \uBAA8\uB2C8\uD130\uB9C1 \uC194\uB8E8\uC158'}
+                    </div>
+                    <div className="info-card-desc">
+                        {
+                            '\uD558\u00B7\uD3D0\uC218 \uCC98\uB9AC\uC640 \uC218\uC9C8 \uC815\uD654 \uBD84\uC57C\uC758 \uAE30\uC220\uB825\uC73C\uB85C \uD604\uC7A5 \uB9DE\uCDA4\uD615 \uD658\uACBD \uC194\uB8E8\uC158\uC744 \uC81C\uACF5\uD569\uB2C8\uB2E4.'
+                        }
+                    </div>
                 </div>
             </div>
         </>

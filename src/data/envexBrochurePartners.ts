@@ -27,7 +27,7 @@ export const ENVEX_BROCHURE_PARTNERS: EnvexBrochurePartner[] = [
         id: 'gemma',
         name: '젬마',
         href: '/brochure/gemma',
-        logoSrc: buildEnvexLogoUrl('회사 로고(젬마).jpg') ?? '',
+        logoSrc: '/model/gemma/gemma_logo.png',
         logoAlt: '젬마',
     },
 ];

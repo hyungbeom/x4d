@@ -40,6 +40,47 @@ export const ENVEX_CONTACT_PAGE: ContactUsScreenProps = {
     ],
 };
 
+export const GEMMA_CONTACT_PAGE: ContactUsScreenProps = {
+    backHref: '/brochure/gemma',
+    backAriaLabel: '젬마 브로슈어로 돌아가기',
+    phoneHref: 'tel:07076008577',
+    lead: (
+        <>
+            <strong>Instru Korea</strong> · <strong>(주)젬마</strong>
+            <br />
+            수질·환경 모니터링 제품 및 기술 문의는 아래 연락처로 연락해 주세요.
+        </>
+    ),
+    rows: [
+        {
+            key: 'phone',
+            icon: 'phone',
+            primary: '070-7600-8577',
+            href: 'tel:07076008577',
+            secondary: 'Tel.',
+        },
+        {
+            key: 'email',
+            icon: 'mail',
+            primary: 'gemma@gemma-e.com',
+            href: 'mailto:gemma@gemma-e.com',
+            secondary: '이메일 문의',
+        },
+        {
+            key: 'hq',
+            icon: 'pin',
+            primary: '경기도 안성시 공도읍 대신두길 76-15',
+            secondary: '본사',
+        },
+        {
+            key: 'branch',
+            icon: 'pin',
+            primary: '경기도 화성시 동탄첨단산업1로 51-9',
+            secondary: '지점 · 동탄엠타워 1018호',
+        },
+    ],
+};
+
 export const BDTEC_CONTACT_PAGE: ContactUsScreenProps = {
     backHref: '/brochure/bdtec',
     backAriaLabel: '비디텍 브로슈어로 돌아가기',
