@@ -3,6 +3,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  transition: opacity 0.55s ease;
 }
 
 .scrollMain {
@@ -41,6 +42,11 @@
     #121f2e 68%,
     #0c141c 100%
   );
+  transition: background 0.55s ease;
+}
+
+.stickyViewportWhite {
+  background: #ffffff;
 }
 
 .introWrapper {
@@ -98,6 +104,11 @@
     #0e1822 82%,
     #0c141c 100%
   );
+  transition: background 0.55s ease;
+}
+
+.blurContainerWhite {
+  background: #ffffff;
 }
 
 /* R3F WebGPU: 브라우저가 드래그를 스크롤/제스처로 가로채면 Orbit에 pointermove가 안 올 수 있음 */
@@ -106,10 +117,24 @@
   overscroll-behavior: none;
 }
 
-/* 인트로·로딩: 3D 씬을 반투명 오버레이 뒤에서 보이게 */
+/* 로딩 중 — 3D 씬 숨김 (100% 후 onSceneReveal) */
+.canvasHostHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* 인트로 오버레이 뒤 3D 씬 */
 .canvasHostDuringIntro {
-  opacity: 0.72;
+  opacity: 1;
   visibility: visible;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+/* NEXT — 3D 객체 숨김 */
+.canvasHostCleared {
+  opacity: 0;
   pointer-events: none;
 }
 

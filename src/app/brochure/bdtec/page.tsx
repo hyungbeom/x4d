@@ -5,11 +5,13 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import NavBar from "@/utils/ui/NavBar";
 import InfoPanel from "@/utils/ui/InfoPanel";
+import infoPanelStyles from "@/utils/ui/InfoPanel.module.css";
 import PageWrapper from "@/utils/ui/PageWrapper";
 import styles from "./page.module.css";
 import BdtecEntryOverlay from "@/components/bdtec/BdtecEntryOverlay";
 import BdtecSceneHeroCopy from "@/components/bdtec/BdtecSceneHeroCopy";
 import BdtecSpecModal from "@/components/bdtec/BdtecSpecModal";
+import BdtecTankGridCopy from "@/components/bdtec/BdtecTankGridCopy";
 import { SceneLoadingProvider } from "@/utils/three/SceneLoadingContext";
 import dynamic from "next/dynamic";
 
@@ -27,12 +29,15 @@ const panelContents: Record<number, { title: string; desc: string; extra?: strin
 
 export default function Home() {
     const [intro, setIntro] = useState(false);
+    const [sceneVisible, setSceneVisible] = useState(false);
     const [activePanelId, setActivePanelId] = useState<number>(0);
     const [quality, setQuality] = useState("default");
 
     // 🚀 1. 기기 타입을 3가지로 세분화하여 관리합니다.
     const [deviceType, setDeviceType] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
     const [autoTour, setAutoTour] = useState(false);
+    const [whiteSceneBg, setWhiteSceneBg] = useState(false);
+    const [snapSceneFade, setSnapSceneFade] = useState(false);
     const AUTO_TOUR_INTERVAL_MS = 5000;
 
     const mainContainerRef = useRef(null);
@@ -70,7 +75,37 @@ export default function Home() {
 
     const handleVariableChange = (newValue: number) => {
         setActivePanelId(newValue);
+        setWhiteSceneBg(false);
     };
+
+    /** 흰 화면(Tank2) → 3D 브로슈어 패널 */
+    const handleNext = () => {
+        setWhiteSceneBg(false);
+        setActivePanelId((prev) => (prev < 1 ? 1 : prev));
+    };
+
+    /** 3D 패널 → 흰 화면(Tank2), 패널 순환 */
+    const handlePrev = () => {
+        setWhiteSceneBg(true);
+        setActivePanelId((prev) => {
+            if (prev < 1) return 1;
+            if (prev >= 5) return 1;
+            return prev + 1;
+        });
+    };
+
+    const handleBrochureStart = () => {
+        setSnapSceneFade(true);
+        setIntro(true);
+        setWhiteSceneBg(true);
+        setActivePanelId(1);
+    };
+
+    useEffect(() => {
+        if (!snapSceneFade) return;
+        const id = window.requestAnimationFrame(() => setSnapSceneFade(false));
+        return () => window.cancelAnimationFrame(id);
+    }, [snapSceneFade]);
 
     const handleLogoClick = () => {
         setAutoTour(false);
@@ -81,6 +116,7 @@ export default function Home() {
         setAutoTour((prev) => {
             const next = !prev;
             if (next) {
+                setWhiteSceneBg(false);
                 setActivePanelId((panelId) => (panelId < 1 ? 1 : panelId));
             }
             return next;
@@ -88,7 +124,7 @@ export default function Home() {
     };
 
     useEffect(() => {
-        if (!autoTour || !intro) return;
+        if (!autoTour || !intro || whiteSceneBg) return;
 
         const tick = () => {
             setActivePanelId((prev) => {
@@ -99,7 +135,7 @@ export default function Home() {
 
         const intervalId = window.setInterval(tick, AUTO_TOUR_INTERVAL_MS);
         return () => window.clearInterval(intervalId);
-    }, [autoTour, intro]);
+    }, [autoTour, intro, whiteSceneBg]);
 
     const currentPanelData = panelContents[activePanelId] || { title: "", desc: "", extra: "" };
 
@@ -120,21 +156,35 @@ export default function Home() {
                             autoTour={autoTour}
                             onAutoTourToggle={handleAutoTourToggle}
                             onLogoClick={handleLogoClick}
+                            bottomNavFaded={whiteSceneBg}
+                            showAiAsk
+                            aiCompanyId="bdtec"
                         />
-                        <BdtecSpecModal visible={intro} />
+                        <BdtecSpecModal
+                            visible={intro}
+                            showPrev={!whiteSceneBg}
+                            onPrev={handlePrev}
+                        />
                     </div>
                     {/*{process.env.NODE_ENV === 'development' && <DomStats />}*/}
 
                     <BdtecSceneHeroCopy
-                        visible={intro && activePanelId === 0}
+                        visible={intro && activePanelId === 0 && !whiteSceneBg}
+                    />
+
+                    <BdtecTankGridCopy
+                        visible={intro && whiteSceneBg}
+                        onNext={handleNext}
                     />
 
                     <InfoPanel
                         isOpen={activePanelId >= 1 && activePanelId <= 5}
+                        uiFaded={whiteSceneBg}
                         title={currentPanelData.title}
                         desc={currentPanelData.desc}
                         extra={currentPanelData.extra}
                         onClose={() => handleVariableChange(0)}
+                        teaserClassName={`${infoPanelStyles.teaserAboveBottomNav} ${infoPanelStyles.teaserBdtecGlass}`}
                     />
 
                     <div
@@ -144,19 +194,22 @@ export default function Home() {
                         <div
                             ref={canvasHostRef}
                             data-bdtec-canvas-host
-                            className={`${styles.canvasHost} ${!intro ? styles.canvasHostDuringIntro : ''}`}
+                            className={`${styles.canvasHost} ${!sceneVisible ? styles.canvasHostHidden : ''} ${sceneVisible && !intro ? styles.canvasHostDuringIntro : ''}`}
                         >
                             <BdtecScene
                                 quality={quality}
                                 activePanelId={activePanelId}
                                 deviceType={deviceType}
+                                whiteBackground={whiteSceneBg}
+                                snapSceneFade={snapSceneFade}
                             />
                         </div>
                         <BdtecEntryOverlay
                             blurContainerRef={blurContainerRef}
                             canvasHostRef={canvasHostRef}
                             brochureUiRef={brochureUiRef}
-                            onReveal={() => setIntro(true)}
+                            onSceneReveal={() => setSceneVisible(true)}
+                            onReveal={handleBrochureStart}
                         />
                     </div>
                 </div>

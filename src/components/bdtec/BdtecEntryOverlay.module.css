@@ -2,21 +2,27 @@
   position: absolute;
   inset: 0;
   z-index: 2000;
-  background: rgba(255, 255, 255, 0.62);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: transparent;
   overflow: hidden;
 }
 
 .loadingLayer {
   position: absolute;
   inset: 0;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 24px;
   pointer-events: auto;
+  background: linear-gradient(
+    180deg,
+    #1e3a52 0%,
+    #182f42 32%,
+    #121f2e 68%,
+    #0c141c 100%
+  );
 }
 
 .logo {

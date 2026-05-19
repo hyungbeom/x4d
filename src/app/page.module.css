@@ -38,6 +38,13 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  transition: filter 0.75s ease;
+  will-change: filter;
+}
+
+/* 로딩 후 인트로 — 3D 배경 블러 (EnvexEntryOverlay가 data-scene-blur 설정) */
+.stickyViewport[data-scene-blur] .canvasLayer {
+  filter: blur(6px);
 }
 
 .canvasLayer canvas {

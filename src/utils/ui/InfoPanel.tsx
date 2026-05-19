@@ -19,6 +19,8 @@ interface InfoPanelProps {
     teaserClassName?: string;
     /** 티저 CTA 버튼 문구 */
     detailButtonLabel?: string;
+    /** true면 열린 상태 유지하되 티저·패널만 페이드 아웃 (NEXT 화면 전환) */
+    uiFaded?: boolean;
     /** 있으면 확장 시 기업 리스트 표시 */
     companies?: CompanyListItem[];
 }
@@ -46,6 +48,7 @@ export default function InfoPanel({
     teaserClassName,
     detailButtonLabel = '자세히 보기',
     companies,
+    uiFaded = false,
 }: InfoPanelProps) {
     const panelRef = useRef<HTMLDivElement>(null);
     const teaserRef = useRef<HTMLDivElement>(null);
@@ -55,10 +58,11 @@ export default function InfoPanel({
     const [companyListOpen, setCompanyListOpen] = useState(false);
 
     const hasCompanyList = Boolean(companies && companies.length > 0);
-    const showTeaser = isOpen && !isExpanded && !companyListOpen;
+    const uiVisible = isOpen && !uiFaded;
+    const showTeaser = uiVisible && !isExpanded && !companyListOpen;
     /** 데스크톱+기업목록: 티저만 · 모바일/태블릿: 확장 시 · 데스크톱(목록없음): 바로 패널 */
     const showPanel =
-        isOpen &&
+        uiVisible &&
         (isCompact ? isExpanded : !hasCompanyList);
     useEffect(() => {
         if (!isOpen) {

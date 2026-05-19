@@ -21,25 +21,29 @@ export default function Overlay1() {
                         position: absolute;
                         top: 0;
                         left: 0;
+                        right: 0;
                         z-index: 10;
-                        padding: 15px; 
+                        padding: 15px;
+                        text-align: center;
                     }
                     .overlay-text {
                         padding: 10px 15px;
                         font-weight: 800;
-                        font-size: 16px; 
+                        font-size: 16px;
                         line-height: 1.4;
-                        color: #333; /* 글자색 지정 (필요시 수정) */
+                        color: #000;
+                        text-align: center;
                     }
-                    
-                    /* 로고의 처음 (큰) 상태 */
+
+                    /* 로고 초기 — 가로 중앙, 크게, 슬로건 아래 */
                     .overlay-logo {
                         position: absolute;
-                        top: 150px;  /* 초기 Y 위치 (화면 중앙쯤) */
-                        left: 50px;  /* 초기 X 위치 */
-                        width: 350px; /* 초기 큰 사이즈 */
+                        top: clamp(108px, 20vh, 150px);
+                        left: 50%;
+                        width: min(90vw, 680px);
+                        transform: translateX(-50%);
                         pointer-events: auto;
-                        will-change: transform, width, top, left; /* 애니메이션 최적화 */
+                        will-change: transform, width, top, left;
                     }
 
                     /* --- 2. 좌측 하단 정보 카드 (모바일 기준) --- */
@@ -47,7 +51,7 @@ export default function Overlay1() {
                         position: absolute;
                         bottom: 15px;
                         left: 15px;
-                        width: 260px; 
+                        width: 260px;
                         padding: 15px;
                         z-index: 10;
                         background: rgba(255, 255, 255, 0.1);
@@ -55,7 +59,7 @@ export default function Overlay1() {
                         -webkit-backdrop-filter: blur(3px);
                         border: 1px solid rgba(255, 255, 255, 0.2);
                         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-                        color: #333; /* 글자색 지정 */
+                        color: #333;
                         word-break: keep-all;
                         pointer-events: none;
                     }
@@ -63,22 +67,59 @@ export default function Overlay1() {
                         font-size: 14px;
                         font-weight: bold;
                         margin-bottom: 12px;
+                        line-height: 1.35;
                     }
                     .info-card-desc {
                         font-size: 11px;
                         opacity: 0.9;
                         white-space: normal;
+                        line-height: 1.5;
+                    }
+
+                    /* 모바일 — 슬로건 상단 중앙, 로고 그 아래 크게 중앙 */
+                    @media (max-width: 767px) {
+                        .overlay-header {
+                            top: calc(8px + env(safe-area-inset-top, 0px));
+                            padding: 0 16px;
+                        }
+
+                        .overlay-text {
+                            padding: 0;
+                            font-size: clamp(0.85rem, 3.6vw, 1rem);
+                            line-height: 1.35;
+                        }
+
+                        .overlay-logo {
+                            top: calc(64px + env(safe-area-inset-top, 0px));
+                            width: min(92vw, 520px);
+                        }
+
+                        .info-card {
+                            bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+                            left: 12px;
+                            width: min(58vw, 220px);
+                            padding: 10px 12px;
+                        }
+
+                        .info-card-title {
+                            font-size: 12px;
+                            margin-bottom: 8px;
+                        }
+
+                        .info-card-desc {
+                            font-size: 10px;
+                        }
                     }
 
                     /* --- 🖥️ 반응형 사이즈 (기존 코드 유지) --- */
                     @media (min-width: 768px) {
                         .overlay-header { padding: 30px; }
                         .overlay-text { padding: 20px 30px; font-size: 20px; }
-                        
+
                         .info-card {
                             bottom: 30px;
                             left: 30px;
-                            width: 500px; 
+                            width: 500px;
                             padding: 20px;
                         }
                         .info-card-title { font-size: 16px; margin-bottom: 16px; }
@@ -89,18 +130,11 @@ export default function Overlay1() {
                         .info-card {
                             bottom: 40px;
                             left: 40px;
-                            width: 700px; 
+                            width: 700px;
                             padding: 25px;
                         }
                         .info-card-title { font-size: 18px; margin-bottom: 20px; }
                         .info-card-desc { font-size: 14px; line-height: 1.5; }
-                        
-                        /* 데스크탑에서 로고 초기 위치 조금 더 이동하고 싶다면 */
-                        .overlay-logo {
-                            top: 125px;
-                            left: 70px;
-                            width: 700px;
-                        }
                     }
                 `}
             </style>
@@ -127,13 +161,15 @@ export default function Overlay1() {
                 {/* 정보 카드 */}
                 <div className="info-card fade-out-target">
                     <div className="info-card-title">
-                        타이틀 넣어주세요<br/>홍보하고자하는 타이틀을요<br/>제품명이여도 좋습니다.
+                        믿을 수 있는 KS 인증<br />
+                        국내 생산, 국내 제조!
                     </div>
                     <div className="info-card-desc">
-                        Lorem ipsum (/ˌlɔː.rəm ˈɪp.səm/ LOR-əm IP-səm) is a dummy or placeholder text commonly used in
-                        graphic design, publishing, and web development. It is typically a corrupted version of De finibus
-                        bonorum et malorum, a 1st-century BC text by the Roman statesman and philosopher Cicero, with words
-                        altered, added, and
+                        2000년대 초반 페인트를 통한 적외선 반사 기술의 최초 시도는
+                        어드그린코트로부터 시작되었습니다.
+                        <br /><br />
+                        평균 입자크기 세라믹진구는 태양에너지의 절반을 포함하고 있는
+                        적외선을 집중적으로 반사하여 태양에너지의 흡수를 효과적으로 분산시켜줍니다.
                     </div>
                 </div>
 

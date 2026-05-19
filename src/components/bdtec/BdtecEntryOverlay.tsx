@@ -20,6 +20,8 @@ type BdtecEntryOverlayProps = {
     blurContainerRef: RefObject<HTMLDivElement | null>;
     canvasHostRef: RefObject<HTMLDivElement | null>;
     brochureUiRef: RefObject<HTMLDivElement | null>;
+    /** 로딩 100% → 인트로 전환 시 3D 씬 표시 */
+    onSceneReveal: () => void;
     onReveal: () => void;
 };
 
@@ -40,6 +42,7 @@ export default function BdtecEntryOverlay({
     blurContainerRef,
     canvasHostRef,
     brochureUiRef,
+    onSceneReveal,
     onReveal,
 }: BdtecEntryOverlayProps) {
     const loading = useBdtecSceneLoadingState();
@@ -86,6 +89,15 @@ export default function BdtecEntryOverlay({
         }
 
         setPhase('intro');
+        onSceneReveal();
+        const canvas = canvasHostRef.current;
+        if (canvas) {
+            gsap.fromTo(
+                canvas,
+                { autoAlpha: 0 },
+                { autoAlpha: 1, duration: INTRO_FADE_MS, ease: 'power2.out' },
+            );
+        }
         const tl = gsap.timeline();
         tl.to(loadingLayer, {
             opacity: 0,
@@ -106,7 +118,7 @@ export default function BdtecEntryOverlay({
             },
             '-=0.25',
         );
-    }, []);
+    }, [canvasHostRef, onSceneReveal]);
 
     useEffect(() => {
         if (fullyReady) return;

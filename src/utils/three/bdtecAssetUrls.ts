@@ -2,6 +2,7 @@
 export const BDTEC_GLB_URLS = [
     '/model/bdtec/Air_Product.glb',
     '/model/bdtec/Tank.glb',
+    '/model/bdtec/Tank2.glb',
     '/model/bdtec/modem.glb',
     '/model/bdtec/Factory.glb',
     '/model/bdtec/Wifi.glb',

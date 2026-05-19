@@ -295,14 +295,15 @@ function HomeContent() {
                     <BdtecSceneHeroCopy
                         visible={intro && activePanelId === 0}
                         title="ENVEX EXHIBITION"
-                        subtitle="3D 브로슈어 샘플"
+                        subtitle="3D 컨셉환경"
                         body={[
                             '전시장 6개 구역을 3D 맵에서 둘러볼 수 있는 데모 화면입니다.',
                             '하단 아이콘을 누르면 해당 존으로 카메라가 이동하고 설명 패널이 열립니다.',
+                            '좀더 친숙한 산업박람회를 즐겨보세요',
                         ]}
                     />
 
-                    <div className={styles.canvasLayer}>
+                    <div className={styles.canvasLayer} data-scene-canvas>
                         <ManciniCanvas quality="default" backgroundColor="#b8dff5">
                             <CameraController activePanelId={activePanelId} deviceType={deviceType} />
 
@@ -340,7 +341,7 @@ function HomeContent() {
                                 menus={navMenus}
                                 compact
                                 hideBottomNav
-                                contactLink="/brochure/bdtec/contactus"
+                                contactLink="/contactus"
                                 activeIndex={
                                     activePanelId >= 1 && activePanelId <= PANEL_COUNT
                                         ? activePanelId - 1

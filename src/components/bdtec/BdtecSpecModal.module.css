@@ -1,8 +1,21 @@
-.trigger {
+.triggerStack {
   position: absolute;
   right: clamp(16px, 3vw, 28px);
   bottom: calc(108px + env(safe-area-inset-bottom, 0px));
   z-index: 55;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.triggerStack > * {
+  pointer-events: auto;
+}
+
+.trigger {
+  position: relative;
   pointer-events: auto;
   padding: 8px 16px;
   border-radius: 999px;
@@ -28,6 +41,30 @@
 
 .trigger:active {
   transform: scale(0.97);
+}
+
+.triggerNext {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 18px;
+  letter-spacing: 0.04em;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.triggerNextTitle {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.triggerNextSub {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .triggerHidden {
@@ -171,17 +208,45 @@
   word-break: keep-all;
 }
 
-@media (min-width: 1025px) {
-  .trigger {
-    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+/* 모바일·태블릿 — 단일 열 리스트 */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .row {
+    padding: 12px 14px;
   }
 }
 
+@media (min-width: 1025px) {
+  .triggerStack {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+
+}
+
 @media (max-width: 768px) {
-  .trigger {
+  .triggerStack {
     bottom: calc(118px + env(safe-area-inset-bottom, 0px));
     right: 14px;
+  }
+
+  .trigger {
     padding: 8px 14px;
+    font-size: 11px;
+  }
+
+  .triggerNext {
+    padding: 9px 16px;
+  }
+
+  .triggerNextTitle {
+    font-size: 10px;
+  }
+
+  .triggerNextSub {
     font-size: 11px;
   }
 }

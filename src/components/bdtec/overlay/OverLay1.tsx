@@ -29,30 +29,47 @@ export default function Overlay1() {
                     /* --- 2. 좌측 하단 정보 카드 (모바일 기준) --- */
                     .info-card {
                         position: absolute;
-                        /* 🚀 핵심 수정: 모바일 하단 중앙의 파란색 시작 버튼(bottom: 40px)을 피하도록 위로 110px 올림 */
-                        bottom: 110px; 
+                        bottom: 110px;
                         left: 15px;
-                        width: 260px; /* 📱 모바일 너비 */
+                        width: 260px;
                         padding: 15px;
                         z-index: 10;
-                        background: rgba(255, 255, 255, 0.72);
-                        border: 1px solid rgba(18, 61, 82, 0.14);
-                        box-shadow: 0 8px 24px rgba(18, 61, 82, 0.1);
-                        backdrop-filter: blur(8px);
-                        -webkit-backdrop-filter: blur(8px);
-                        color: #123d52;
+                        isolation: isolate;
+                        background: transparent;
+                        border: 1px solid rgba(255, 255, 255, 0.28);
+                        box-shadow:
+                            0 6px 20px rgba(0, 0, 0, 0.08),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.35);
+                        border-radius: 12px;
                         word-break: keep-all;
                         will-change: transform, opacity;
-                        pointer-events: none; /* 클릭 무시 (시작 버튼 클릭 방해 방지) */
+                        pointer-events: none;
+                    }
+                    .info-card::before {
+                        content: '';
+                        position: absolute;
+                        inset: 0;
+                        border-radius: inherit;
+                        background: rgba(255, 255, 255, 0.16);
+                        backdrop-filter: blur(6px) saturate(1.05);
+                        -webkit-backdrop-filter: blur(6px) saturate(1.05);
+                        z-index: 0;
+                        pointer-events: none;
+                    }
+                    .info-card-title,
+                    .info-card-desc {
+                        position: relative;
+                        z-index: 1;
+                        color: #ffffff;
                     }
                     .info-card-title {
                         font-size: 14px;
-                        font-weight: bold;
+                        font-weight: 800;
                         margin-bottom: 12px;
                     }
                     .info-card-desc {
                         font-size: 11px;
-                        opacity: 0.9;
+                        font-weight: 500;
                         white-space: normal;
                     }
 

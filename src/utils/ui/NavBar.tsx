@@ -29,6 +29,8 @@ interface NavBarProps {
     onLogoClick?: () => void;
     /** true면 하단 navbar-wrapper 숨김 (ENVEX 푸터 등 별도 UI 사용 시) */
     hideBottomNav?: boolean;
+    /** true면 하단 바를 페이드 아웃 (NEXT 화면 전환 등) */
+    bottomNavFaded?: boolean;
     /** 모바일 상단 바 중앙 AI ASK */
     showAiAsk?: boolean;
     aiCompanyId?: string;
@@ -45,6 +47,7 @@ export default function NavBar({
     compact = false,
     onLogoClick,
     hideBottomNav = false,
+    bottomNavFaded = false,
     showAiAsk = false,
     aiCompanyId = 'envex',
 }: NavBarProps) {
@@ -136,6 +139,15 @@ export default function NavBar({
                         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
                         padding: 8px;
                         max-width: 95vw;
+                        opacity: 1;
+                        pointer-events: auto;
+                        transition: opacity 0.55s ease, transform 0.55s ease;
+                    }
+
+                    .navbar-wrapper--faded {
+                        opacity: 0;
+                        pointer-events: none;
+                        transform: translateX(-50%) translateY(14px);
                     }
 
                     .logo-cluster {
@@ -544,7 +556,15 @@ export default function NavBar({
             </div>
 
             {!hideBottomNav && (
-            <div className={`navbar-wrapper${compact ? ' navbar-wrapper--compact' : ''}`}>
+            <div
+                className={[
+                    'navbar-wrapper',
+                    compact ? 'navbar-wrapper--compact' : '',
+                    bottomNavFaded ? 'navbar-wrapper--faded' : '',
+                ]
+                    .filter(Boolean)
+                    .join(' ')}
+            >
                 {logoBlock}
 
                 <nav className="nav-links-box" onMouseLeave={() => moveHighlight(activeIndex)}>

@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { gsap } from '@/lib/brochureGsap';
+import { ENVEX_BROCHURE_PARTNERS } from '@/data/envexBrochurePartners';
+import { usePageTransition } from '@/utils/ui/usePageTransition';
 import styles from './EnvexEntryOverlay.module.css';
 import EnvexLoadingScreen from './EnvexLoadingScreen';
 import { useEnvexLoadingProgress } from './useEnvexLoadingProgress';
@@ -20,6 +22,7 @@ type EnvexEntryOverlayProps = {
 
 export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryOverlayProps) {
     const { displayPct, barFillRef } = useEnvexLoadingProgress();
+    const navigate = usePageTransition();
 
     const shellRef = useRef<HTMLDivElement>(null);
     const loadingLayerRef = useRef<HTMLDivElement>(null);
@@ -52,6 +55,8 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
         }
 
         setPhase('intro');
+        viewportRef.current?.setAttribute('data-scene-blur', '');
+
         const tl = gsap.timeline();
         tl.to(loadingLayer, {
             opacity: 0,
@@ -73,7 +78,7 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
             },
             '-=0.25',
         );
-    }, []);
+    }, [viewportRef]);
 
     useEffect(() => {
         if (transitionedRef.current || displayPct < 100) return;
@@ -100,6 +105,8 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
 
         if (introLayer) introLayer.style.pointerEvents = 'none';
         shell.style.pointerEvents = 'auto';
+
+        const canvasLayer = viewport?.querySelector('[data-scene-canvas]') as HTMLElement | null;
 
         const tl = gsap.timeline({
             defaults: { ease: 'power2.inOut' },
@@ -132,6 +139,18 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
             );
         }
 
+        if (canvasLayer) {
+            tl.to(
+                canvasLayer,
+                {
+                    filter: 'blur(0px)',
+                    duration: 0.55,
+                    ease: 'power2.inOut',
+                },
+                0,
+            );
+        }
+
         tl.add(() => onReveal(), 0);
 
         tl.to(
@@ -143,6 +162,11 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
             },
             0.1,
         );
+
+        tl.add(() => {
+            viewport?.removeAttribute('data-scene-blur');
+            if (canvasLayer) gsap.set(canvasLayer, { clearProps: 'filter' });
+        });
 
         if (viewport) {
             gsap.set(viewport, { clearProps: 'opacity,visibility,transform' });
@@ -177,6 +201,7 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
                                 height={44}
                                 priority
                                 className={styles.introLogo}
+
                             />
                         </div>
                         <button
@@ -215,16 +240,42 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
 
                     <div className={styles.introCopy}>
                         <h1 className={styles.introHeading}>
-                            제46회 <br/>
+                            제47회 <br/>
                             국제환경산업기술
                             <br/>
                             &그린에너지전
                         </h1>
                         <p className={styles.introDesc}>
-                            국내 최대 환경·탄소중립기술 전시회,<br/>
-                            산업을 선도할 최신 트렌드와 미래를 한눈에 <br/>확인해 보세요.
+                            국내 최대 탈탄소 산업기술 전시회,<br/>
+                            녹색산업을 선도할 최신 트렌드와 미래를 한눈에 <br/>확인해 보세요.
                         </p>
                     </div>
+
+                    <ul className={styles.brochurePartners} aria-label="참가사 브로슈어">
+                        {ENVEX_BROCHURE_PARTNERS.map((partner) => (
+                            <li key={partner.id} className={styles.partnerCard}>
+                                <div className={styles.partnerLogoWrap}>
+                                    {partner.logoSrc ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img
+                                            src={partner.logoSrc}
+                                            alt={partner.logoAlt}
+                                            className={styles.partnerLogo}
+                                        />
+                                    ) : (
+                                        <span className={styles.partnerLogoFallback}>{partner.name}</span>
+                                    )}
+                                </div>
+                                <button
+                                    type="button"
+                                    className={styles.partnerVisitBtn}
+                                    onClick={() => navigate(partner.href, 'blinds')}
+                                >
+                                    방문하기
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
 
                     <div className={styles.startBtnContainer}>
                         <button

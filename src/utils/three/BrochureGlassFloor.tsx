@@ -7,12 +7,14 @@ const PLANE_SIZE = 12000;
 type BrochureGlassFloorProps = {
     y?: number;
     tint?: string;
+    opacity?: number;
 };
 
 /** WebGPU 호환 유리·거울 바닥 (alphaMap·씬 복제 미사용) */
 export function BrochureGlassFloor({
     y = -12,
     tint = '#0a1624',
+    opacity = 0.88,
 }: BrochureGlassFloorProps) {
     return (
         <mesh
@@ -28,8 +30,8 @@ export function BrochureGlassFloor({
                 color={tint}
                 metalness={0.88}
                 roughness={0.06}
-                opacity={0.88}
-                transparent
+                opacity={opacity}
+                transparent={opacity < 1}
                 depthWrite={false}
                 side={THREE.DoubleSide}
             />

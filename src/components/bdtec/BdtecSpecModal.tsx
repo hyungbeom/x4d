@@ -8,9 +8,17 @@ import styles from './BdtecSpecModal.module.css';
 
 type BdtecSpecModalProps = {
     visible?: boolean;
+    showPrev?: boolean;
+    onNext?: () => void;
+    onPrev?: () => void;
 };
 
-export default function BdtecSpecModal({ visible = true }: BdtecSpecModalProps) {
+export default function BdtecSpecModal({
+    visible = true,
+    showPrev = false,
+    onNext,
+    onPrev,
+}: BdtecSpecModalProps) {
     const [open, setOpen] = useState(false);
     const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -76,18 +84,32 @@ export default function BdtecSpecModal({ visible = true }: BdtecSpecModalProps) 
 
     if (!mounted) return null;
 
+    const hidden = !visible || open;
+
     return (
         <>
-            <button
-                ref={btnRef}
-                type="button"
-                className={`${styles.trigger} ${!visible || open ? styles.triggerHidden : ''}`}
-                onClick={openModal}
-                aria-label="제품 사양 SPEC 보기"
-                aria-expanded={open}
-            >
-                SPEC
-            </button>
+            <div className={`${styles.triggerStack} ${hidden ? styles.triggerHidden : ''}`}>
+                <button
+                    ref={btnRef}
+                    type="button"
+                    className={styles.trigger}
+                    onClick={openModal}
+                    aria-label="제품 사양 SPEC 보기"
+                    aria-expanded={open}
+                >
+                    SPEC
+                </button>
+                {showPrev && onPrev ? (
+                    <button
+                        type="button"
+                        className={styles.trigger}
+                        onClick={onPrev}
+                        aria-label="이전 화면으로 돌아가기"
+                    >
+                        PREV
+                    </button>
+                ) : null}
+            </div>
             {modalTree ? createPortal(modalTree, document.body) : null}
         </>
     );
