@@ -283,7 +283,7 @@ export default function DynamicIsland({
             }
 
             // 🌟 백엔드 API 연결
-            const url = `https://260a-116-124-128-7.ngrok-free.app:8080/api/chat/${companyId}?message=${encodeURIComponent(question)}&chatId=${chatId}`;
+            const url = `https://260a-116-124-128-7.ngrok-free.app/api/chat/${companyId}?message=${encodeURIComponent(question)}&chatId=${chatId}`;
             const eventSource = new EventSource(url);
             eventSourceRef.current = eventSource;
 
