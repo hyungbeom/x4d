@@ -1,0 +1,71 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  pointer-events: auto;
+  background: #ffffff;
+}
+
+.layerFixed {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+}
+
+.logo {
+  width: min(280px, 72vw);
+  height: auto;
+  filter: brightness(0) saturate(100%) invert(17%) sepia(42%) saturate(1200%) hue-rotate(168deg)
+    brightness(0.85);
+}
+
+.loadingLabel {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #a8b4bc;
+}
+
+.progressBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.barTrack {
+  width: min(240px, 72vw);
+  height: 3px;
+  border-radius: 2px;
+  background: #e5e9ec;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  width: 100%;
+  border-radius: 2px;
+  background: #1a6fd4;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.pct {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: #1a1a1a;
+}
+
+@media (max-width: 768px) {
+  .layer {
+    gap: 40px;
+  }
+}
