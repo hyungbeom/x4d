@@ -42,7 +42,7 @@ export default function Overlay1() {
                         left: 50%;
                         width: min(90vw, 680px);
                         transform: translateX(-50%);
-                        pointer-events: auto;
+                        pointer-events: none;
                         will-change: transform, width, top, left;
                     }
 

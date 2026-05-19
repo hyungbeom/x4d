@@ -59,9 +59,13 @@ const BENEFITS = [
     },
 ];
 
-export default function DuonHousingBenefits() {
+type Props = {
+    embedded?: boolean;
+};
+
+export default function DuonHousingBenefits({ embedded = false }: Props) {
     return (
-        <section className={styles.section}>
+        <section className={embedded ? styles.sectionEmbedded : styles.section}>
             <div className={styles.inner}>
                 <header className={`${styles.header} benefits-header-anim`}>
                     <h2 className={styles.title}>공동주택 시공 시 좋은 점!</h2>

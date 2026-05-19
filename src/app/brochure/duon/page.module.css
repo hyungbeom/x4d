@@ -1,8 +1,14 @@
+.pageRoot {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
 .scrollMain {
   position: relative;
-  height: 300vh;
+  height: 400vh;
   width: 100dvw;
   background-color: #e5e5e5;
+  touch-action: pan-y;
 }
 
 .stickyStage {
@@ -11,6 +17,7 @@
   height: 100dvh;
   overflow: hidden;
   isolation: isolate;
+  touch-action: pan-y;
 }
 
 .splineHost {
@@ -19,6 +26,9 @@
   z-index: 1;
   width: 100%;
   height: 100%;
+  /* Spline 캔버스가 터치를 먹지 않도록 — 세로 스크롤·GSAP scrub 유지 */
+  pointer-events: none;
+  touch-action: pan-y;
 }
 
 .splineHost > :global(*) {
@@ -30,6 +40,8 @@
   display: block;
   width: 100% !important;
   height: 100% !important;
+  pointer-events: none !important;
+  touch-action: pan-y !important;
 }
 
 .copyPanel {
@@ -158,27 +170,23 @@
   }
 }
 
-.apartmentSection {
-  position: relative;
-  width: 100%;
-  min-height: 85vh;
-  background: #f3f4f6;
+.phase1Copy {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
 }
 
-.apartmentCanvasWrap {
-  width: 100%;
-  height: min(85vh, 720px);
-  opacity: 0;
-  transform: translateY(60px) scale(0.92);
-  will-change: transform, opacity;
+.paintSectionWrap {
+  margin: 0;
+  padding: 0;
 }
 
 @media (max-width: 768px) {
-  .apartmentSection {
-    min-height: 70vh;
-  }
-
-  .apartmentCanvasWrap {
-    height: min(70vh, 520px);
+  .paintSectionWrap {
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
   }
 }
+
