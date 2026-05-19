@@ -93,23 +93,23 @@ function MapScene({
                 smoothTime={0.45}
                 draggingSmoothTime={0.12}
             />
-            {/*{mapEditTools ? (*/}
-            {/*    <CameraHelper*/}
-            {/*        controlsRef={cameraControlsRef}*/}
-            {/*        activePanelId={0}*/}
-            {/*        deviceType={deviceType}*/}
-            {/*        contextLabel={booth ? `booth ${booth}` : 'map'}*/}
-            {/*    />*/}
-            {/*) : null}*/}
+            {mapEditTools ? (
+                <CameraHelper
+                    controlsRef={cameraControlsRef}
+                    activePanelId={0}
+                    deviceType={deviceType}
+                    contextLabel={booth ? `booth ${booth}` : 'map'}
+                />
+            ) : null}
             <MapModel skipAutoFit={hasBoothCamera}/>
-            {/*{mapEditTools ? (*/}
-            {/*    <MapClickCopyHandler*/}
-            {/*        enabled*/}
-            {/*        booth={booth}*/}
-            {/*        onCopied={onCoordCopied}*/}
-            {/*        onMapNotReady={onMapNotReady}*/}
-            {/*    />*/}
-            {/*) : null}*/}
+            {mapEditTools ? (
+                <MapClickCopyHandler
+                    enabled
+                    booth={booth}
+                    onCopied={onCoordCopied}
+                    onMapNotReady={onMapNotReady}
+                />
+            ) : null}
             {booth ? <MapBoothMarks booth={booth} /> : null}
             <MapNavPath nav={mapNav}/>
         </>
@@ -228,13 +228,13 @@ function MapPageContent() {
                             ) : null}
                         </div>
                     ) : null}
-                    {/*{mapEditTools ? (*/}
-                    {/*    <span className={styles.copyHint}>*/}
-                    {/*            {cameraPointLabel*/}
-                    {/*                ? `${cameraPointLabel} · 맵 클릭 → markPosition 복사`*/}
-                    {/*                : '맵 클릭 → 좌표 복사 · 좌측 카메라 헬퍼'}*/}
-                    {/*        </span>*/}
-                    {/*) : null}*/}
+                    {mapEditTools ? (
+                        <span className={styles.copyHint}>
+                                {cameraPointLabel
+                                    ? `${cameraPointLabel} · 맵 클릭 → markPosition 복사`
+                                    : '맵 클릭 → 좌표 복사 · 좌측 카메라 헬퍼'}
+                            </span>
+                    ) : null}
                 </div>
 
                 <MapCompanySearchModal
