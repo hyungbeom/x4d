@@ -122,7 +122,7 @@ export default function Home() {
         const camera = app.findObjectByName('Camera');
 
         if (!obj) {
-            console.warn('main_paint\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.');
+            console.warn('main_paint를 찾을 수 없습니다.');
             return;
         }
 
