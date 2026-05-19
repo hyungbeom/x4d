@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
+import ReactMarkdown from "react-markdown";
 
 // 🌟 커스텀 훅: 화면 너비 감지
 function useWindowSize() {
@@ -433,7 +434,51 @@ export default function DynamicIsland({
                                         whiteSpace: 'pre-wrap',
                                     }}
                                 >
-                                    {aiResponse || '답변을 불러오는 중입니다...'}
+                                    <ReactMarkdown
+                                        components={{
+                                            // ... a 태그 가로채는 코드 ...
+                                            a: ({ node, ...props }) => (
+                                                <a
+                                                    {...props}
+                                                    style={{
+                                                        display: 'block',
+
+                                                        backgroundColor: '#10b981', // 쨍한 초록색 버튼
+                                                        color: '#ffffff',           // 글자색은 흰색
+                                                        padding: '10px 15px',       // 버튼 상하좌우 여유 공간
+                                                        borderRadius: '8px',        // 모서리 둥글게
+                                                        textDecoration: 'none',     // 밑줄 강제 제거
+                                                        fontWeight: 'bold',         // 글자 굵게
+                                                        marginTop: '15px',          // 위쪽 텍스트와 간격 벌리기
+                                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)', // 입체감 있는 그림자
+                                                        cursor: 'pointer'           // 마우스 올리면 손가락 모양
+                                                    }}
+                                                />
+                                            ),
+                                            // 🌟 여기를 수정합니다! 마크다운 안의 이미지(img) 태그 가로채기
+                                            img: ({ node, ...props }) => (
+                                                <img
+                                                    {...props}
+                                                    style={{
+                                                        // ❌ 기존: maxWidth: '100%',
+                                                        // ⭕ 수정 후: 15px 크기로 아주 작게 고정!
+                                                        width: '100px',
+                                                        // height: '50px', // 정사각형 형태로 고정 (비율이 안 맞으면 찌그러질 수 있으니 주의!)
+                                                        display: 'block',
+                                                        // 만약 원본 비율을 유지하면서 가로 크기만 15px로 고정하고 싶다면 height: 'auto' 로 하세요.
+                                                        // width: '15px',
+                                                        // height: 'auto',
+
+                                                        borderRadius: '2px', // 아주 작은 크기에 맞게 둥근 모서리도 살짝
+                                                        marginRight: '5px', // 혹시 옆에 텍스트가 붙을 경우를 위해 살짝 간격
+                                                        verticalAlign: 'middle' // 텍스트와 줄 바꿈이 맞게
+                                                    }}
+                                                />
+                                            )
+                                        }}
+                                    >
+                                        {aiResponse}
+                                    </ReactMarkdown>
                                 </p>
                             </div>
                         </div>

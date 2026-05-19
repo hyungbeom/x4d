@@ -1,19 +1,16 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { gsap } from '@/lib/brochureGsap';
-import {
-    isBdtecSceneFullyReady,
-    useBdtecSceneLoadingState,
-} from '@/utils/three/SceneLoadingContext';
 import styles from './EnvexEntryOverlay.module.css';
+import EnvexLoadingScreen from './EnvexLoadingScreen';
+import { useEnvexLoadingProgress } from './useEnvexLoadingProgress';
 
 /** 로딩 100% 도달 후 intro 전환까지 대기 (ms) */
 const HOLD_AT_100_MS = 2000;
 const INTRO_FADE_MS = 0.5;
-const FILL_TO_100_SEC = 2;
 type Phase = 'loading' | 'intro' | 'exit' | 'gone';
 
 type EnvexEntryOverlayProps = {
@@ -21,38 +18,18 @@ type EnvexEntryOverlayProps = {
     onReveal: () => void;
 };
 
-function computePct(loading: ReturnType<typeof useBdtecSceneLoadingState>, fullyReady: boolean) {
-    const { moduleReady, canvasMounted, webgpuReady, suspenseReady, active, progress } = loading;
-    const assetPct = Math.min(100, Math.max(0, Math.round(Number.isFinite(progress) ? progress : 0)));
-
-    let floor = 0;
-    if (moduleReady) floor = 12;
-    if (canvasMounted) floor = Math.max(floor, 22);
-    if (webgpuReady) floor = Math.max(floor, 35);
-    if (suspenseReady) floor = Math.max(floor, 72);
-    const blended = active ? Math.max(floor, assetPct * 0.85) : Math.max(floor, assetPct);
-    return Math.min(99, Math.round(blended));
-}
-
 export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryOverlayProps) {
-    const loading = useBdtecSceneLoadingState();
-    const fullyReady = isBdtecSceneFullyReady(loading);
+    const { displayPct, barFillRef } = useEnvexLoadingProgress();
 
     const shellRef = useRef<HTMLDivElement>(null);
     const loadingLayerRef = useRef<HTMLDivElement>(null);
     const introLayerRef = useRef<HTMLDivElement>(null);
     const introContentRef = useRef<HTMLDivElement>(null);
     const startBtnRef = useRef<HTMLButtonElement>(null);
-    const barFillRef = useRef<HTMLDivElement>(null);
-    const pctRef = useRef(0);
-    const mountTimeRef = useRef(performance.now());
-    const fillTo100StartedRef = useRef(false);
     const transitionedRef = useRef(false);
     const exitStartedRef = useRef(false);
 
     const [phase, setPhase] = useState<Phase>('loading');
-    const [displayPct, setDisplayPct] = useState(0);
-    const [loadTick, setLoadTick] = useState(0);
     const [portalReady, setPortalReady] = useState(false);
 
     useEffect(() => {
@@ -62,19 +39,6 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
             gsap.set(viewport, { clearProps: 'opacity,visibility,transform' });
         }
     }, [viewportRef]);
-
-    useEffect(() => {
-        if (fullyReady) return;
-        const id = window.setInterval(() => setLoadTick((n) => n + 1), 120);
-        return () => window.clearInterval(id);
-    }, [fullyReady]);
-
-    const assetTargetPct = useMemo(() => {
-        const raw = computePct(loading, fullyReady);
-        const elapsed = performance.now() - mountTimeRef.current;
-        const timeCap = (elapsed / (FILL_TO_100_SEC * 1000)) * 99;
-        return Math.min(99, raw, timeCap);
-    }, [loading, fullyReady, loadTick]);
 
     const transitionToIntro = useCallback(() => {
         if (transitionedRef.current) return;
@@ -112,60 +76,10 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
     }, []);
 
     useEffect(() => {
-        if (fullyReady) return;
-
-        const bar = barFillRef.current;
-        if (!bar) {
-            setDisplayPct(assetTargetPct);
-            return;
-        }
-
-        const proxy = { value: pctRef.current };
-        gsap.killTweensOf(proxy);
-        gsap.to(proxy, {
-            value: assetTargetPct,
-            duration: 0.22,
-            ease: 'power2.out',
-            onUpdate: () => {
-                const next = Math.round(proxy.value);
-                pctRef.current = next;
-                setDisplayPct(next);
-                bar.style.transform = `scaleX(${next / 100})`;
-            },
-        });
-    }, [assetTargetPct, fullyReady]);
-
-    useEffect(() => {
-        if (!fullyReady || fillTo100StartedRef.current) return;
-        fillTo100StartedRef.current = true;
-
-        const bar = barFillRef.current;
-        if (!bar) {
-            pctRef.current = 100;
-            setDisplayPct(100);
-            return;
-        }
-
-        const proxy = { value: pctRef.current };
-        gsap.killTweensOf(proxy);
-        gsap.to(proxy, {
-            value: 100,
-            duration: FILL_TO_100_SEC,
-            ease: 'power2.inOut',
-            onUpdate: () => {
-                const next = Math.round(proxy.value);
-                pctRef.current = next;
-                setDisplayPct(next);
-                bar.style.transform = `scaleX(${next / 100})`;
-            },
-        });
-    }, [fullyReady]);
-
-    useEffect(() => {
-        if (!fullyReady || transitionedRef.current || displayPct < 100) return;
+        if (transitionedRef.current || displayPct < 100) return;
         const t = window.setTimeout(transitionToIntro, HOLD_AT_100_MS);
         return () => window.clearTimeout(t);
-    }, [fullyReady, displayPct, transitionToIntro]);
+    }, [displayPct, transitionToIntro]);
 
     const handleStart = useCallback(() => {
         if (exitStartedRef.current) return;
@@ -244,23 +158,12 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
             aria-busy={phase === 'loading'}
             aria-label={phase === 'loading' ? '로딩 중' : 'ENVEX 소개'}
         >
-            <div ref={loadingLayerRef} className={styles.loadingLayer}>
-                <Image
-                    src="/logo.svg"
-                    alt="ENVEX"
-                    width={280}
-                    height={61}
-                    priority
-                    className={styles.logo}
-                />
-                <div className={styles.progressBlock}>
-                    <p className={styles.loadingLabel}>Loading ...</p>
-                    <div className={styles.barTrack}>
-                        <div ref={barFillRef} className={styles.barFill} />
-                    </div>
-                    <p className={styles.pct}>{displayPct}%</p>
-                </div>
-            </div>
+            <EnvexLoadingScreen
+                ref={loadingLayerRef}
+                barFillRef={barFillRef}
+                displayPct={displayPct}
+                className={styles.loadingLayer}
+            />
 
             <div ref={introLayerRef} className={styles.introLayer}>
                 <div className={styles.introScrim} aria-hidden />

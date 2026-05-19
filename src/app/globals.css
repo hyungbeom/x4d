@@ -88,3 +88,45 @@ canvas {
 html {
   scrollbar-width: none;
 }
+
+/* AI 답변 내의 링크(a 태그)를 버튼 모양으로 만들기 */
+.ai-message-bubble a {
+  /* 1. 기본 버튼 모양 잡기 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 2. 배경색 및 글자색 (ENVEX 테마: 초록색) */
+  background-color: #10b981; /* 영롱한 에메랄드 초록 */
+  color: white !important;   /* 글자색은 무조건 흰색 */
+
+  /* 3. 간격 및 둥근 모서리 */
+  padding: 12px 24px;
+  margin-top: 15px;
+  border-radius: 12px;
+
+  /* 4. 글꼴 스타일 */
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none !important; /* 밑줄 절대 금지 */
+
+  /* 5. 그림자 효과 (입체감) */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  /* 6. 부드러운 애니메이션 */
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+/* 마우스를 올렸을 때 (Hover 효과) */
+.ai-message-bubble a:hover {
+  background-color: #059669; /* 약간 더 진한 초록 */
+  transform: translateY(-2px); /* 살짝 위로 떠오르는 효과 */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* 클릭했을 때 효과 */
+.ai-message-bubble a:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
