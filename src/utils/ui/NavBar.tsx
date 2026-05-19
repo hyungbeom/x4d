@@ -429,6 +429,11 @@ export default function NavBar({
                             display: none;
                         }
 
+                        /* hideBottomNav: 상단 바만 쓸 때(젬마 상세 등) 왼쪽 로고 표시 */
+                        .mobile-top-bar--desktopVisible .mobile-top-bar__logo {
+                            display: inline-flex;
+                        }
+
                         .navbar-wrapper > .logo-cluster,
                         .navbar-wrapper > .contact-wrapper { display: none; }
 
@@ -530,7 +535,7 @@ export default function NavBar({
                             }}
                             aria-label="전체 보기로 이동"
                         >
-                            <img src={logoSrc} alt="ENVEX" />
+                            <img src={logoSrc} alt="" />
                         </a>
                     ) : null}
                     {autoToggleButton}

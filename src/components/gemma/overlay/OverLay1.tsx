@@ -6,12 +6,14 @@ const GEMMA_LOGO_SRC = '/model/gemma/gemma_logo.png';
 
 type Overlay1Props = {
     showProductDetail?: boolean;
+    hidden?: boolean;
     productDetailRef?: RefObject<HTMLButtonElement | null>;
     onProductDetailClick?: () => void;
 };
 
 export default function Overlay1({
     showProductDetail = false,
+    hidden = false,
     productDetailRef,
     onProductDetailClick,
 }: Overlay1Props) {
@@ -24,6 +26,14 @@ export default function Overlay1({
                         inset: 0;
                         z-index: 10;
                         pointer-events: none;
+                        opacity: 1;
+                        visibility: visible;
+                        transition: opacity 0.45s ease, visibility 0.45s ease;
+                    }
+
+                    .gemma-overlay-root--hidden {
+                        opacity: 0;
+                        visibility: hidden;
                     }
 
                     .overlay-header {
@@ -33,6 +43,17 @@ export default function Overlay1({
                         left: 0;
                         z-index: 10;
                         padding: 20px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 12px;
+                        max-width: min(92vw, 520px);
+                    }
+
+                    .overlay-header__brand {
+                        display: flex;
+                        align-items: center;
+                        gap: 14px;
                     }
 
                     .overlay-text {
@@ -43,18 +64,20 @@ export default function Overlay1({
                     }
 
                     .overlay-logo {
-                        width: 80%;
-                        margin-top: 10px;
-                        margin-left: 15px;
+                        width: auto;
+                        height: 28px;
+                        margin: 0;
                         display: block;
+                        object-fit: contain;
+                        flex-shrink: 0;
                     }
 
                     .product-detail-btn {
                         display: inline-flex;
                         align-items: center;
                         justify-content: center;
-                        margin-top: 14px;
-                        margin-left: 15px;
+                        margin-top: 2px;
+                        margin-left: 0;
                         padding: 10px 20px;
                         border-radius: 999px;
                         border: 1.5px solid rgba(72, 168, 154, 0.65);
@@ -155,13 +178,11 @@ export default function Overlay1({
                         }
 
                         .overlay-logo {
-                            width: auto;
-                            margin-left: 30px;
+                            height: 36px;
                         }
 
                         .product-detail-btn {
-                            margin-left: 30px;
-                            margin-top: 18px;
+                            margin-top: 4px;
                             padding: 12px 24px;
                             font-size: 14px;
                         }
@@ -204,12 +225,11 @@ export default function Overlay1({
                         }
 
                         .overlay-logo {
-                            width: 300px;
+                            height: 44px;
                         }
 
                         .product-detail-btn {
-                            margin-left: 30px;
-                            margin-top: 20px;
+                            margin-top: 8px;
                             padding: 12px 28px;
                             font-size: 15px;
                         }
@@ -217,21 +237,26 @@ export default function Overlay1({
                 `}
             </style>
 
-            <div className="gemma-overlay-root">
+            <div
+                className={`gemma-overlay-root${hidden ? ' gemma-overlay-root--hidden' : ''}`}
+                aria-hidden={hidden}
+            >
                 <div className="overlay-header">
-                    <div className="overlay-text" style={{ textAlign: 'left' }}>
-                        <div>Environmental Iot</div>
-                        <div>Total Technology Company</div>
+                    <div className="overlay-header__brand">
+                        <img className="overlay-logo" src={GEMMA_LOGO_SRC} alt={'\uC810\uB9C8 \uB85C\uACE0'} />
+                        <div className="overlay-text" style={{ textAlign: 'left' }}>
+                            <div>Environmental Iot</div>
+                            <div>Total Technology Company</div>
+                        </div>
                     </div>
-                    <img className="overlay-logo" src={GEMMA_LOGO_SRC} alt={'\uC810\uB9C8 \uB85C\uACE0'} />
                     <button
                         ref={productDetailRef}
                         type="button"
                         className={`product-detail-btn ${showProductDetail ? '' : 'product-detail-btn--hidden'}`}
                         onClick={onProductDetailClick}
-                        aria-label={'\uC81C\uD488 \uC0C1\uC138\uBCF4\uAE30'}
+                        aria-label={'\uC81C\uD488 \uC790\uC138\uD788 \uBCF4\uAE30'}
                     >
-                        {'\uC81C\uD488 \uC0C1\uC138\uBCF4\uAE30'}
+                        {'\uC81C\uD488 \uC790\uC138\uD788 \uBCF4\uAE30'}
                     </button>
                 </div>
 
