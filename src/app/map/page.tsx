@@ -30,6 +30,7 @@ import {getMap2DTopViewSnapshot, getMap3DViewSnapshot, type MapViewMode,} from '
 import {MapViewModeToggle} from '@/components/map/MapViewModeToggle';
 import {useMapEditTools} from '@/utils/map/useMapEditTools';
 import styles from './page.module.css';
+import CameraHelper from "@/utils/three/CamHelper";
 
 type DeviceType = 'desktop' | 'tablet' | 'mobile';
 
