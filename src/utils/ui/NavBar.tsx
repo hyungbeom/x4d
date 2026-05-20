@@ -524,21 +524,24 @@ export default function NavBar({
 
             <div className={`mobile-top-bar${compact ? ' mobile-top-bar--compact' : ''}${hideBottomNav ? ' mobile-top-bar--desktopVisible' : ''}`}>
                 <div className="mobile-top-bar__left">
-                    {hideBottomNav && logoSrc ? (
-                        <a
-                            href="#"
-                            className="mobile-top-bar__logo"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                setActiveIndexLocal(null);
-                                onLogoClick?.();
-                            }}
-                            aria-label="전체 보기로 이동"
-                        >
-                            <img src={logoSrc} alt="" />
-                        </a>
-                    ) : null}
-                    {autoToggleButton}
+                    {onAutoTourToggle
+                        ? autoToggleButton
+                        : hideBottomNav && logoSrc
+                          ? (
+                                <a
+                                    href="#"
+                                    className="mobile-top-bar__logo"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setActiveIndexLocal(null);
+                                        onLogoClick?.();
+                                    }}
+                                    aria-label="전체 보기로 이동"
+                                >
+                                    <img src={logoSrc} alt="" />
+                                </a>
+                            )
+                          : null}
                 </div>
 
                 <div className="mobile-top-bar__center">

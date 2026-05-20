@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect, useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
-import ReactMarkdown from "react-markdown";
+import ChatAnswerContent from '@/components/chat/ChatAnswerContent';
+import { flushSseRemainder, parseSseBuffer } from '@/utils/prepareChatHtml';
 
 // 🌟 커스텀 훅: 화면 너비 감지
 function useWindowSize() {
@@ -40,21 +41,57 @@ export default function DynamicIsland({
     // 모바일/PC 반응형 크기 변수
     const fzTitle = isMobile ? '12px' : '16px';
     const fzText = isMobile ? '11px' : '15px';
-    const paddingIsland = isMobile ? '12px' : '25px';
+    const panelPadPx = isMobile ? 12 : 25;
+    const paddingIsland = `${panelPadPx}px`;
 
     const closedWidth = isInline ? '112px' : isMobile ? '110px' : '200px';
     const closedHeight = isInline ? '32px' : isMobile ? '32px' : '50px';
 
-    const openInputHeight = isMobile ? '200px' : '350px';
-    const openThinkingHeight = isMobile ? '110px' : '200px';
-    const openResultHeight = isMobile ? '250px' : '420px';
+    /** 입력·답변 영역 1줄 높이 (font-size × line-height 1.5) */
+    const lineHeightPx = isMobile ? 18 : 24;
+    const panelLines = (collapsed: boolean) => (collapsed ? 5 : 12);
+    const collapseBarH = isMobile ? 18 : 22;
+    const panelGap = 6;
+    const inputFooterH = isMobile ? 50 : 76;
+    const resultActionH = isMobile ? 32 : 50;
+    const thinkingStatusH = isMobile ? 32 : 50;
+    const thinkingMsgH = isMobile ? 36 : 52;
+
+    const getTargetHeight = useCallback(
+        (m: typeof mode, collapsed: boolean) => {
+            const lines = panelLines(collapsed);
+            const textH = lines * lineHeightPx;
+            const chrome = panelPadPx * 2 + panelGap + collapseBarH;
+
+            if (m === 'input') {
+                return chrome + textH + inputFooterH;
+            }
+            if (m === 'thinking') {
+                return chrome + thinkingMsgH + (isMobile ? 8 : 15) + thinkingStatusH;
+            }
+            const resultGap = isMobile ? 6 : 10;
+            return chrome + textH + resultGap + resultActionH;
+        },
+        [
+            isMobile,
+            lineHeightPx,
+            panelPadPx,
+            collapseBarH,
+            panelGap,
+            inputFooterH,
+            resultActionH,
+            thinkingStatusH,
+            thinkingMsgH,
+        ],
+    );
 
     // 1. DOM Refs
     const islandRef = useRef<HTMLDivElement>(null);
     const initialContentRef = useRef<HTMLDivElement>(null);
     const chatPanelRef = useRef<HTMLDivElement>(null);
+    const chatContentRef = useRef<HTMLDivElement>(null);
 
-    const inputSectionRef = useRef<HTMLDivElement>(null);
+    const inputSectionRef = useRef<HTMLFormElement>(null);
     const thinkingSectionRef = useRef<HTMLDivElement>(null);
     const resultSectionRef = useRef<HTMLDivElement>(null);
 
@@ -63,6 +100,8 @@ export default function DynamicIsland({
 
     // 2. 상태(State) 관리
     const [isExpanded, setIsExpanded] = useState(false);
+    /** true = 5줄(기본), false = 12줄(펼침) */
+    const [isPanelCollapsed, setIsPanelCollapsed] = useState(true);
     /** inline: 상단 바 슬롯에 붙어 있는 상태 (닫힘 애니메이션 끝난 뒤만 true) */
     const [inlineDocked, setInlineDocked] = useState(true);
     const [mode, setMode] = useState<'input' | 'thinking' | 'result'>('input');
@@ -71,9 +110,10 @@ export default function DynamicIsland({
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // 🌟 백엔드 연동 관련 추가 상태
-    const [aiResponse, setAiResponse] = useState(""); // AI가 보내주는 실시간 텍스트 누적
+    const [aiResponse, setAiResponse] = useState(''); // AI가 보내주는 실시간 텍스트 누적
+    const [chatStreaming, setChatStreaming] = useState(false);
     const [companyId] = useState(companyIdProp);
-    const eventSourceRef = useRef<EventSource | null>(null); // 통신 객체 보관용
+    const chatAbortRef = useRef<AbortController | null>(null);
 
     const [chatId] = useState(() => Math.random().toString(36).substring(2, 12));
 
@@ -87,9 +127,7 @@ export default function DynamicIsland({
     useEffect(() => {
         return () => {
             if (resetCallRef.current) resetCallRef.current.kill();
-            if (eventSourceRef.current) {
-                eventSourceRef.current.close(); // 열려있는 통신 강제 종료
-            }
+            chatAbortRef.current?.abort();
             const nodes = [islandRef.current, initialContentRef.current, chatPanelRef.current, inputSectionRef.current, thinkingSectionRef.current, resultSectionRef.current, modalOverlayRef.current, modalContentRef.current].filter(Boolean);
             if (nodes.length) gsap.killTweensOf(nodes);
         };
@@ -126,9 +164,8 @@ export default function DynamicIsland({
         gsap.killTweensOf([island, initialContent, chatPanel]);
         if (resetCallRef.current) resetCallRef.current.kill();
 
-        const targetHeight =
-            mode === 'input' ? openInputHeight : mode === 'thinking' ? openThinkingHeight : openResultHeight;
-        const openWidth = Math.min(window.innerWidth * 0.9, 350);
+        const targetHeight = getTargetHeight(mode, isPanelCollapsed);
+        const openWidth = Math.min(window.innerWidth * 0.92, isMobile ? 400 : 420);
         const openTop = Math.max(12, 10);
 
         if (isExpanded) {
@@ -171,10 +208,8 @@ export default function DynamicIsland({
             gsap.to(chatPanel, { opacity: 1, duration: 0.3, delay: 0.35 });
         } else {
             // 🌟 아일랜드가 닫힐 때 통신 진행 중이라면 끊어주기
-            if (eventSourceRef.current) {
-                eventSourceRef.current.close();
-                eventSourceRef.current = null;
-            }
+            chatAbortRef.current?.abort();
+            chatAbortRef.current = null;
 
             gsap.to(chatPanel, { opacity: 0, duration: 0.2 });
 
@@ -214,13 +249,21 @@ export default function DynamicIsland({
 
             resetCallRef.current = gsap.delayedCall(0.6, () => {
                 setMode('input');
+                setIsPanelCollapsed(true);
                 setChatInput("");
                 setAiResponse(""); // 텍스트 초기화
                 gsap.set(inputSectionRef.current, { opacity: 1, y: 0 });
                 gsap.set([thinkingSectionRef.current, resultSectionRef.current], { opacity: 0, y: 10 });
             });
         }
-    }, [isExpanded, isMobile, isInline, closedWidth, closedHeight, mode, openInputHeight, openThinkingHeight, openResultHeight]);
+    }, [isExpanded, isMobile, isInline, closedWidth, closedHeight, mode, isPanelCollapsed, getTargetHeight]);
+
+    // 💡 [Effect 2b] 5줄 ↔ 12줄 높이 전환
+    useLayoutEffect(() => {
+        if (!islandRef.current || !isExpanded) return;
+        const h = getTargetHeight(mode, isPanelCollapsed);
+        gsap.to(islandRef.current, { height: h, duration: 0.35, ease: 'power3.out' });
+    }, [isPanelCollapsed, isExpanded, mode, getTargetHeight]);
 
     // 💡 [Effect 3] Mode 전환 애니메이션
     useEffect(() => {
@@ -232,20 +275,78 @@ export default function DynamicIsland({
 
         gsap.killTweensOf([islandRef.current, inputSectionRef.current, thinkingSectionRef.current, resultSectionRef.current]);
 
+        const h = getTargetHeight(mode, isPanelCollapsed);
+
         if (mode === 'input') {
-            gsap.to(islandRef.current, { height: openInputHeight, duration: 0.4, ease: "power3.out" });
+            gsap.to(islandRef.current, { height: h, duration: 0.4, ease: "power3.out" });
             gsap.to([thinkingSectionRef.current, resultSectionRef.current], { opacity: 0, y: 10, duration: 0.2 });
             gsap.to(inputSectionRef.current, { opacity: 1, y: 0, duration: 0.3, delay: 0.2 });
         } else if (mode === 'thinking') {
-            gsap.to(islandRef.current, { height: openThinkingHeight, duration: 0.4, ease: "power3.out" });
+            gsap.to(islandRef.current, { height: h, duration: 0.4, ease: "power3.out" });
             gsap.to([inputSectionRef.current, resultSectionRef.current], { opacity: 0, y: -10, duration: 0.2 });
             gsap.to(thinkingSectionRef.current, { opacity: 1, y: 0, duration: 0.3, delay: 0.2 });
         } else if (mode === 'result') {
-            gsap.to(islandRef.current, { height: openResultHeight, duration: 0.4, ease: "power3.out" });
+            gsap.to(islandRef.current, { height: h, duration: 0.4, ease: "power3.out" });
             gsap.to([inputSectionRef.current, thinkingSectionRef.current], { opacity: 0, y: -10, duration: 0.2 });
             gsap.to(resultSectionRef.current, { opacity: 1, y: 0, duration: 0.3, delay: 0.2 });
         }
-    }, [mode, isExpanded, isMobile]);
+    }, [mode, isExpanded, isPanelCollapsed, getTargetHeight]);
+
+    const togglePanelCollapsed = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsPanelCollapsed((v) => !v);
+    }, []);
+
+    const panelResizeToggle = (
+        <button
+            type="button"
+            aria-expanded={!isPanelCollapsed}
+            aria-label={isPanelCollapsed ? '채팅창 펼치기' : '채팅창 접기'}
+            onClick={togglePanelCollapsed}
+            style={{
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                width: '100%',
+                height: collapseBarH,
+                margin: 0,
+                padding: 0,
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+            }}
+        >
+            <span
+                style={{
+                    width: isMobile ? '28px' : '36px',
+                    height: '3px',
+                    borderRadius: '2px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                }}
+            />
+            <span
+                style={{
+                    color: 'rgba(255, 255, 255, 0.45)',
+                    fontSize: isMobile ? '9px' : '10px',
+                    fontWeight: 600,
+                    letterSpacing: '0.02em',
+                }}
+            >
+                {isPanelCollapsed ? '펼치기' : '접기'}
+            </span>
+            <span
+                style={{
+                    color: 'rgba(255, 255, 255, 0.55)',
+                    fontSize: isMobile ? '8px' : '9px',
+                    lineHeight: 1,
+                }}
+            >
+                {isPanelCollapsed ? '▼' : '▲'}
+            </span>
+        </button>
+    );
 
     // 💡 [Effect 4] 모달 창 열기/닫기 애니메이션
     useEffect(() => {
@@ -265,51 +366,101 @@ export default function DynamicIsland({
         }
     }, [isModalOpen]);
 
-    // 💡 [Event] Enter 키 동작 및 백엔드 연동 핵심 로직
+    const submitChat = useCallback(
+        (question: string) => {
+            setSubmittedMessage(question);
+            setMode('thinking');
+            setChatInput('');
+            setAiResponse('');
+            setChatStreaming(true);
+
+            chatAbortRef.current?.abort();
+            const abort = new AbortController();
+            chatAbortRef.current = abort;
+
+            const url = `/api/chat/${encodeURIComponent(companyId)}?message=${encodeURIComponent(question)}&chatId=${encodeURIComponent(chatId)}`;
+
+            void (async () => {
+                try {
+                    const res = await fetch(url, {
+                        signal: abort.signal,
+                        headers: { Accept: 'text/event-stream' },
+                    });
+
+                    if (!res.ok) {
+                        const errText = await res.text().catch(() => '');
+                        throw new Error(errText || `HTTP ${res.status}`);
+                    }
+
+                    const reader = res.body?.getReader();
+                    if (!reader) throw new Error('no stream');
+
+                    const decoder = new TextDecoder();
+                    let buffer = '';
+                    let gotChunk = false;
+                    const appendPayload = (payload: string) => {
+                        if (!payload || payload === '[DONE]') return;
+                        if (!gotChunk) {
+                            gotChunk = true;
+                            setMode('result');
+                        }
+                        setAiResponse((prev) => prev + payload);
+                    };
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+
+                        buffer += decoder.decode(value, { stream: true });
+                        buffer = parseSseBuffer(buffer, appendPayload);
+                    }
+
+                    flushSseRemainder(buffer, appendPayload);
+
+                    if (!gotChunk) {
+                        setMode('result');
+                        setAiResponse(
+                            'AI 서버가 빈 응답을 반환했습니다. 로컬 백엔드(8080)를 쓰는 경우 CHAT_API_BASE 또는 API 키 설정을 확인해 주세요.',
+                        );
+                    }
+                } catch (err) {
+                    if (abort.signal.aborted) return;
+                    setChatStreaming(false);
+                    setMode('result');
+                    setAiResponse(
+                        err instanceof Error && err.message
+                            ? `답변을 가져오지 못했습니다. (${err.message})`
+                            : '답변을 생성하는 도중 오류가 발생했습니다.',
+                    );
+                } finally {
+                    setChatStreaming(false);
+                    if (chatAbortRef.current === abort) {
+                        chatAbortRef.current = null;
+                    }
+                }
+            })();
+        },
+        [chatId, companyId],
+    );
+
+    const handleChatSubmit = useCallback(
+        (e: React.FormEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const question = chatInput.trim();
+            if (!question) return;
+            submitChat(question);
+        },
+        [chatInput, submitChat],
+    );
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            if (!chatInput.trim()) return;
-
+            e.stopPropagation();
             const question = chatInput.trim();
-            setSubmittedMessage(question);
-            setMode('result');
-            setChatInput("");
-            setAiResponse(""); // 이전 답변 초기화
-
-            // 기존에 연결된 SSE가 있다면 종료
-            if (eventSourceRef.current) {
-                eventSourceRef.current.close();
-            }
-
-            // 🌟 백엔드 API 연결
-            // const url = `https://promote.co.kr/api/chat/${companyId}?message=${encodeURIComponent(question)}&chatId=${chatId}`;
-            const url = `http://localhost:8080/api/chat/${companyId}?message=${encodeURIComponent(question)}&chatId=${chatId}`;
-            const eventSource = new EventSource(url);
-            eventSourceRef.current = eventSource;
-
-            let isFirstMessage = true;
-
-            // 서버에서 글자가 한 글자씩 날아올 때마다 실행됨
-            eventSource.onmessage = (event) => {
-                if (isFirstMessage) {
-                    setMode('result'); // 첫 글자가 오면 결과창 모드로 부드럽게 전환!
-                    isFirstMessage = false;
-                }
-                setAiResponse((prev) => prev + event.data);
-            };
-
-            // 서버 통신이 종료되거나 에러가 났을 때
-            eventSource.onerror = (error) => {
-                eventSource.close();
-                eventSourceRef.current = null;
-
-                // 만약 에러로 끝났는데 아직 첫 글자도 못 받았다면 강제로 결과창 전환
-                if (isFirstMessage) {
-                    setMode('result');
-                    setAiResponse("답변을 생성하는 도중 오류가 발생했습니다.");
-                }
-            };
+            if (!question) return;
+            submitChat(question);
         }
     };
 
@@ -378,15 +529,61 @@ export default function DynamicIsland({
                 <div
                     ref={chatPanelRef}
                     style={{
-                        position: 'absolute', inset: 0, padding: paddingIsland,
-                        opacity: 0, pointerEvents: isExpanded ? 'auto' : 'none'
+                        position: 'absolute',
+                        inset: 0,
+                        padding: paddingIsland,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        opacity: 0,
+                        pointerEvents: isExpanded ? 'auto' : 'none',
+                        boxSizing: 'border-box',
                     }}
                 >
+                    <div
+                        ref={chatContentRef}
+                        style={{
+                            flex: 1,
+                            position: 'relative',
+                            minHeight: 0,
+                            overflow: 'hidden',
+                        }}
+                    >
                     {/* A. 입력 모드 */}
-                    <div ref={inputSectionRef} style={{ position: 'absolute', inset: paddingIsland, display: 'flex', flexDirection: 'column', pointerEvents: mode === 'input' ? 'auto' : 'none' }}>
+                    <form
+                        ref={inputSectionRef}
+                        onSubmit={handleChatSubmit}
+                        style={{
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            pointerEvents: mode === 'input' ? 'auto' : 'none',
+                            margin: 0,
+                        }}
+                    >
                         <textarea
-                            value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="Ask anything..."
-                            style={{ flex: 1, width: '100%', backgroundColor: 'transparent', border: 'none', color: '#fff', fontSize: fzTitle, outline: 'none', resize: 'none', fontFamily: 'inherit' }}
+                            value={chatInput}
+                            onChange={(e) => setChatInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Ask anything..."
+                            rows={panelLines(isPanelCollapsed)}
+                            style={{
+                                flex: '0 0 auto',
+                                width: '100%',
+                                height: panelLines(isPanelCollapsed) * lineHeightPx,
+                                minHeight: 5 * lineHeightPx,
+                                maxHeight: 12 * lineHeightPx,
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                color: '#fff',
+                                fontSize: fzTitle,
+                                lineHeight: 1.5,
+                                outline: 'none',
+                                resize: 'none',
+                                fontFamily: 'inherit',
+                                overflowY: 'auto',
+                                boxSizing: 'border-box',
+                            }}
                         />
                         <div style={{ display: 'flex', flexDirection: 'column', marginTop: 'auto', gap: isMobile ? '4px' : '8px' }}>
                             <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: isMobile ? '9px' : '13px', alignSelf: 'flex-end' }}>Press Enter</span>
@@ -394,10 +591,10 @@ export default function DynamicIsland({
                                 <span style={{ color: '#fff', fontSize: fzTitle, fontWeight: 600 }}>How can I guide you?</span>
                             </div>
                         </div>
-                    </div>
+                    </form>
 
                     {/* B. 생각 중 모드 (서버에 요청 후 응답이 올 때까지 대기) */}
-                    <div ref={thinkingSectionRef} style={{ position: 'absolute', inset: paddingIsland, display: 'flex', flexDirection: 'column', opacity: 0, transform: 'translateY(10px)', pointerEvents: mode === 'thinking' ? 'auto' : 'none', gap: isMobile ? '8px' : '15px' }}>
+                    <div ref={thinkingSectionRef} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', opacity: 0, transform: 'translateY(10px)', pointerEvents: mode === 'thinking' ? 'auto' : 'none', gap: isMobile ? '8px' : '15px' }}>
                         <div style={{ flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: isMobile ? '12px' : '20px', padding: isMobile ? '8px 12px' : '15px 20px', display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '15px' }}>
                             <div style={{ width: isMobile ? '10px' : '14px', height: isMobile ? '10px' : '14px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.2)', flexShrink: 0 }} />
                             <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: fzText, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{submittedMessage}</span>
@@ -408,11 +605,25 @@ export default function DynamicIsland({
                     </div>
 
                     {/* C. 결과 모드 — 질문 + 답변 */}
-                    <div ref={resultSectionRef} style={{ position: 'absolute', inset: paddingIsland, display: 'flex', flexDirection: 'column', opacity: 0, transform: 'translateY(10px)', pointerEvents: mode === 'result' ? 'auto' : 'none', gap: isMobile ? '6px' : '10px' }}>
-                        <div style={{ flex: 1, backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: isMobile ? '12px' : '20px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: isMobile ? '12px' : '20px', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', minHeight: 0 }}>
+                    <div ref={resultSectionRef} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', minHeight: 0, opacity: 0, transform: 'translateY(10px)', pointerEvents: mode === 'result' ? 'auto' : 'none', gap: isMobile ? '6px' : '10px' }}>
+                        <div style={{ flex: 1, minHeight: 0, backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: isMobile ? '12px' : '20px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: isMobile ? '12px' : '20px', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
                             <div onClick={() => setIsExpanded(false)} style={{ position: 'absolute', top: isMobile ? '10px' : '15px', right: isMobile ? '10px' : '15px', color: '#888', cursor: 'pointer', fontSize: isMobile ? '10px' : '14px' }}>✕</div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '10px' : '14px', overflowY: 'auto', flex: 1, minHeight: 0, paddingRight: '10px', paddingTop: isMobile ? '4px' : '8px' }}>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: isMobile ? '10px' : '14px',
+                                    overflowY: 'auto',
+                                    flex: 1,
+                                    minHeight: 5 * lineHeightPx,
+                                    maxHeight: 12 * lineHeightPx,
+                                    height: panelLines(isPanelCollapsed) * lineHeightPx,
+                                    paddingRight: '10px',
+                                    paddingTop: isMobile ? '4px' : '8px',
+                                    boxSizing: 'border-box',
+                                }}
+                            >
                                 {submittedMessage ? (
                                     <p
                                         style={{
@@ -426,55 +637,7 @@ export default function DynamicIsland({
                                         {submittedMessage}
                                     </p>
                                 ) : null}
-                                <div style={{ margin: 0, color: "#fff", fontSize: "14px", lineHeight: 1.55, whiteSpace: "pre-wrap" }}>
-
-
-                                    <ReactMarkdown
-                                        components={{
-                                            // ... a 태그 가로채는 코드 ...
-                                            a: ({ node, ...props }) => (
-                                                <a
-                                                    {...props}
-                                                    style={{
-                                                        display: 'block',
-
-                                                        backgroundColor: '#10b981', // 쨍한 초록색 버튼
-                                                        color: '#ffffff',           // 글자색은 흰색
-                                                        padding: '10px 15px',       // 버튼 상하좌우 여유 공간
-                                                        borderRadius: '8px',        // 모서리 둥글게
-                                                        textDecoration: 'none',     // 밑줄 강제 제거
-                                                        fontWeight: 'bold',         // 글자 굵게
-                                                        marginTop: '15px',          // 위쪽 텍스트와 간격 벌리기
-                                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)', // 입체감 있는 그림자
-                                                        cursor: 'pointer'           // 마우스 올리면 손가락 모양
-                                                    }}
-                                                />
-                                            ),
-                                            // 🌟 여기를 수정합니다! 마크다운 안의 이미지(img) 태그 가로채기
-                                            img: ({ node, ...props }) => (
-                                                <img
-                                                    {...props}
-                                                    style={{
-                                                        // ❌ 기존: maxWidth: '100%',
-                                                        // ⭕ 수정 후: 15px 크기로 아주 작게 고정!
-                                                        width: '100px',
-                                                        // height: '50px', // 정사각형 형태로 고정 (비율이 안 맞으면 찌그러질 수 있으니 주의!)
-                                                        display: 'block',
-                                                        // 만약 원본 비율을 유지하면서 가로 크기만 15px로 고정하고 싶다면 height: 'auto' 로 하세요.
-                                                        // width: '15px',
-                                                        // height: 'auto',
-
-                                                        borderRadius: '2px', // 아주 작은 크기에 맞게 둥근 모서리도 살짝
-                                                        marginRight: '5px', // 혹시 옆에 텍스트가 붙을 경우를 위해 살짝 간격
-                                                        verticalAlign: 'middle' // 텍스트와 줄 바꿈이 맞게
-                                                    }}
-                                                />
-                                            )
-                                        }}
-                                    >
-                                        {aiResponse}
-                                    </ReactMarkdown>
-                                </div>
+                                <ChatAnswerContent raw={aiResponse} streaming={chatStreaming} />
                             </div>
                         </div>
                         {/* 다시 질문하기 버튼 */}
@@ -482,6 +645,8 @@ export default function DynamicIsland({
                             <span style={{ color: '#fff', fontSize: isMobile ? '11px' : '14px', fontWeight: 600 }}>다른 질문하기</span>
                         </div>
                     </div>
+                    </div>
+                    {panelResizeToggle}
                 </div>
             </div>
 

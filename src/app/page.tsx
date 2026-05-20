@@ -337,7 +337,6 @@ function HomeContent() {
                     {intro && (
                         <div className={styles.homeUi}>
                             <NavBar
-                                logoSrc="/logo.svg"
                                 menus={navMenus}
                                 compact
                                 hideBottomNav
