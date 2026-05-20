@@ -283,7 +283,8 @@ export default function DynamicIsland({
             }
 
             // 🌟 백엔드 API 연결
-            const url = `http://localhost:8080/api/chat/${companyId}?message=${encodeURIComponent(question)}&chatId=${chatId}`;
+            const url = `https://promote.co.kr:8080/api/chat/${companyId}?message=${encodeURIComponent(question)}&chatId=${chatId}`;
+            // const url = `http://localhost:8080/api/chat/${companyId}?message=${encodeURIComponent(question)}&chatId=${chatId}`;
             const eventSource = new EventSource(url);
             eventSourceRef.current = eventSource;
 
@@ -425,15 +426,9 @@ export default function DynamicIsland({
                                         {submittedMessage}
                                     </p>
                                 ) : null}
-                                <p
-                                    style={{
-                                        margin: 0,
-                                        color: '#fff',
-                                        fontSize: isMobile ? '12px' : '14px',
-                                        lineHeight: 1.55,
-                                        whiteSpace: 'pre-wrap',
-                                    }}
-                                >
+                                <div style={{ margin: 0, color: "#fff", fontSize: "14px", lineHeight: 1.55, whiteSpace: "pre-wrap" }}>
+
+
                                     <ReactMarkdown
                                         components={{
                                             // ... a 태그 가로채는 코드 ...
@@ -479,7 +474,7 @@ export default function DynamicIsland({
                                     >
                                         {aiResponse}
                                     </ReactMarkdown>
-                                </p>
+                                </div>
                             </div>
                         </div>
                         {/* 다시 질문하기 버튼 */}
