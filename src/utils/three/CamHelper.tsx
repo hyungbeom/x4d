@@ -52,6 +52,7 @@ export default function CameraHelper({
         copyBtn.style.borderRadius = '4px';
         copyBtn.style.fontWeight = 'bold';
 
+        
         // 복사 버튼 클릭 이벤트
         copyBtn.onclick = () => {
             const textToCopy = textDiv.dataset.copyString;
