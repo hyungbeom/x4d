@@ -283,7 +283,7 @@ export default function DynamicIsland({
             }
 
             // 🌟 백엔드 API 연결
-            const url = `http://promote.co.kr/api/chat/${companyId}?message=${encodeURIComponent(question)}&chatId=${chatId}`;
+            const url = `https://promote.co.kr/api/chat/${companyId}?message=${encodeURIComponent(question)}&chatId=${chatId}`;
             // const url = `http://localhost:8080/api/chat/${companyId}?message=${encodeURIComponent(question)}&chatId=${chatId}`;
             const eventSource = new EventSource(url);
             eventSourceRef.current = eventSource;
