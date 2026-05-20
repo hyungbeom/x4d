@@ -240,7 +240,7 @@ export default function GemmaBrochurePage() {
             ) : null}
 
             <div className={styles.brochureUi} aria-hidden={!entryDone}>
-                <GemmaSpecModal ref={specModalRef} visible={entryDone && !detailViewActive} />
+                <GemmaSpecModal ref={specModalRef} visible={entryDone} />
                 {entryDone && detailViewActive ? (
                     <NavBar
                         logoSrc={GEMMA_LOGO}

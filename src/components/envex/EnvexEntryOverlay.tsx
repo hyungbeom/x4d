@@ -251,8 +251,23 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
                         </p>
                     </div>
 
-                    <ul className={styles.brochurePartners} aria-label="참가사 브로슈어">
-                        {ENVEX_BROCHURE_PARTNERS.map((partner) => (
+                    <div className={styles.startBtnContainer}>
+                        <button
+                            ref={startBtnRef}
+                            type="button"
+                            className={styles.startBtn}
+                            onClick={handleStart}
+                        >
+                            <span className={styles.startBtnLabel}>Explore the 2026 Envex</span>
+                            <span className={styles.startBtnChevron} aria-hidden="true">
+                                &gt;
+                            </span>
+                        </button>
+                    </div>
+
+                    <div className={styles.introBottomDock}>
+                        <ul className={styles.brochurePartners} aria-label="참가사 브로슈어">
+                            {ENVEX_BROCHURE_PARTNERS.map((partner) => (
                             <li key={partner.id} className={styles.partnerCard}>
                                 <div className={styles.partnerLogoWrap}>
                                     {partner.logoSrc ? (
@@ -273,22 +288,9 @@ export default function EnvexEntryOverlay({ viewportRef, onReveal }: EnvexEntryO
                                 >
                                     방문하기
                                 </button>
-                            </li>
-                        ))}
-                    </ul>
-
-                    <div className={styles.startBtnContainer}>
-                        <button
-                            ref={startBtnRef}
-                            type="button"
-                            className={styles.startBtn}
-                            onClick={handleStart}
-                        >
-                            <span className={styles.startBtnLabel}>Explore the 2026 Envex</span>
-                            <span className={styles.startBtnChevron} aria-hidden="true">
-                                &gt;
-                            </span>
-                        </button>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
             </div>
